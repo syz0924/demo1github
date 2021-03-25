@@ -1,0 +1,6 @@
+package com.lovdmx.control.mapper;
+
+import com.lovdmx.control.pojo.Err;
+
+public interface ErrMapper extends BaseMapper<Err> {
+}

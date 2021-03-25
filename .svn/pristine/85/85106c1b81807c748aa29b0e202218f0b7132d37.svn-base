@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.RelayTasksMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.RelayTasks">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="week_id" property="weekId" jdbcType="INTEGER" />
+		<result column="relay_id" property="relayId" jdbcType="INTEGER" />
+		<result column="delay_time" property="delayTime" jdbcType="INTEGER" />
+		<result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+		<result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, week_id, relay_id,delay_time, start_time, end_time
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from ea_relay_tasks
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+	<select id="findByRelayId" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from ea_relay_tasks
+		where relay_id = #{relayId,jdbcType=INTEGER}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		ea_relay_tasks
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id"
+		parameterType="java.util.List">
+		insert into ea_relay_tasks
+		(week_id,relay_id,delay_time,start_time,end_time)
+		values
+		<if test="list !=null">
+			<foreach collection="list" item="item" separator="," close=";">
+				(#{item.weekId},#{item.relayId},#{item.delayTime},#{item.startTime},#{item.endTime})
+			</foreach>
+		</if>
+	</insert>
+
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.RelayTasks">
+		insert into ea_relay_tasks
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="weekId != null">
+				week_id,
+			</if>
+			<if test="relayId != null">
+				relay_id,
+			</if>
+			<if test="delayTime != null">
+				delay_time,
+			</if>
+			<if test="startTime != null">
+				start_time,
+			</if>
+			<if test="endTime != null">
+				end_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="weekId != null">
+				#{weekId,jdbcType=INTEGER},
+			</if>
+			<if test="relayId != null">
+				#{relayId,jdbcType=INTEGER},
+			</if>
+			<if test="relayId != null">
+				#{relayId,jdbcType=INTEGER},
+			</if>
+			<if test="delayTime != null">
+				#{delayTime,jdbcType=INTEGER},
+			</if>
+			<if test="startTime != null">
+				#{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				#{endTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.RelayTasks">
+		update ea_relay_tasks
+		<set>
+			<if test="weekId != null">
+				week_id = #{weekId,jdbcType=INTEGER},
+			</if>
+			<if test="relayId != null">
+				relay_id = #{relayId,jdbcType=INTEGER},
+			</if>
+			<if test="delayTime != null">
+				delay_time = #{delayTime,jdbcType=INTEGER},
+			</if>
+			<if test="startTime != null">
+				start_time = #{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				end_time = #{endTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

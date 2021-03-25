@@ -1,0 +1,6 @@
+package com.lovdmx.control.mapper;
+
+import com.lovdmx.control.pojo.EdlmxSplit;
+
+public interface EdlmxSplitMapper extends BaseMapper<EdlmxSplit>{
+}

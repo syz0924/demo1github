@@ -1,0 +1,35 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.RelayMapper;
+import com.lovdmx.control.pojo.Relay;
+import com.lovdmx.control.service.RelayService;
+
+@Service("relayService")
+public class RelayServiceImpl extends BaseServiceImpl<Relay> implements RelayService {
+
+	@Autowired
+	private RelayMapper relayMapper;
+
+	@Override
+	public List<Relay> findByGatewayMac(String gatewayMac) {
+		// TODO Auto-generated method stub
+		return relayMapper.findByGatewayMac(gatewayMac);
+	}
+
+	@Override
+	public List<Relay> findGrouprs485toNetIpBygatewayMac(String gatewayMac) {
+		// TODO Auto-generated method stub
+		return relayMapper.findGrouprs485toNetIpBygatewayMac(gatewayMac);
+	}
+
+	@Override
+	public List<Relay> findByGatewayMacAndRs485toNetIp(String gatewayMac, String rs485toNetIp) {
+		// TODO Auto-generated method stub
+		return relayMapper.findByGatewayMacAndRs485toNetIp(gatewayMac, rs485toNetIp);
+	}
+}

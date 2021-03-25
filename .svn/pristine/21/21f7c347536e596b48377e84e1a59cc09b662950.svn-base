@@ -1,0 +1,29 @@
+package com.lovdmx.control.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.lovdmx.control.pojo.RtrDevice;
+
+public interface RtrDeviceMapper extends BaseMapper<RtrDevice> {
+
+	/**
+	 * 
+	 * @Function: RtrDeviceMapper.java
+	 * @Description: 根据父类ID获取所有RTR服务器信息
+	 *
+	 * @param:parentId 父类ID
+	 * @return：List<RtrDevice>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月21日 下午4:46:23
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月21日 Administrator v1.0.0 修改原因
+	 */
+	List<RtrDevice> findByParentId(@Param("parentId") Integer parentId);
+}

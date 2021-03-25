@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.WeekMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.Week">
+		<id column="w_id" property="wId" jdbcType="INTEGER" />
+		<result column="w_week" property="wWeek" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		w_id, w_week
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from date_week
+		where w_id = #{wId,jdbcType=INTEGER}
+	</select>
+	<select id="findAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from date_week
+	</select>
+	<select id="findRelayNotExistsWeekByRelayId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from date_week WHERE NOT FIND_IN_SET( w_id , (select
+		GROUP_CONCAT(week_id separator ',') from ea_relay_tasks where
+		relay_id=#{relayId}))
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		date_week
+		where w_id = #{wId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.Week">
+		insert into date_week
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="wId != null">
+				w_id,
+			</if>
+			<if test="wWeek != null">
+				w_week,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="wId != null">
+				#{wId,jdbcType=INTEGER},
+			</if>
+			<if test="wWeek != null">
+				#{wWeek,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.Week">
+		update date_week
+		<set>
+			<if test="wWeek != null">
+				w_week = #{wWeek,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where w_id = #{wId,jdbcType=INTEGER}
+	</update>
+</mapper>

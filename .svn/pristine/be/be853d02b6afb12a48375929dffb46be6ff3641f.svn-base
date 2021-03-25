@@ -1,0 +1,43 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.lovdmx.control.mapper.Dmx512DeviceMapper;
+import com.lovdmx.control.pojo.Dmx512Device;
+import com.lovdmx.control.service.Dmx512DeviceService;
+
+@Service("dmx512DeviceService")
+public class Dmx512DeviceServiceImpl extends BaseServiceImpl<Dmx512Device> implements Dmx512DeviceService {
+
+	@Autowired
+	private Dmx512DeviceMapper dmx512DeviceMapper;
+
+	@Override
+	public List<Dmx512Device> findByParentMac(String rtrMac) {
+		return dmx512DeviceMapper.findByParentMac(rtrMac);
+	}
+
+	@Override
+	public Integer batchInsert(List<Dmx512Device> list) {
+		// TODO Auto-generated method stub
+		return dmx512DeviceMapper.batchInsert(list);
+	}
+
+	@Override
+	public PageInfo<Dmx512Device> queryPageListByWhereRtrMac(Dmx512Device dmx512Device, Integer pageNo, Integer rows) {
+		// 设置分页参数
+		if (pageNo == null || "".equals(pageNo)) {
+			pageNo = 1;
+		}
+		PageHelper.startPage(pageNo, rows);
+		List<Dmx512Device> list = this.dmx512DeviceMapper.findByParentMac(dmx512Device.getRtrMac());
+
+		PageInfo<Dmx512Device> pageInfo = new PageInfo<Dmx512Device>(list);
+		return pageInfo;
+	}
+}

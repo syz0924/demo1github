@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.TasksMapper">
+	<resultMap id="BaseResultMap"
+		type="com.lovdmx.control.pojo.Tasks">
+		<id column="task_id" property="taskId" jdbcType="INTEGER" />
+		<result column="subtask_ids" property="subtaskIds"
+			jdbcType="VARCHAR" />
+		<result column="subtask_names" property="subtaskNames"
+			jdbcType="VARCHAR" />
+		<result column="task_name" property="taskName"
+			jdbcType="VARCHAR" />
+		<result column="task_md5" property="taskMd5" jdbcType="VARCHAR" />
+		<result column="task_type" property="taskType"
+			jdbcType="VARCHAR" />
+		<result column="cyclic_mode" property="cyclicMode"
+			jdbcType="CHAR" />
+		<result column="cyclic_date" property="cyclicDate"
+			jdbcType="VARCHAR" />
+		<result column="project_id" property="projectId"
+			jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="start_date" property="startDate"
+			jdbcType="TIMESTAMP" />
+		<result column="end_date" property="endDate"
+			jdbcType="TIMESTAMP" />
+		<result column="start_time" property="startTime"
+			jdbcType="TIMESTAMP" />
+		<result column="end_time" property="endTime"
+			jdbcType="TIMESTAMP" />
+		<result column="create_time" property="createTime"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		task_id, subtask_ids, task_name,task_md5, task_type,
+		cyclic_mode,
+		cyclic_date,
+		project_id,status,
+		start_date, end_date,
+		start_time,
+		end_time,
+		create_time
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_tasks
+		where task_id = #{taskId,jdbcType=INTEGER}
+	</select>
+	<select id="findByProjectId" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select task_id, subtask_ids, task_name,task_md5,
+		task_type,
+		cyclic_mode,
+		cyclic_date,
+		project_id,status,
+		start_date,
+		end_date,
+		start_time,
+		end_time,
+		create_time,
+		(select
+		GROUP_CONCAT(subtask_name
+		order by
+		FIND_IN_SET(subtask_id,subtask_ids))
+		from dev_subtasks where
+		FIND_IN_SET(subtask_id,subtask_ids))subtask_names
+		from dev_tasks
+		where
+		project_id = #{projectId};
+	</select>
+
+	<select id="findByProjectIdAndTaskMd5" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_tasks
+		where project_id = #{projectId,jdbcType=INTEGER} and
+		task_md5=#{taskMd5}
+	</select>
+
+	<select id="findByProjectIdAndTaskName"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_tasks
+		where project_id = #{projectId,jdbcType=INTEGER} and
+		task_name=#{taskName}
+	</select>
+
+	<select id="findCountByProjectId"
+		parameterType="java.lang.Integer" resultType="Integer">
+		select
+		count(1)
+		from
+		dev_tasks
+		where project_id =
+		#{projectId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findTaskIdByTaskMd5List">
+		select GROUP_CONCAT(task_id separator ',') FROM from
+		dev_tasks
+		where
+		task_md5 in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="findTaskListByTaskMd5List" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_tasks
+		where
+		task_md5 in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="findByOrTasks"
+		parameterType="com.lovdmx.control.pojo.Tasks"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_tasks
+		<where>
+			<if test="projectId != null and projectId != ''">
+				AND project_id =#{projectId}
+			</if>
+			<if test="taskName != null and taskName != ''">
+				AND task_name LIKE
+				CONCAT(CONCAT('%',#{taskName},'%'))
+			</if>
+			<if test="taskTypeId != null">
+				and task_type = #{taskTypeId}
+			</if>
+			<if test="cyclicModeId != null">
+				and cyclic_mode = #{cyclicModeId}
+			</if>
+			<if test="startTime !=null">
+				and DATE_FORMAT(start_time,'%H:%i:%s')  <![CDATA[>=]]>
+				DATE_FORMAT(#{startTime},'%H:%i:%s')
+			</if>
+			<if test="endTime !=null">
+				and DATE_FORMAT(end_time,'%H:%i:%s') <![CDATA[<=]]>
+				DATE_FORMAT(#{endTime},'%H:%i:%s')
+			</if>
+		</where>
+		order by task_id desc
+	</select>
+
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		delete from
+		dev_tasks
+		where task_id =
+		#{taskId,jdbcType=INTEGER}
+	</delete>
+
+	<delete id="batchDeleteByTaskMd5List">
+		delete from
+		dev_tasks
+		where task_md5 in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<insert id="insert"
+		parameterType="com.lovdmx.control.pojo.Tasks" useGeneratedKeys="true"
+		keyProperty="taskId">
+		insert into dev_tasks
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="taskId != null">
+				task_id,
+			</if>
+			<if test="subtaskIds != null">
+				subtask_ids,
+			</if>
+			<if test="taskName != null">
+				task_name,
+			</if>
+			<if test="taskMd5 != null">
+				task_md5,
+			</if>
+			<if test="taskType != null">
+				task_type,
+			</if>
+			<if test="cyclicMode != null">
+				cyclic_mode,
+			</if>
+			<if test="cyclicDate != null">
+				cyclic_date,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="startDate != null">
+				start_date,
+			</if>
+			<if test="endDate != null">
+				end_date,
+			</if>
+			<if test="startTime != null">
+				start_time,
+			</if>
+			<if test="endTime != null">
+				end_time,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="taskId != null">
+				#{taskId,jdbcType=INTEGER},
+			</if>
+			<if test="subtaskIds != null">
+				#{subtaskIds,jdbcType=VARCHAR},
+			</if>
+			<if test="taskName != null">
+				#{taskName,jdbcType=VARCHAR},
+			</if>
+			<if test="taskMd5 != null">
+				#{taskMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="taskType != null">
+				#{taskType,jdbcType=VARCHAR},
+			</if>
+			<if test="cyclicMode != null">
+				#{cyclicMode,jdbcType=CHAR},
+			</if>
+			<if test="cyclicDate != null">
+				#{cyclicDate,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=INTEGER},
+			</if>
+			<if test="startDate != null">
+				#{startDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endDate != null">
+				#{endDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="startTime != null">
+				#{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				#{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="update"
+		parameterType="com.lovdmx.control.pojo.Tasks">
+		update dev_tasks
+		<set>
+			<if test="subtaskIds != null">
+				subtask_ids = #{subtaskIds,jdbcType=VARCHAR},
+			</if>
+			<if test="taskName != null">
+				task_name = #{taskName,jdbcType=VARCHAR},
+			</if>
+			<if test="taskMd5 != null">
+				task_md5 = #{taskMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="taskType != null">
+				task_type = #{taskType,jdbcType=VARCHAR},
+			</if>
+			<if test="cyclicMode != null">
+				cyclic_mode = #{cyclicMode,jdbcType=CHAR},
+			</if>
+			<if test="cyclicDate != null">
+				cyclic_date = #{cyclicDate,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			<if test="startDate != null">
+				start_date = #{startDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endDate != null">
+				end_date = #{endDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="startTime != null">
+				start_time = #{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				end_time = #{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where task_id = #{taskId,jdbcType=INTEGER}
+	</update>
+
+
+	<update id="updateStatusByTaskMd5"
+		parameterType="com.lovdmx.control.pojo.Tasks">
+		update dev_tasks
+		<set>
+			<if test="subtaskIds != null">
+				subtask_ids = #{subtaskIds,jdbcType=VARCHAR},
+			</if>
+			<if test="taskName != null">
+				task_name = #{taskName,jdbcType=VARCHAR},
+			</if>
+			<if test="taskType != null">
+				task_type = #{taskType,jdbcType=VARCHAR},
+			</if>
+			<if test="cyclicMode != null">
+				cyclic_mode = #{cyclicMode,jdbcType=CHAR},
+			</if>
+			<if test="cyclicDate != null">
+				cyclic_date = #{cyclicDate,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			<if test="startDate != null">
+				start_date = #{startDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endDate != null">
+				end_date = #{endDate,jdbcType=TIMESTAMP},
+			</if>
+			<if test="startTime != null">
+				start_time = #{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				end_time = #{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where task_md5 = #{taskMd5,jdbcType=VARCHAR}
+	</update>
+
+	<update id="updateAllStatusByProjectIdAndStatus">
+		update
+		dev_tasks set
+		status =
+		#{status,jdbcType=INTEGER},
+		where project_id =
+		#{projectId,jdbcType=INTEGER}
+	</update>
+
+</mapper>

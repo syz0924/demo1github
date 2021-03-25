@@ -1,0 +1,10 @@
+package com.lovdmx.control.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.pojo.RackDevice;
+import com.lovdmx.control.service.RackDeviceService;
+
+@Service("rackDeviceService")
+public class RackDeviceServiceImpl extends BaseServiceImpl<RackDevice> implements RackDeviceService {
+}

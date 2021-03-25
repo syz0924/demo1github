@@ -1,0 +1,6 @@
+package com.lovdmx.control.service;
+
+import com.lovdmx.control.pojo.Project;
+
+public interface ProjectService extends BaseService<Project>{
+}

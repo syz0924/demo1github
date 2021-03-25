@@ -1,0 +1,12 @@
+package com.lovdmx.control.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.pojo.IntelligentGateway;
+import com.lovdmx.control.service.IntelligentGatewayService;
+
+@Service("intelligentGatewayService")
+public class IntelligentGatewayServiceImpl extends BaseServiceImpl<IntelligentGateway>
+		implements IntelligentGatewayService {
+
+}

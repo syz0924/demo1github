@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.SpriteEdlmxMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.SpriteEdlmx">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="sprite_mac" property="spriteMac" jdbcType="CHAR" />
+		<result column="newlmx_name" property="newlmxName" jdbcType="VARCHAR" />
+		<result column="orglmx_md5" property="orglmxMd5" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, sprite_mac, newlmx_name,orglmx_md5
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_sprite_edlmx
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		dev_sprite_edlmx
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.SpriteEdlmx">
+		insert into dev_sprite_edlmx
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="spriteMac != null">
+				sprite_mac,
+			</if>
+			<if test="newlmxName != null">
+				newlmx_name,
+			</if>
+			<if test="newlmxMd5 != null">
+				newlmx_md5,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="spriteMac != null">
+				#{spriteMac,jdbcType=CHAR},
+			</if>
+			<if test="newlmxName != null">
+				#{newlmxName,jdbcType=VARCHAR},
+			</if>
+			<if test="orglmxMd5 != null">
+				#{orglmxMd5,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.SpriteEdlmx">
+		update dev_sprite_edlmx
+		<set>
+			<if test="spriteMac != null">
+				sprite_mac = #{spriteMac,jdbcType=CHAR},
+			</if>
+			<if test="newlmxName != null">
+				newlmx_name = #{newlmxName,jdbcType=VARCHAR},
+			</if>
+			<if test="orglmxMd5 != null">
+				orglmx_md5 = #{orglmxMd5,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

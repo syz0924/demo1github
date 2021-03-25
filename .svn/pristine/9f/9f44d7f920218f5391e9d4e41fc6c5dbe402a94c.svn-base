@@ -1,0 +1,78 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.thread 
+ * @author: Administrator   
+ * @date: 2019年2月21日 下午4:08:45 
+ */
+package com.lovdmx.control.common.thread;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.socket.WebSocket;
+import com.lovdmx.control.pojo.Project;
+import com.lovdmx.control.service.ProjectService;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RealTimeDeviceInfoThread.java
+ * @Description:线程,发送最新设备信息（每隔十秒）
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月21日 下午4:08:45
+ *
+ */
+public class RealTimeDeviceInfoThread implements Runnable {
+	// 项目
+	@Autowired
+	private ProjectService projectService;
+	// 启动线程
+	private boolean isOK = true;
+	// 项目ID
+	private Integer projectId;
+
+	private JSONObject jsonObject = new JSONObject();
+
+	public void setOK(boolean isOK) {
+		this.isOK = isOK;
+	}
+
+	/**
+	 * @Function: RealTimeDeviceInfoThread.java
+	 * @Description: 构造函数
+	 *
+	 * @param:参数描述
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年2月21日 下午4:11:47
+	 */
+	public RealTimeDeviceInfoThread(Integer projectId, ProjectService projectService) {
+		super();
+		this.projectId = projectId;
+		this.projectService = projectService;
+	}
+
+	@Override
+	public void run() {
+		try {
+			// 标识
+			jsonObject.put("opCode", 1111);
+			while (isOK) {
+				// 根据项目ID获取 所有机架信息
+				Project projectDeviceInfo = projectService.findProjectCentreAllDeviceInfo(projectId);
+				jsonObject.put("dataJson", projectDeviceInfo);
+				String jsonString = jsonObject.toJSONString();
+				WebSocket.sendDataInfo(jsonString);
+				WebSocket.datJson = jsonString;
+				// 休眠10秒
+				Thread.sleep(1000 * 10);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+}

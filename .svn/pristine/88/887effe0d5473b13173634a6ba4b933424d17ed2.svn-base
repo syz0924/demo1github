@@ -1,0 +1,172 @@
+package com.lovdmx.control.pojo;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+import com.lovdmx.control.vo.CurrentVo;
+import com.lovdmx.control.vo.VoltageVo;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RackDevice.java
+ * @Description: 小型服务器机架表
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月15日 上午10:39:30
+ *
+ */
+public class RackDevice implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 3299563032155639859L;
+	// 编号
+	private Integer rackId;
+	// 机架编号
+	private Integer rackIndex;
+	// 机架名称
+	private String rackName;
+	// 项目ID
+	private Integer projectId;
+	// 实时电流
+	private Integer current;
+	// 实时电压
+	private Integer voltage;
+	// 创建时间
+	private Date createTime;
+	// 更新时间
+	private Date modifyTime;
+	// RTR服务器集合信息(子类)
+	private List<RtrDevice> sonRtrDeviceList;
+	// 录放精灵集合信息(子类)
+	private List<SpriteDevice> sonSpriteDeviceList;
+	// 电流对象
+	private CurrentVo currentVo;
+	// 电流对象
+	private VoltageVo voltageVo;
+
+	public RackDevice() {
+	}
+
+	/**
+	 * @Function: RackDevice.java
+	 * @Description: 该函数的功能描述
+	 *
+	 * @param:参数描述
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月28日 下午1:45:07
+	 */
+	public RackDevice(Integer rackIndex, String rackName, Integer projectId, Integer current, Integer voltage,
+			Date createTime) {
+		super();
+		this.rackIndex = rackIndex;
+		this.rackName = rackName;
+		this.projectId = projectId;
+		this.current = current;
+		this.voltage = voltage;
+		this.createTime = createTime;
+	}
+
+	public Integer getRackId() {
+		return rackId;
+	}
+
+	public void setRackId(Integer rackId) {
+		this.rackId = rackId;
+	}
+
+	public Integer getRackIndex() {
+		return rackIndex;
+	}
+
+	public void setRackIndex(Integer rackIndex) {
+		this.rackIndex = rackIndex;
+	}
+
+	public String getRackName() {
+		return rackName;
+	}
+
+	public void setRackName(String rackName) {
+		this.rackName = rackName == null ? null : rackName.trim();
+	}
+
+	public Integer getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
+	}
+
+	public List<RtrDevice> getSonRtrDeviceList() {
+		return sonRtrDeviceList;
+	}
+
+	public void setSonRtrDeviceList(List<RtrDevice> sonRtrDeviceList) {
+		this.sonRtrDeviceList = sonRtrDeviceList;
+	}
+
+	public List<SpriteDevice> getSonSpriteDeviceList() {
+		return sonSpriteDeviceList;
+	}
+
+	public void setSonSpriteDeviceList(List<SpriteDevice> sonSpriteDeviceList) {
+		this.sonSpriteDeviceList = sonSpriteDeviceList;
+	}
+
+	public Integer getCurrent() {
+		return current;
+	}
+
+	public void setCurrent(Integer current) {
+		this.current = current;
+	}
+
+	public Integer getVoltage() {
+		return voltage;
+	}
+
+	public void setVoltage(Integer voltage) {
+		this.voltage = voltage;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public CurrentVo getCurrentVo() {
+		if (currentVo == null)
+			this.currentVo = new CurrentVo();
+		return currentVo;
+	}
+
+	public void setCurrentVo(CurrentVo currentVo) {
+		this.currentVo = currentVo;
+	}
+
+	public VoltageVo getVoltageVo() {
+		if (voltageVo == null)
+			this.voltageVo = new VoltageVo();
+		return voltageVo;
+	}
+
+	public void setVoltageVo(VoltageVo voltageVo) {
+		this.voltageVo = voltageVo;
+	}
+
+	public Date getModifyTime() {
+		return modifyTime;
+	}
+
+	public void setModifyTime(Date modifyTime) {
+		this.modifyTime = modifyTime;
+	}
+}

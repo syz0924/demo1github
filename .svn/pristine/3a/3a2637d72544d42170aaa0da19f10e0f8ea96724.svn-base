@@ -1,0 +1,68 @@
+package com.lovdmx.control.service;
+
+import java.util.List;
+
+import com.lovdmx.control.pojo.Relay;
+
+public interface RelayService extends BaseService<Relay> {
+
+	/**
+	 * 
+	 * @Function: RelayService.java
+	 * @Description: 根据网关MAC 获取 所有继电器信息
+	 *
+	 * @param:gatewayMac 网关MAC
+	 * @return：List<Relay>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月14日 上午11:00:11
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年5月14日 Administrator v1.0.0 修改原因
+	 */
+	List<Relay> findByGatewayMac(String gatewayMac);
+
+	/**
+	 * 
+	 * @Function: RelayService.java
+	 * @Description: 根据网关MAC 分组 rs485toNetIp
+	 *
+	 * @param:gatewayMac 网关MAC
+	 * @return：List<Relay>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月14日 上午11:00:11
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年5月14日 Administrator v1.0.0 修改原因
+	 */
+	List<Relay> findGrouprs485toNetIpBygatewayMac(String gatewayMac);
+
+	/**
+	 * 
+	 * @Function: RelayService.java
+	 * @Description: 根据rs485toNetIp 获取 节点下的所有继电器
+	 *
+	 * @param: gatewayMac
+	 *             网关MAC
+	 * @param: rs485toNetIp
+	 *             rs485toNet的IP地址
+	 * @return：List<Relay>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月16日 上午11:21:30
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年5月16日 Administrator v1.0.0 修改原因
+	 */
+	List<Relay> findByGatewayMacAndRs485toNetIp(String gatewayMac, String rs485toNetIp);
+}

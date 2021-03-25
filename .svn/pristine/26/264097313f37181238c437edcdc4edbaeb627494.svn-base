@@ -1,0 +1,101 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.utils 
+ * @author: syz  
+ * @date: 2019年3月1日 上午11:14:53 
+ */
+package com.lovdmx.control.common.utils;
+
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.socket.SpriteServerSocketThread;
+import com.lovdmx.control.common.socket.WebSocket;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: AnalysisSocketUtils.java
+ * @Description: 解析opCode公共类
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月1日 上午11:14:53
+ *
+ */
+public class AnalysisSocketUtils {
+
+	/**
+	 * 
+	 * @Function: AnalysisSocketUtils.java
+	 * @Description: (主)录放精灵根据OpCode 解析
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月1日 下午5:01:19
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月1日 Administrator v1.0.0 修改原因
+	 */
+	public static void AnalysisSpriteOpCode(JSONObject jsonObject) throws Exception {
+		short opCode = (short) jsonObject.get("opCode");
+		if (opCode == 0x1022) {
+			// 组装 文件上传状态
+			String dataJson = SpriteAnalysisServiceUtils.getAssembleDeviceInfo(jsonObject);
+			jsonObject.put("dataJson", dataJson);
+			// 赋值最新的文件信息
+			SpriteServerSocketThread.setFileJsonData(dataJson);
+		} else if (opCode == 0x1026) {
+			JSONObject dataJson = (JSONObject) jsonObject.get("dataJson");
+			Integer status = (Integer) dataJson.get("status");
+			// 判断是否成功
+			if (status == 1) {
+				// 上传成功添加 记录
+				SpriteAnalysisServiceUtils.addUploadVideoOrEdlmxFile(dataJson);
+			}
+		}
+		// 广播给所有客户端
+		WebSocket.sendDataInfo(jsonObject.toJSONString());
+	}
+
+	/**
+	 * @Function: AnalysisSocketUtils.java
+	 * @Description: 该函数的功能描述
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月2日 下午5:00:21
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月2日 Administrator v1.0.0 修改原因
+	 */
+	public static void AnalysisRtrOpCode(JSONObject jsonObject) {
+		/*
+		 * short opCode = (short) jsonObject.get("opCode"); if (opCode ==
+		 * 0x1006) {
+		 * 
+		 * } else if (opCode == 0x1007) {
+		 * 
+		 * } else if (opCode == 0x1008) {
+		 * 
+		 * } else if (opCode == 0x1009) {
+		 * 
+		 * } else if (opCode == 0x1010) {
+		 * 
+		 * }
+		 */
+		// 广播给所有客户端
+		WebSocket.sendDataInfo(jsonObject.toJSONString());
+	}
+
+}

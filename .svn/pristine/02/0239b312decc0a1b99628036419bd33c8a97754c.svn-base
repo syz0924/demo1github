@@ -1,0 +1,172 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var="path" value="${pageContext.request.contextPath }"></c:set>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!DOCTYPE html>
+<html>
+<head>
+<title>雷舞后台-修改录放精灵账号</title>
+<link rel="shortcut icon" href="${path}/img/lei.jpg" type="image/x-icon" />
+<link rel="stylesheet" href="${path}/js/layui/css/layui.css"
+	type="text/css" />
+<link href="${path}/css/style.css" rel="stylesheet" type="text/css" />
+<link href="${path}/css/public.css" rel="stylesheet" type="text/css" />
+<link type="text/css" rel="stylesheet" href="${path }/js/sg/css/sg.css"></link>
+<link type="text/css" rel="stylesheet"
+	href="${path }/js/upload/upload.css"></link>
+<script type="text/javascript" src="${path}/js/jquery.min.js"></script>
+<script type="text/javascript" src="${path}/js/jquery.js"></script>
+<style type="text/css">
+</style>
+</head>
+
+<body>
+	<%@include file="/common/header.jsp"%>
+
+	<div class="container">
+		<%@include file="/common/left.jsp"%>
+		<div class="col-md bor-1">
+			<div class="panel-heading bg-cl">
+				<a class="btn btn-info btn-tit" href="javascript:void(0)">修改录放精灵账号</a>
+				<a class="btn btn-info " href="javascript:void(0)"
+					onClick="history.go(-1);">返回</a>
+			</div>
+			<div class="panel-body mm">
+				<form method="POST" id="form" action="${path}/ht/account/update.do">
+					<input name="accountId" value="${account.accountId }"
+						hidden="hidden" /> <input name=usName
+						value="${account.userName }" hidden="hidden" />
+					<table>
+						<tr>
+							<td>MAC:</td>
+							<td><input type="text" name="macAddress" readonly="readonly"
+								value="${account.macAddress }" class="form-control" /><span
+								style="color: red;">*</span></td>
+						</tr>
+						<tr>
+							<td>项目名:</td>
+							<td><input type="text" name="projectName"
+								readonly="readonly" value="${account.projectName }"
+								class="form-control" /><span style="color: red;">*</span></td>
+						</tr>
+						<tr>
+							<td>账号:</td>
+							<td><input type="text" name="userName"  readonly="readonly"
+								value="${account.userName }" class="form-control" /><span
+								style="color: red;">*</span></td>
+						</tr>
+						<tr>
+							<td>是否修改密碼</td>
+							<td><select id="updatePassword" name="updatePassword"
+								class="form-control">
+									<option value="0">不修改</option>
+									<option value="1">修改</option>
+							</select></td>
+						</tr>
+						<tr class="passwd1 hidden">
+							<td>密码:</td>
+							<td><input type="password" name="password"
+								class="form-control" /><span style="color: red;">*</span></td>
+						</tr>
+						<tr class="passwd2 hidden">
+							<td>确定密码:</td>
+							<td><input type="password" name="confirm_password"
+								class="form-control" /><span style="color: red;">*</span></td>
+						</tr>
+					</table>
+					<div class="group">
+						<input type="button" id="sbt" value="提交"
+							class="btn btn-primary btn-block active btn-lg passwd-err">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+
+<script type="text/javascript">
+
+
+	$("#updatePassword").change(function(){
+		//获取状态
+		var status = $(this).val();
+		if(status==0){
+			$(".passwd1").addClass("hidden");
+			$(".passwd2").addClass("hidden");
+		}else{
+			$(".passwd1").removeClass("hidden");
+			$(".passwd2").removeClass("hidden");
+		}
+		
+	});
+
+
+
+	//判断密码是否一致
+	$("input[name='confirm_password']").blur(
+			function() {
+				var passwd = $(this).val();
+				var password = $("input[name='password']").val();
+				if (passwd != "" && passwd != null && passwd != undefined
+						&& passwd == password) {
+					$("#sbt").removeClass("passwd-err");
+				} else {
+					$("#sbt").addClass("passwd-err");
+					layer.msg('密码不一致,请重新输入！！', {
+						icon : 5
+					});
+				}
+			});
+
+	//提交
+	$("#sbt").click(function() {
+		//获取账号和密码
+		var password = $("input[name='password']").val();
+		var password1 = $("input[name='confirm_password']").val();
+		//判断账号和密码是否输入
+		//状态
+		var status=$("#updatePassword").val();	
+		//修改 则判断
+		if(status==1){
+			if (password == "" || password == null || password == undefined) {
+				layer.msg('必填项不能为空', {
+					icon : 5
+				});
+				$("input[name='password']").focus();
+				return;
+			}
+	
+			if (password1 == "" || password1 == null || password1 == undefined) {
+				layer.msg('必填项不能为空', {
+					icon : 5
+				});
+				$("input[name='confirm_password']").focus();
+				return;
+			} else {
+				if (password1 == password) {
+					$(this).removeClass("passwd-err");
+				}
+			}
+		}else{
+			//密码清空
+			$("input[name='password']").val(null);
+			$(this).removeClass("passwd-err");
+		}
+		//提交表单 判断 密码是否一致
+		if (!$(this).hasClass("passwd-err")) {
+			$("#form").submit();
+		} else {
+			layer.msg('密码不一致,请重新输入！！', {
+				icon : 5
+			});
+			$("input[name='confirm_password']").val("").focus();
+			return;
+		}
+	});
+</script>
+
+<script type="text/javascript" src="${path }/js/upload/tz_upload.js"></script>
+<script type="text/javascript" src="${path }/js/sg/tz_util.js"></script>
+<script type="text/javascript" src="${path }/js/sg/sg.js"></script>
+<script type="text/javascript" src="${path }/js/layui/layui.all.js"></script>
+</html>

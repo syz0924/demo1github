@@ -1,0 +1,6 @@
+package com.lovdmx.control.mapper;
+
+import com.lovdmx.control.pojo.IntelligentGateway;
+
+public interface IntelligentGatewayMapper extends BaseMapper<IntelligentGateway> {
+}

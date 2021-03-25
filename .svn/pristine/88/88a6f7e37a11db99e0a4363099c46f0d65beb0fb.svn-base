@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.ProjectMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.Project">
+		<id column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="project_name" property="projectName" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<resultMap id="BaseResultProjectAllDeviceInfoMap" type="com.lovdmx.control.pojo.Project">
+		<id column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="project_name" property="projectName" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<collection property="sonRackDeviceList" ofType="com.lovdmx.control.pojo.RackDevice">
+			<id column="rack_id" property="rackId" jdbcType="INTEGER" />
+			<result column="rack_index" property="rackIndex" jdbcType="DECIMAL" />
+			<result column="rack_name" property="rackName" jdbcType="VARCHAR" />
+			<result column="project_id" property="projectId" jdbcType="INTEGER" />
+			<result column="current" property="current" jdbcType="DECIMAL" />
+			<result column="voltage" property="voltage" jdbcType="DECIMAL" />
+			<result column="rack_create_time" property="createTime"
+				jdbcType="TIMESTAMP" />
+			<result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+			<collection property="sonRtrDeviceList" ofType="com.lovdmx.control.pojo.RtrDevice">
+				<id column="rtr_id" property="rtrId" jdbcType="INTEGER" />
+				<id column="rtr_mac" property="mac" jdbcType="CHAR" />
+				<result column="rtr_ip" property="ip" jdbcType="CHAR" />
+				<result column="model_size" property="modelSize" jdbcType="VARCHAR" />
+				<result column="rtr_cur_mode" property="curMode" jdbcType="CHAR" />
+				<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+				<result column="rtr_is_online" property="isOnline" jdbcType="DECIMAL" />
+				<result column="rtr_offline_alarm_status" property="offlineAlarmStatus"
+					jdbcType="INTEGER" />
+				<collection property="sonDmx512DeviceList"
+					ofType="com.lovdmx.control.pojo.Dmx512Device">
+					<id column="dmx_id" property="dmxId" jdbcType="INTEGER" />
+					<result column="dmx_ip" property="ip" jdbcType="CHAR" />
+					<result column="dmx_universe" property="universe" jdbcType="VARCHAR" />
+					<result column="dmx_rdm_nums" property="rdmNums" jdbcType="DECIMAL" />
+					<result column="dmx_rdmts" property="rdmts" jdbcType="VARCHAR" />
+					<result column="rtr_mac" property="rtrMac" jdbcType="CHAR" />
+					<result column="dmx_is_online" property="isOnline" jdbcType="INTEGER" />
+					<result column="dmx_offline_alarm_status" property="offlineAlarmStatus"
+						jdbcType="INTEGER" />
+				</collection>
+			</collection>
+			<collection property="sonSpriteDeviceList"
+				ofType="com.lovdmx.control.pojo.SpriteDevice">
+				<id column="sprite_id" property="spriteId" jdbcType="INTEGER" />
+				<id column="sprite_mac" property="mac" jdbcType="CHAR" />
+				<result column="sprite_ip" property="ip" jdbcType="CHAR" />
+				<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+				<result column="sprite_is_online" property="isOnline"
+					jdbcType="DECIMAL" />
+				<result column="sprite_offline_alarm_status" property="offlineAlarmStatus"
+					jdbcType="INTEGER" />
+			</collection>
+		</collection>
+	</resultMap>
+
+
+	<sql id="Base_Column_List">
+		project_id, project_name, create_time
+	</sql>
+	<select id="findAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from pro_project
+	</select>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from pro_project
+		where project_id = #{projectId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findProjectCentreAllDeviceInfo" resultMap="BaseResultProjectAllDeviceInfoMap"
+		parameterType="java.lang.Integer">
+		select
+		project.project_id,project.project_name,project.create_time,
+		rack.rack_id,rack.rack_index,rack.rack_name,
+		rack.current,rack.voltage,rack.create_time as
+		rack_create_time,rack.modify_time,
+		rtr.rtr_id,rtr.mac as rtr_mac,rtr.ip
+		as rtr_ip,rtr.model_size as
+		rtr_model_size,rtr.cur_mode as
+		rtr_cur_mode,rtr.is_online
+		as
+		rtr_is_online,sprite.sprite_id as
+		sprite_id,sprite.ip as
+		sprite_ip,sprite.mac as
+		sprite_mac,sprite.is_online as
+		sprite_is_online,dmx512.dmx_id as
+		dmx_id,dmx512.ip as
+		dmx_ip,dmx512.universe as dmx_universe,
+		dmx512.rdm_nums as
+		dmx_rdm_nums,dmx512.is_online as
+		dmx_is_online,(select 1
+		from t_err
+		where rtr.mac = device_mac and
+		device_type='RTR') as
+		rtr_offline_alarm_status,(select
+		1 from t_err
+		where sprite.mac =
+		device_mac and device_type='Sprite') as
+		sprite_offline_alarm_status ,(select 1
+		from t_err
+		where
+		rtr.mac =
+		device_mac and device_type='DMX512') as
+		dmx_offline_alarm_status
+		from
+		pro_project
+		project,dev_rack_device
+		rack,
+		dev_rtr_device
+		rtr,dev_sprite_device
+		sprite,dev_dmx512_device
+		dmx512
+		where
+		project.project_id=#{projectId}
+		and
+		rack.rack_id=rtr.rack_id and
+		rack.rack_id = sprite.rack_id and
+		rtr.mac=dmx512.rtr_mac order by
+		rack_index
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		pro_project
+		where project_id = #{projectId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.Project">
+		insert into pro_project
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="projectName != null">
+				project_name,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="projectName != null">
+				#{projectName,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.Project">
+		update pro_project
+		<set>
+			<if test="projectName != null">
+				project_name = #{projectName,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where project_id = #{projectId,jdbcType=INTEGER}
+	</update>
+</mapper>

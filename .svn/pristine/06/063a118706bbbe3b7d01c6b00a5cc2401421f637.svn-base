@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.RackDeviceMapper">
+
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.RackDevice">
+		<id column="rack_id" property="rackId" jdbcType="INTEGER" />
+		<result column="rack_index" property="rackIndex" jdbcType="DECIMAL" />
+		<result column="rack_name" property="rackName" jdbcType="VARCHAR" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="current" property="current" jdbcType="DECIMAL" />
+		<result column="voltage" property="voltage" jdbcType="DECIMAL" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		rack_id, rack_index, rack_name, project_id, current,
+		voltage, create_time,
+		modify_time
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_rack_device
+		where rack_id = #{rackId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findByParentId" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_rack_device
+		where project_id = #{parentId,jdbcType=INTEGER}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		dev_rack_device
+		where rack_id = #{rackId,jdbcType=INTEGER}
+	</delete>
+
+
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="rackId"
+		parameterType="java.util.List">
+		insert into dev_rack_device
+		(rack_index,rack_name,project_id,
+		current,voltage,create_time)
+		values
+		<if test="list !=null">
+			<foreach collection="list" item="item" separator="," close=";">
+				(#{item.rackIndex},#{item.rackName},#{item.projectId},#{item.current},#{item.voltage},#{item.createTime})
+			</foreach>
+		</if>
+	</insert>
+
+
+
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.RackDevice">
+		insert into dev_rack_device
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="rackId != null">
+				rack_id,
+			</if>
+			<if test="rackIndex != null">
+				rack_index,
+			</if>
+			<if test="rackName != null">
+				rack_name,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="current != null">
+				current,
+			</if>
+			<if test="voltage != null">
+				voltage,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="modifyTime != null">
+				modify_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="rackId != null">
+				#{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="rackIndex != null">
+				#{rackIndex,jdbcType=DECIMAL},
+			</if>
+			<if test="rackName != null">
+				#{rackName,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="current != null">
+				#{current,jdbcType=DECIMAL},
+			</if>
+			<if test="voltage != null">
+				#{voltage,jdbcType=DECIMAL},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyTime != null">
+				#{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.RackDevice">
+		update dev_rack_device
+		<set>
+			<if test="rackIndex != null">
+				rack_index = #{rackIndex,jdbcType=DECIMAL},
+			</if>
+			<if test="rackName != null">
+				rack_name = #{rackName,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="current != null">
+				current = #{current,jdbcType=DECIMAL},
+			</if>
+			<if test="voltage != null">
+				voltage = #{voltage,jdbcType=DECIMAL},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyTime != null">
+				modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where rack_id = #{rackId,jdbcType=INTEGER}
+	</update>
+</mapper>

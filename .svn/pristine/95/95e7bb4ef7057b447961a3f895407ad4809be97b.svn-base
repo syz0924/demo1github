@@ -1,0 +1,27 @@
+package com.lovdmx.control.mapper;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.lovdmx.control.pojo.Project;
+
+public interface ProjectMapper extends BaseMapper<Project> {
+
+	/**
+	 * @Function: ProjectMapper.java
+	 * @Description: 根据项目ID获取项目中所有机架设备信息(机架,RTR设备,录放精灵设备,DMX512设备信息)
+	 *
+	 * @param: projectId
+	 *             项目ID
+	 * @return：List<Project>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月25日 下午1:53:54
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月25日 Administrator v1.0.0 修改原因
+	 */
+	Project findProjectCentreAllDeviceInfo(@Param("projectId") Integer projectId);
+}

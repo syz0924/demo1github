@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.lovdmx.control.mapper.Dmx512DeviceDetailsMapper">
+	<resultMap id="BaseResultMap"
+		type="com.lovdmx.control.pojo.Dmx512DeviceDetails">
+		<result column="dmx512_mac" property="dmx512Mac"
+			jdbcType="VARCHAR" />
+		<result column="rdmts" property="rdmts" jdbcType="VARCHAR" />
+		<result column="temperatures" property="temperatures"
+			jdbcType="VARCHAR" />
+		<result column="humiditys" property="humiditys"
+			jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime"
+			jdbcType="TIMESTAMP" />
+		<result column="create_times" property="createTimes"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="BaseResultExcelExportDmx512DeviceMap"
+		type="com.lovdmx.control.httpVo.ExcelExportDmx512DeviceVo">
+		<result column="rtr_mac" property="rtrMac" jdbcType="VARCHAR" />
+		<result column="rack_name" property="rackName"
+			jdbcType="VARCHAR" />
+		<result column="project_name" property="projectName"
+			jdbcType="VARCHAR" />
+		<collection property="dmx512DateList"
+			ofType="com.lovdmx.control.httpVo.Dmx512DeviceDateVo">
+			<result column="dmx512_date" property="dmx512Date"
+				jdbcType="VARCHAR" />
+			<collection property="dmx512MacList"
+				ofType="com.lovdmx.control.httpVo.Dmx512DeviceMacVo">
+				<result column="dmx512_mac" property="dmx512Mac"
+					jdbcType="VARCHAR" />
+				<collection property="dmx512DeviceDetailsVoList"
+					ofType="com.lovdmx.control.httpVo.Dmx512DeviceDetailsVo">
+					<result column="temperature" property="temperature"
+						jdbcType="INTEGER" />
+					<result column="humidity" property="humidity"
+						jdbcType="INTEGER" />
+					<result column="smokeAlarm_sate" property="smokeAlarmSate"
+						jdbcType="VARCHAR" />
+					<result column="create_time" property="createTime"
+						jdbcType="TIMESTAMP" />
+				</collection>
+			</collection>
+		</collection>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		dmx512_mac,rdmts,create_time
+	</sql>
+
+	<select id="findByDmx512MacAndToday" resultMap="BaseResultMap">
+		select
+		dmx512_mac,GROUP_CONCAT(substring_index(rdmts,',', 1) ORDER BY
+		create_time)
+		temperatures,
+		GROUP_CONCAT(substring_index(substring_index(rdmts,',',
+		2),',',-1)
+		ORDER BY create_time) humiditys,GROUP_CONCAT(create_time ORDER BY
+		create_time) create_times
+		from dev_dmx512_device_details where
+		dmx512_mac =
+		#{dmx512Mac} and date_format(create_time,'%Y-%m-%d') =
+		#{today}
+		order
+		by create_time
+	</select>
+
+	<select id="findLesstodayByToday"
+		resultMap="BaseResultExcelExportDmx512DeviceMap">
+		select prop.project_name,racd.rack_name,dmdd.create_date
+		dmx512_date,dmxd.rtr_mac,
+		dmdd.dmx512_mac,substring_index(dmdd.rdmts,',', 1) temperature,
+		substring_index(substring_index(dmdd.rdmts,',', 2),',',-1) humidity,
+		if(substring_index(dmdd.rdmts,',', -1),'报警','无') smokeAlarm_sate,
+		dmdd.create_time create_time
+		from pro_project prop inner join
+		dev_rack_device racd on
+		prop.project_id=racd.project_id
+		inner join
+		dev_rtr_device rtrd on
+		racd.rack_id=rtrd.rack_id
+		inner join
+		dev_dmx512_device dmxd on
+		dmxd.rtr_mac=rtrd.mac
+		right join
+		dev_dmx512_device_details dmdd on
+		dmdd.dmx512_mac=dmxd.dmx512_mac where
+		dmdd.create_date <![CDATA[<]]>
+		#{today}
+		order by dmdd.create_time
+	</select>
+
+	<delete id="deleteLesstodayByToday"
+		parameterType="java.lang.String">
+		delete from dev_dmx512_device_details where create_date <![CDATA[<]]>
+		#{today}
+	</delete>
+
+</mapper>

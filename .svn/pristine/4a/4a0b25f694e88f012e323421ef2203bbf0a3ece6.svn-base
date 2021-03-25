@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.ProjectMapper">
+	<resultMap id="BaseResultMap"
+		type="com.lovdmx.control.pojo.Project">
+		<id column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="project_name" property="projectName"
+			jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<resultMap id="BaseResultProjectAllDeviceInfoMap"
+		type="com.lovdmx.control.pojo.Project">
+		<id column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="project_name" property="projectName"
+			jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime"
+			jdbcType="TIMESTAMP" />
+		<collection property="sonRackDeviceList"
+			ofType="com.lovdmx.control.pojo.RackDevice">
+			<id column="rack_id" property="rackId" jdbcType="INTEGER" />
+			<result column="err_id" property="errId" jdbcType="INTEGER" />
+			<result column="rack_index" property="rackIndex"
+				jdbcType="DECIMAL" />
+			<result column="rack_name" property="rackName"
+				jdbcType="VARCHAR" />
+			<result column="project_id" property="projectId"
+				jdbcType="INTEGER" />
+			<result column="current" property="current" jdbcType="DECIMAL" />
+			<result column="voltage" property="voltage" jdbcType="DECIMAL" />
+			<result column="rack_longitude" property="rackLongitude"
+				jdbcType="DOUBLE" />
+			<result column="rack_latitude" property="rackLatitude"
+				jdbcType="DOUBLE" />
+			<result column="create_time" property="createTime"
+				jdbcType="TIMESTAMP" />
+			<result column="modify_time" property="modifyTime"
+				jdbcType="TIMESTAMP" />
+			<collection property="sonRtrDeviceList"
+				ofType="com.lovdmx.control.pojo.RtrDevice">
+				<id column="rtr_id" property="rtrId" jdbcType="INTEGER" />
+				<result column="rtr_mac" property="mac" jdbcType="CHAR" />
+				<result column="rtr_ip" property="ip" jdbcType="CHAR" />
+				<result column="model_size" property="modelSize"
+					jdbcType="VARCHAR" />
+				<result column="cur_mode" property="curMode" jdbcType="CHAR" />
+				<result column="rtr_is_online" property="isOnline"
+					jdbcType="DECIMAL" />
+				<result column="rtr_offline_alarm_status"
+					property="rtrOfflineAlarmStatus" jdbcType="INTEGER" />
+				<result column="dmx_offline_alarm_status"
+					property="dmxOfflineAlarmStatus" jdbcType="INTEGER" />
+				<result column="dmx_before_alarm_number"
+					property="dmxBeforeAlarmNumber" jdbcType="INTEGER" />
+				<result column="dmx_now_alarm_number"
+					property="dmxNowAlarmNumber" jdbcType="INTEGER" />
+				<collection property="sonDmx512DeviceList"
+					ofType="com.lovdmx.control.pojo.Dmx512Device">
+					<id column="dmx_id" property="dmxId" jdbcType="INTEGER" />
+					<result column="dmx512_mac" property="dmx512Mac"
+						jdbcType="CHAR" />
+					<result column="dmx_ip" property="ip" jdbcType="CHAR" />
+					<result column="universe" property="universe"
+						jdbcType="VARCHAR" />
+					<result column="rdm_nums" property="rdmNums"
+						jdbcType="INTEGER" />
+					<result column="rdmts" property="rdmts" jdbcType="VARCHAR" />
+					<result column="dmx_is_online" property="isOnline"
+						jdbcType="DECIMAL" />
+				</collection>
+			</collection>
+			<collection property="sonSpriteDeviceList"
+				ofType="com.lovdmx.control.pojo.SpriteDevice">
+				<id column="sprite_id" property="spriteId" jdbcType="INTEGER" />
+				<result column="err_id" property="errId" jdbcType="INTEGER" />
+				<result column="sprite_mac" property="mac" jdbcType="CHAR" />
+				<result column="sprite_ip" property="ip" jdbcType="CHAR" />
+				<result column="sprite_is_online" property="isOnline"
+					jdbcType="DECIMAL" />
+				<result column="sprite_offline_alarm_status"
+					property="offlineAlarmStatus" jdbcType="INTEGER" />
+			</collection>
+			<collection property="sonIntelligentGatewayList"
+				ofType="com.lovdmx.control.pojo.IntelligentGateway">
+				<id column="gateway_id" property="id" jdbcType="INTEGER" />
+				<result column="gateway_ip" property="ip" jdbcType="CHAR" />
+				<result column="gateway_mac" property="mac" jdbcType="CHAR" />
+				<result column="gateway_mode" property="mode"
+					jdbcType="INTEGER" />
+				<result column="gateway_version" property="version"
+					jdbcType="VARCHAR" />
+				<result column="gateway_is_online" property="isOnline"
+					jdbcType="INTEGER" />
+			</collection>
+		</collection>
+	</resultMap>
+
+	<resultMap id="BaseResultAlarmMessageMap"
+		type="com.lovdmx.control.httpVo.AlarmDataVo">
+		<result column="device_mac" property="mac" jdbcType="VARCHAR" />
+		<result column="ip" property="ip" jdbcType="VARCHAR" />
+		<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+		<result column="rack_name" property="rackName"
+			jdbcType="VARCHAR" />
+		<result column="task_name" property="taskName"
+			jdbcType="VARCHAR" />
+		<result column="file_md5" property="fileMd5" jdbcType="VARCHAR" />
+		<result column="file_path" property="filePath"
+			jdbcType="VARCHAR" />
+		<result column="err_id" property="errId" jdbcType="INTEGER" />
+		<result column="offline_alarm_status"
+			property="offlineAlarmStatus" jdbcType="INTEGER" />
+		<result column="before_alarm_number"
+			property="beforeAlarmNumber" jdbcType="INTEGER" />
+		<result column="now_alarm_number" property="nowAlarmNumber"
+			jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap id="BaseResultAlarmDeviceInfoMap"
+		type="com.lovdmx.control.httpVo.AlarmDeviceInfoVo">
+		<id column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+		<result column="rack_index" property="rackIndex"
+			jdbcType="INTEGER" />
+		<result column="err_id" property="errId" jdbcType="INTEGER" />
+		<result column="rack_name" property="rackName"
+			jdbcType="VARCHAR" />
+		<result column="rtr_mac" property="rtrMac" jdbcType="VARCHAR" />
+		<result column="sprite_mac" property="spriteMac"
+			jdbcType="VARCHAR" />
+		<result column="rtr_ip" property="rtrIp" jdbcType="VARCHAR" />
+		<result column="sprite_ip" property="spriteIp"
+			jdbcType="VARCHAR" />
+		<result column="rtr_is_online" property="rtrIsOnline"
+			jdbcType="DECIMAL" />
+		<result column="sprite_is_online" property="spriteIsOnline"
+			jdbcType="DECIMAL" />
+		<result column="sprite_offline_alarm_status"
+			property="spriteOfflineAlarmStatus" jdbcType="INTEGER" />
+		<result column="rtr_offline_alarm_status"
+			property="rtrOfflineAlarmStatus" jdbcType="INTEGER" />
+		<result column="dmx_offline_alarm_status"
+			property="dmxOfflineAlarmStatus" jdbcType="INTEGER" />
+		<result column="dmx_before_alarm_number"
+			property="dmxBeforeAlarmNumber" jdbcType="INTEGER" />
+		<result column="dmx_now_alarm_number"
+			property="dmxNowAlarmNumber" jdbcType="INTEGER" />
+	</resultMap>
+
+
+	<sql id="Base_Column_List">
+		project_id, project_name, create_time
+	</sql>
+	<select id="findAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from pro_project
+	</select>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from pro_project
+		where project_id = #{projectId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findByProjectName" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from pro_project
+		where project_name = #{projectName}
+	</select>
+
+	<select id="findProjectIdOrProjectName"
+		resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.Project">
+		select
+		<include refid="Base_Column_List" />
+		from pro_project
+		<where>
+			<if test="projectId != null and projectId != ''">
+				and project_id = #{projectId}
+			</if>
+			<if test="projectName != null and projectName != ''">
+				AND project_name LIKE
+				CONCAT(CONCAT('%',#{projectName},'%'))
+			</if>
+		</where>
+		order by project_id desc
+	</select>
+
+	<select id="findProjectRackDeviceInfo"
+		resultMap="BaseResultProjectAllDeviceInfoMap"
+		parameterType="java.lang.Integer">
+		select prop.project_id
+		project_id,
+		prop.project_name
+		project_name,rack.rack_id
+		rack_id
+		,rack.rack_index
+		rack_index,rack.rack_name
+		rack_name,rack.current
+		current,rack.voltage
+		voltage,rack.rack_longitude
+		rack_longitude,rack.rack_latitude
+		rack_latitude,
+		rtrd.rtr_id rtr_id, rtrd.mac rtr_mac, rtrd.ip rtr_ip,
+		rtrd.model_size model_size, rtrd.cur_mode cur_mode,
+		rtrd.is_online
+		rtr_is_online,
+		sprd.sprite_id sprite_id, sprd.mac sprite_mac, sprd.ip
+		sprite_ip, sprd.is_online sprite_is_online,
+		dmx512.dmx_id
+		dmx_id,dmx512.dmx512_mac dmx512_mac, dmx512.ip dmx_ip, dmx512.universe
+		universe, dmx512.rdm_nums rdm_nums, dmx512.rdmts rdmts, dmx512.rtr_mac
+		rtr_mac,
+		dmx512.is_online dmx_is_online,eaig.id gateway_id, eaig.ip
+		gateway_ip,eaig.mode gateway_mode, eaig.mac gateway_mac,eaig.version
+		gateway_version,
+		eaig.is_online gateway_is_online
+		from pro_project prop
+		inner join
+		dev_rack_device rack on prop.project_id=rack.project_id
+		LEFT
+		JOIN
+		dev_rtr_device rtrd on rack.rack_id=rtrd.rack_id LEFT JOIN
+		dev_sprite_device sprd on rack.rack_id=sprd.rack_id
+		LEFT JOIN
+		dev_dmx512_device dmx512 on rtrd.mac=dmx512.rtr_mac LEFT JOIN
+		ea_intelligent_gateway eaig on rack.rack_id=eaig.rack_id where
+		prop.project_id=#{projectId}
+	</select>
+
+	<select id="findProjectRackDeviceAlarmInfo"
+		resultMap="BaseResultAlarmDeviceInfoMap"
+		parameterType="java.lang.Integer">
+		select prop.project_id project_id,racd.rack_id rack_id
+		,racd.rack_index rack_index,racd.rack_name rack_name,
+		rtrd.ip
+		rtr_ip,rtrd.mac rtr_mac,rtrd.is_online rtr_is_online,sprd.ip
+		sprite_ip,sprd.mac sprite_mac,sprd.is_online sprite_is_online,
+		(select
+		1 from t_err where rtrd.mac = device_mac and
+		device_type='RTR' and
+		err_type='OffLine' and resolution_state=0)
+		rtr_offline_alarm_status,
+		(select 1 from t_err where sprd.mac
+		=device_mac and
+		device_type='Sprite' and
+		err_type='OffLine' and
+		resolution_state=0)
+		sprite_offline_alarm_status,
+		(select 1 from t_err
+		where rtrd.mac
+		=device_mac and device_type='DMX512' and
+		err_type='OffLine' and
+		resolution_state=0) dmx_offline_alarm_status,
+		(select number from t_err
+		where rtrd.mac =device_mac and
+		device_type='DMX512' and
+		err_type='OffLine' and resolution_state=0)
+		dmx_before_alarm_number,
+		(select count(1) from dev_dmx512_device where
+		rtr_mac=rtrd.mac and
+		is_online=0) dmx_now_alarm_number from pro_project prop
+		INNER JOIN
+		dev_rack_device racd on prop.project_id=racd.project_id LEFT
+		JOIN
+		dev_rtr_device rtrd on racd.rack_id=rtrd.rack_id
+		INNER JOIN
+		dev_sprite_device sprd on racd.rack_id=sprd.rack_id where
+		prop.project_id=#{projectId}
+
+	</select>
+
+
+	<select id="findRTRNotExistVideoByParentId"
+		resultMap="BaseResultAlarmMessageMap"
+		parameterType="java.lang.Integer">
+		select rad.rack_name rack_name,rtrd.mac
+		device_mac,rtrd.ip ip,rtrd.rack_id
+		rack_id,
+		(select 1 from t_err where
+		project_id=#{projectId} and
+		device_type="RTR"
+		and rtrd.mac=device_mac
+		and err_type="Video" and
+		resolution_state=0 and
+		uplv.md5=type_md5)
+		offline_alarm_status,
+		(select
+		err_id from
+		t_err where
+		project_id=#{projectId} and rtrd.mac =device_mac
+		and
+		device_type='RTR'
+		and
+		err_type='Video' and resolution_state=0 and
+		uplv.md5=type_md5)
+		err_id,
+		uplv.md5 file_md5,uplv.file_path file_path
+		from pro_project prop
+		inner
+		join
+		dev_rack_device rad on
+		prop.project_id=rad.project_id
+		inner
+		join
+		dev_rtr_device
+		rtrd on
+		rad.rack_id=rtrd.rack_id inner join
+		dev_upload_videos uplv on
+		uplv.project_id=prop.project_id
+		where NOT
+		EXISTS
+		(select 1
+		from
+		dev_rtr_video
+		rtrv
+		where uplv.md5=rtrv.orgvideo_md5
+		and
+		rtrv.rtr_mac=rtrd.mac )
+		and
+		prop.project_id=#{projectId} and
+		uplv.rtr_loaded=1
+
+	</select>
+
+	<select id="findSpriteNotExistLmxByParentId"
+		resultMap="BaseResultAlarmMessageMap"
+		parameterType="java.lang.Integer">
+		select rad.rack_name rack_name,sprd.mac as
+		device_mac,sprd.ip ip,sprd.rack_id
+		rack_id,
+		(select 1 from t_err where
+		project_id=#{projectId} and
+		device_type='Sprite' and
+		sprd.mac=device_mac and err_type='Lmx' and
+		resolution_state=0 and
+		uple.md5=type_md5) offline_alarm_status,
+		(select err_id from
+		t_err where
+		project_id=#{projectId} and sprd.mac
+		=device_mac
+		and
+		device_type='Sprite' and err_type='Lmx' and
+		resolution_state=0 and
+		uple.md5=type_md5)
+		err_id,
+		uple.md5 file_md5,uple.file_path file_path
+		from
+		pro_project
+		prop inner
+		join
+		dev_rack_device rad on
+		prop.project_id=rad.project_id
+		inner
+		join
+		dev_sprite_device sprd on
+		rad.rack_id=sprd.rack_id inner join
+		dev_upload_edlmx uple on
+		uple.project_id=prop.project_id
+		where NOT
+		EXISTS
+		(select 1 from
+		dev_sprite_edlmx as
+		edls where
+		edls.orglmx_md5=uple.md5 and
+		edls.sprite_mac =sprd.mac )
+		and
+		prop.project_id=#{projectId} and
+		uple.rtr_loaded=1
+	</select>
+
+	<select id="findSpriteNotExistTasksByParentId"
+		resultMap="BaseResultAlarmMessageMap"
+		parameterType="java.lang.Integer">
+		select racd.rack_name rack_name,sprd.mac as
+		device_mac,sprd.ip ip,sprd.rack_id
+		rack_id,
+		task_name as
+		task_name,task_md5 as file_md5,
+		(select 1 from t_err where
+		project_id=#{projectId}
+		and
+		sprd.mac=device_mac and device_type="Sprite"
+		and err_type="Task"
+		and
+		resolution_state=0 and task.task_name=task_name)
+		offline_alarm_status,
+		(select err_id from t_err
+		where
+		project_id=#{projectId} and sprd.mac
+		=device_mac and
+		device_type='Sprite'
+		and err_type='Task' and
+		resolution_state=0 and
+		task.task_name=task_name) err_id
+		from pro_project
+		prop inner join
+		dev_rack_device racd on
+		prop.project_id=racd.project_id
+		inner join
+		dev_sprite_device sprd on
+		sprd.rack_id=racd.rack_id inner
+		join
+		dev_tasks
+		task on
+		prop.project_id=task.project_id
+		where NOT
+		EXISTS(select 1 from
+		dev_sprite_tasks sprt where
+		sprd.mac=sprite_mac and
+		sprt.task_id=task.task_id) and
+		prop.project_id=#{projectId}
+	</select>
+
+	<select id="findSpriteNotExistDeleteTasksByParentId"
+		resultMap="BaseResultAlarmMessageMap"
+		parameterType="java.lang.Integer">
+		select racd.rack_name rack_name,sprd.mac as
+		device_mac,sprd.ip ip,sprd.rack_id
+		rack_id,
+		task_name as
+		task_name,task_md5 as file_md5,
+		(select 1 from t_err where
+		project_id=#{projectId}
+		and
+		sprd.mac=device_mac and device_type="Sprite"
+		and
+		err_type="DeleteTask"
+		and
+		resolution_state=0 and
+		dtask.task_name=task_name)
+		offline_alarm_status,
+		(select err_id from
+		t_err
+		where
+		project_id=#{projectId} and sprd.mac
+		=device_mac and
+		device_type='Sprite'
+		and err_type='DeleteTask' and
+		resolution_state=0
+		and
+		dtask.task_name=task_name) err_id
+		from pro_project
+		prop inner join
+		dev_rack_device racd on
+		prop.project_id=racd.project_id
+		inner join
+		dev_sprite_device sprd on
+		sprd.rack_id=racd.rack_id inner
+		join
+		del_tasks
+		dtask on
+		prop.project_id=dtask.project_id
+		where NOT
+		EXISTS(select 1 from
+		del_sprite_tasks dsprt where
+		sprd.mac=sprite_mac and
+		del_task_id=dtask.del_id) and
+		prop.project_id=#{projectId}
+	</select>
+
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		delete from
+		pro_project
+		where project_id =
+		#{projectId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert"
+		parameterType="com.lovdmx.control.pojo.Project"
+		useGeneratedKeys="true" keyProperty="projectId">
+		insert into pro_project
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="projectName != null">
+				project_name,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="projectName != null">
+				#{projectName,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="update"
+		parameterType="com.lovdmx.control.pojo.Project">
+		update pro_project
+		<set>
+			<if test="projectName != null">
+				project_name = #{projectName,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where project_id = #{projectId,jdbcType=INTEGER}
+	</update>
+</mapper>

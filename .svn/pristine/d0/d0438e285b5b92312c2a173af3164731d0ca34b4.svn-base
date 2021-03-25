@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.ErrMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.Err">
+		<id column="err_id" property="errId" jdbcType="INTEGER" />
+		<result column="device_mac" property="deviceMac" jdbcType="CHAR" />
+		<result column="ip" property="ip" jdbcType="CHAR" />
+		<result column="device_type" property="deviceType" jdbcType="CHAR" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+		<result column="err_type" property="errType" jdbcType="CHAR" />
+		<result column="err_rank" property="errRank" jdbcType="CHAR" />
+		<result column="type_md5" property="typeMd5" jdbcType="VARCHAR" />
+		<result column="err_describe" property="errDescribe" jdbcType="VARCHAR" />
+		<result column="resolution_state" property="resolutionState"
+			jdbcType="INTEGER" />
+		<result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+		<result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		err_id, device_mac, ip, device_type, project_id,rack_id,
+		err_type,err_rank,
+		type_md5,resolution_state,err_describe,start_time,end_time
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from t_err
+		where err_id = #{errId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findAlarmDataByDeviceType" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_err
+		where device_type = #{deviceType,jdbcType=VARCHAR} where
+		resolution_state=0
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from t_err
+		where err_id = #{errId,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="errId"
+		parameterType="java.util.List">
+		insert into t_err
+		(device_mac,ip,device_type,project_id,rack_id,err_type,err_rank,type_md5,err_describe,resolution_state,start_time)
+		values
+		<if test="list !=null">
+			<foreach collection="list" item="item" separator="," close=";">
+				(#{item.deviceMac},#{item.ip},#{item.deviceType},#{item.projectId},#{item.rackId},#{item.errType},#{item.errRank},#{item.typeMd5},#{item.errDescribe},#{item.resolutionState},#{item.startTime})
+			</foreach>
+		</if>
+	</insert>
+
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.Err">
+		insert into t_err
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="errId != null">
+				err_id,
+			</if>
+			<if test="deviceMac != null">
+				device_mac,
+			</if>
+			<if test="ip != null">
+				ip,
+			</if>
+			<if test="deviceType != null">
+				device_type,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="rackId != null">
+				rack_id,
+			</if>
+			<if test="errType != null">
+				err_type,
+			</if>
+			<if test="errRank != null">
+				err_rank,
+			</if>
+			<if test="typeMd5 != null">
+				type_md5,
+			</if>
+			<if test="errDescribe != null">
+				err_describe,
+			</if>
+			<if test="resolutionState != null">
+				resolution_state,
+			</if>
+			<if test="startTime != null">
+				start_time,
+			</if>
+			<if test="endTime != null">
+				end_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="errId != null">
+				#{errId,jdbcType=INTEGER},
+			</if>
+			<if test="deviceMac != null">
+				#{deviceMac,jdbcType=CHAR},
+			</if>
+			<if test="ip != null">
+				#{ip,jdbcType=CHAR},
+			</if>
+			<if test="deviceType != null">
+				#{deviceType,jdbcType=CHAR},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="rackId != null">
+				#{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="errType != null">
+				#{errType,jdbcType=CHAR},
+			</if>
+			<if test="errRank != null">
+				#{errRank,jdbcType=CHAR},
+			</if>
+			<if test="typeMd5 != null">
+				#{typeMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="errDescribe != null">
+				#{errDescribe,jdbcType=VARCHAR},
+			</if>
+			<if test="resolutionState != null">
+				#{resolutionState,jdbcType=INTEGER},
+			</if>
+			<if test="startTime != null">
+				#{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				#{endTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.Err">
+		update t_err
+		<set>
+			<if test="deviceMac != null">
+				device_mac = #{deviceMac,jdbcType=CHAR},
+			</if>
+			<if test="ip != null">
+				ip = #{ip,jdbcType=CHAR},
+			</if>
+			<if test="deviceType != null">
+				device_type = #{deviceType,jdbcType=CHAR},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="rackId != null">
+				rack_id = #{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="errType != null">
+				err_type = #{errType,jdbcType=CHAR},
+			</if>
+			<if test="errRank != null">
+				err_rank = #{errRank,jdbcType=CHAR},
+			</if>
+			<if test="typeMd5 != null">
+				type_md5 = #{typeMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="errDescribe != null">
+				err_describe = #{errDescribe,jdbcType=VARCHAR},
+			</if>
+			<if test="resolutionState != null">
+				resolution_state = #{resolutionState,jdbcType=INTEGER},
+			</if>
+			<if test="startTime != null">
+				start_time = #{startTime,jdbcType=INTEGER},
+			</if>
+			<if test="endTime != null">
+				end_time = #{endTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where err_id = #{errId,jdbcType=TIMESTAMP}
+	</update>
+</mapper>

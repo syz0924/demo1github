@@ -1,0 +1,48 @@
+package com.lovdmx.control.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.lovdmx.control.pojo.Dmx512Device;
+
+public interface Dmx512DeviceMapper extends BaseMapper<Dmx512Device> {
+	/**
+	 * 
+	 * @Function: SpriteDeviceMapper.java
+	 * @Description: 根据父类ID获取所有dmx512控制盒信息
+	 *
+	 * @param:rtrMac 父类Mac
+	 * @return：List<Dmx512Device>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月21日 下午4:52:37
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月21日 Administrator v1.0.0 修改原因
+	 */
+	List<Dmx512Device> findByParentMac(@Param("parentMac") String rtrMac);
+
+	/**
+	 * 
+	 * @Function: Dmx512DeviceMapper.java
+	 * @Description: 批量插入
+	 *
+	 * @param: list
+	 *             集合
+	 * @return：Integer
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月28日 下午2:16:25
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月28日 Administrator v1.0.0 修改原因
+	 */
+	Integer batchInsert(@Param("list") List<Dmx512Device> list);
+}

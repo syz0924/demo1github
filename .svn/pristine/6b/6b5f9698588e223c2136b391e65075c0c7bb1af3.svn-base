@@ -1,0 +1,51 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.pojo 
+ * @author: syz  
+ * @date: 2019年2月22日 下午4:36:28 
+ */
+package com.lovdmx.control.pojo;
+
+/**   
+* Copyright: Copyright (c) 2019 LanRu-Caifu
+* 
+* @ClassName: EnumFileType.java
+* @Description: 该类的功能描述
+*
+* @version: v1.0.0
+* @author: syz
+* @date: 2019年2月22日 下午4:36:28 
+*
+*/
+public enum EnumFileType {
+	file(0,"灯光文件"),video(1,"视频文件");
+	
+	private Integer key;
+	
+	private String value;
+	
+	EnumFileType(Integer key,String value){
+		this.key=key;
+		this.value=value;
+	}
+
+	public Integer getKey() {
+		return key;
+	}
+
+	public void setKey(Integer key) {
+		this.key = key;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+	
+	
+}

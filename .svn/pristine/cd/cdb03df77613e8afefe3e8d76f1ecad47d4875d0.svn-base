@@ -1,0 +1,6 @@
+package com.lovdmx.control.mapper;
+
+import com.lovdmx.control.pojo.RackDevice;
+
+public interface RackDeviceMapper extends BaseMapper<RackDevice>{
+}

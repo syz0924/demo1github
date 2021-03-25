@@ -1,0 +1,6 @@
+package com.lovdmx.control.mapper;
+
+import com.lovdmx.control.pojo.SpriteEdlmx;
+
+public interface SpriteEdlmxMapper extends BaseMapper<SpriteEdlmx> {
+}

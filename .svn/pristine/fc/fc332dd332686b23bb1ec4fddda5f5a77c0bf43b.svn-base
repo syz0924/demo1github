@@ -1,0 +1,40 @@
+package com.lovdmx.control.vo;
+
+import java.util.List;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RelayRealTimeVo.java
+ * @Description: 继电器 实时任务信息
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年5月15日 下午3:46:57
+ *
+ */
+public class RelayRealTimeTaskVo extends BaseIntelligentGatewayVo {
+
+	// IP地址
+	private String rs485toNetIP;
+	// 继电器(实时任务)控制
+	private List<RelayCtrVo> tasks;
+
+	public String getRs485toNetIP() {
+		return rs485toNetIP;
+	}
+
+	public void setRs485toNetIP(String rs485toNetIP) {
+		this.rs485toNetIP = rs485toNetIP;
+	}
+
+	public List<RelayCtrVo> getTasks() {
+		return tasks;
+	}
+
+	public void setTasks(List<RelayCtrVo> tasks) {
+		this.tasks = tasks;
+	}
+
+}

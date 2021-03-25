@@ -1,0 +1,100 @@
+package com.lovdmx.control.pojo;
+
+import java.io.Serializable;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RtrVideo.java
+ * @Description: 存储RTR服务器视频文件表
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月15日 上午10:49:41
+ *
+ */
+public class RtrVideo implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 4439799366508418878L;
+	// 编号
+	private Integer id;
+	// mac地址
+	private String rtrMac;
+	// 视频文件MD5值
+	private String mainMd5;
+	// 切割视频文件MD5值
+	private String videoMd5;
+	// 文件路径
+	private String filePath;
+
+	/**
+	 * @Function: RtrVideo.java
+	 * @Description: 该函数的功能描述
+	 *
+	 * @param:参数描述
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月8日 上午10:32:32
+	 */
+	public RtrVideo(String rtrMac, String mainMd5, String videoMd5, String filePath) {
+		super();
+		this.rtrMac = rtrMac;
+		this.mainMd5 = mainMd5;
+		this.videoMd5 = videoMd5;
+		this.filePath = filePath;
+	}
+
+	/**
+	 * @Function: RtrVideo.java
+	 * @Description: 该函数的功能描述
+	 *
+	 * @param:参数描述
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月8日 上午10:38:57
+	 */
+	public RtrVideo() {
+		super();
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getVideoMd5() {
+		return videoMd5;
+	}
+
+	public void setVideoMd5(String videoMd5) {
+		this.videoMd5 = videoMd5 == null ? null : videoMd5.trim();
+	}
+
+	public String getRtrMac() {
+		return rtrMac;
+	}
+
+	public String getMainMd5() {
+		return mainMd5;
+	}
+
+	public void setMainMd5(String mainMd5) {
+		this.mainMd5 = mainMd5;
+	}
+
+	public void setRtrMac(String rtrMac) {
+		this.rtrMac = rtrMac;
+	}
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath == null ? null : filePath.trim();
+	}
+}

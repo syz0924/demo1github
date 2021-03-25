@@ -1,0 +1,36 @@
+package com.lovdmx.control.vo;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RelayRealTimeTaskDataFormatVo.java
+ * @Description: 定时任务数据格式
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年5月25日 下午2:01:51
+ *
+ */
+public class RelayTimedTaskDataFormatVo {
+	// 机架id（逗号隔开）
+	private String rackId;
+	// 即时任务内容
+	private RelayTimedTaskInfoVo taskMsg;
+
+	public String getRackId() {
+		return rackId;
+	}
+
+	public void setRackId(String rackId) {
+		this.rackId = rackId;
+	}
+
+	public RelayTimedTaskInfoVo getTaskMsg() {
+		return taskMsg;
+	}
+
+	public void setTaskMsg(RelayTimedTaskInfoVo taskMsg) {
+		this.taskMsg = taskMsg;
+	}
+}

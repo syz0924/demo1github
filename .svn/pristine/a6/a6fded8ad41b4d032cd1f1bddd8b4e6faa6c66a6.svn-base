@@ -1,0 +1,48 @@
+package com.lovdmx.control.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.lovdmx.control.pojo.Err;
+
+public interface ErrMapper extends BaseMapper<Err> {
+
+	/**
+	 * 
+	 * @Function: ErrMapper.java
+	 * @Description: 批量插入
+	 *
+	 * @param: list
+	 *             集合
+	 * @return：Integer
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月28日 下午2:16:25
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月28日 Administrator v1.0.0 修改原因
+	 */
+	Integer batchInsert(@Param("list") List<Err> list);
+
+	/**
+	 * @Function: ErrMapper.java
+	 * @Description: 根据设备类型获取报警信息
+	 *
+	 * @param:deviceType 设备类型
+	 * @return：List<Err>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月23日 下午2:15:01
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月23日 Administrator v1.0.0 修改原因
+	 */
+	List<Err> findAlarmDataByDeviceType(@Param("deviceType") String deviceType);
+}

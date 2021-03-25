@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.RoleMapper">
+	<resultMap id="BaseResultMap"
+		type="com.lovdmx.control.pojo.Role">
+		<id column="role_id" property="roleId" jdbcType="INTEGER" />
+		<result column="role_name" property="roleName"
+			jdbcType="VARCHAR" />
+		<result column="role_limit" property="roleLimit"
+			jdbcType="VARCHAR" />
+		<result column="limit_names" property="limitNames"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		role_id, role_name,role_limit
+	</sql>
+	<select id="findAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from ad_role
+	</select>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from ad_role
+		where role_id = #{roleId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findRoleInfoAll" resultMap="BaseResultMap">
+		select
+		role_id,
+		role_name,role_limit,(select
+		GROUP_CONCAT(name separator ',')
+		from
+		t_power
+		where
+		FIND_IN_SET(id,role_limit)) limitNames
+		from ad_role
+	</select>
+
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		delete from
+		ad_role
+		where role_id =
+		#{roleId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.Role"
+		useGeneratedKeys="true" keyProperty="roleId">
+		insert into ad_role
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="roleId != null">
+				role_id,
+			</if>
+			<if test="roleName != null">
+				role_name,
+			</if>
+			<if test="roleLimit != null">
+				role_limit,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="roleId != null">
+				#{roleId,jdbcType=INTEGER},
+			</if>
+			<if test="roleName != null">
+				#{roleName,jdbcType=VARCHAR},
+			</if>
+			<if test="roleLimit != null">
+				#{roleLimit,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.Role">
+		update ad_role
+		<set>
+			<if test="roleName != null">
+				role_name = #{roleName,jdbcType=VARCHAR},
+			</if>
+			<if test="roleLimit != null">
+				role_limit = #{roleLimit,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where role_id = #{roleId,jdbcType=INTEGER}
+	</update>
+</mapper>

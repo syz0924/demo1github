@@ -1,0 +1,69 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.httpVo 
+ * @author: syz  
+ * @date: 2019年3月1日 上午11:33:50 
+ */
+package com.lovdmx.control.httpVo;
+
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: Catalogue.java
+ * @Description: (主录放精灵)目录列表
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月1日 上午11:33:50
+ *
+ */
+public class Catalogue implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 5748101255108519411L;
+	// 目录下标
+	private Integer catalogueIndex;
+	// 目录名
+	private String catalogueName;
+	// 灯光文件
+	private List<LightFile> lightFileList;
+	// 灯光文件
+	private List<VideoFile> videoFileList;
+
+	public Integer getCatalogueIndex() {
+		return catalogueIndex;
+	}
+
+	public void setCatalogueIndex(Integer catalogueIndex) {
+		this.catalogueIndex = catalogueIndex;
+	}
+
+	public String getCatalogueName() {
+		return catalogueName;
+	}
+
+	public void setCatalogueName(String catalogueName) {
+		this.catalogueName = catalogueName;
+	}
+
+	public List<LightFile> getLightFileList() {
+		return lightFileList;
+	}
+
+	public void setLightFileList(List<LightFile> lightFileList) {
+		this.lightFileList = lightFileList;
+	}
+
+	public List<VideoFile> getVideoFileList() {
+		return videoFileList;
+	}
+
+	public void setVideoFileList(List<VideoFile> videoFileList) {
+		this.videoFileList = videoFileList;
+	}
+
+}

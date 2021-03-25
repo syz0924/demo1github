@@ -1,0 +1,22 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.RtrDeviceMapper;
+import com.lovdmx.control.pojo.RtrDevice;
+import com.lovdmx.control.service.RtrDeviceService;
+
+@Service("rtrDeviceService")
+public class RtrDeviceServiceImpl extends BaseServiceImpl<RtrDevice> implements RtrDeviceService {
+
+	@Autowired
+	private RtrDeviceMapper rtrDeviceMapper;
+
+	@Override
+	public List<RtrDevice> findByParentId(Integer parentId) {
+		return rtrDeviceMapper.findByParentId(parentId);
+	}
+}

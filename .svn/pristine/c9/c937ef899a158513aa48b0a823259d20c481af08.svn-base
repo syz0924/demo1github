@@ -1,0 +1,75 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var="path" value="${pageContext.request.contextPath }"></c:set>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!DOCTYPE html>
+<html>
+<head>
+<title>雷舞后台-添加管理员</title>
+<link rel="shortcut icon" href="${path}/img/lei.jpg" type="image/x-icon" />
+<link rel="stylesheet" href="${path}/js/layui/css/layui.css"
+	type="text/css" />
+<link href="${path}/css/style.css" rel="stylesheet" type="text/css" />
+<link href="${path}/css/public.css" rel="stylesheet" type="text/css" />
+<link type="text/css" rel="stylesheet" href="${path }/js/sg/css/sg.css"></link>
+<link type="text/css" rel="stylesheet"
+	href="${path }/js/upload/upload.css"></link>
+<script type="text/javascript" src="${path}/js/jquery.min.js"></script>
+<script type="text/javascript" src="${path}/js/jquery.js"></script>
+<style type="text/css">
+</style>
+</head>
+
+<body>
+	<%@include file="/common/header.jsp"%>
+
+	<div class="container">
+		<%@include file="/common/left.jsp"%>
+		<div class="col-md bor-1">
+			<div class="panel-heading bg-cl">
+				<a class="btn btn-info btn-tit" href="javascript:void(0)">添加管理员</a>
+			</div>
+			<div class="panel-body mm">
+				<form method="POST" action="${path}/ht/manage/save.do">
+					<table>
+						<tr>
+							<td>登录账号:</td>
+							<td><input type="text" name="loginName" required="required"
+								class="form-control" /><span style="color: red;">*</span></td>
+						</tr>
+						<tr>
+							<td>昵称:</td>
+							<td><input type="text" name="nickName" required="required"
+								class="form-control" /><span style="color: red;">*</span></td>
+						</tr>
+						<tr>
+							<td>密码:</td>
+							<td><input type="password" name="password"
+								required="required" class="form-control" /><span
+								style="color: red;">*</span></td>
+						</tr>
+						<tr>
+							<td>电话:</td>
+							<td><input name="phone" type="text" class="form-control" />
+							</td>
+						</tr>
+						<tr>
+							<td>地址:</td>
+							<td><input name="address" type="text" class="form-control" />
+							</td>
+						</tr>
+					</table>
+					<div class="group">
+						<input type="submit" value="提交"
+							class="btn btn-primary btn-block active btn-lg">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="${path }/js/upload/tz_upload.js"></script>
+<script type="text/javascript" src="${path }/js/sg/tz_util.js"></script>
+<script type="text/javascript" src="${path }/js/sg/sg.js"></script>
+<script type="text/javascript" src="${path }/js/layui/layui.all.js"></script>
+</html>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.Dmx512DeviceMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.Dmx512Device">
+		<id column="dmx_id" property="dmxId" jdbcType="INTEGER" />
+		<result column="ip" property="ip" jdbcType="CHAR" />
+		<result column="universe" property="universe" jdbcType="VARCHAR" />
+		<result column="rdm_nums" property="rdmNums" jdbcType="DECIMAL" />
+		<result column="rdmts" property="rdmts" jdbcType="VARCHAR" />
+		<result column="rtr_mac" property="rtrMac" jdbcType="CHAR" />
+		<result column="is_online" property="isOnline" jdbcType="DECIMAL" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		dmx_id, ip, universe, rdm_nums, rdmts, rtr_mac, is_online
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_dmx512_device
+		where dmx_id = #{dmxId,jdbcType=INTEGER}
+	</select>
+	<select id="findByParentMac" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_dmx512_device
+		where rtr_mac = #{parentMac,jdbcType=VARCHAR}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		dev_dmx512_device
+		where dmx_id = #{dmxId,jdbcType=INTEGER}
+	</delete>
+
+
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="dmxId"
+		parameterType="java.util.List">
+		insert into dev_dmx512_device
+		(ip,universe,rdm_nums,
+		rdmts,rtr_mac,is_online)
+		values
+		<if test="list !=null">
+			<foreach collection="list" item="item" separator="," close=";">
+				(#{item.ip},#{item.universe},#{item.rdmNums},#{item.rdmts},#{item.rtrMac},#{item.isOnline})
+			</foreach>
+		</if>
+	</insert>
+
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.Dmx512Device">
+		insert into dev_dmx512_device
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="dmxId != null">
+				dmx_id,
+			</if>
+			<if test="ip != null">
+				ip,
+			</if>
+			<if test="universe != null">
+				universe,
+			</if>
+			<if test="rdmNums != null">
+				rdm_nums,
+			</if>
+			<if test="rdmts != null">
+				rdmts,
+			</if>
+			<if test="rtrMac != null">
+				rtr_mac,
+			</if>
+			<if test="isOnline != null">
+				is_online,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="dmxId != null">
+				#{dmxId,jdbcType=INTEGER},
+			</if>
+			<if test="ip != null">
+				#{ip,jdbcType=CHAR},
+			</if>
+			<if test="universe != null">
+				#{universe,jdbcType=VARCHAR},
+			</if>
+			<if test="rdmNums != null">
+				#{rdmNums,jdbcType=DECIMAL},
+			</if>
+			<if test="rdmts != null">
+				#{rdmts,jdbcType=VARCHAR},
+			</if>
+			<if test="rtrMac != null">
+				#{rtrMac,jdbcType=INTEGER},
+			</if>
+			<if test="isOnline != null">
+				#{isOnline,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.Dmx512Device">
+		update dev_dmx512_device
+		<set>
+			<if test="ip != null">
+				ip = #{ip,jdbcType=CHAR},
+			</if>
+			<if test="universe != null">
+				universe = #{universe,jdbcType=VARCHAR},
+			</if>
+			<if test="rdmNums != null">
+				rdm_nums = #{rdmNums,jdbcType=DECIMAL},
+			</if>
+			<if test="rdmts != null">
+				rdmts = #{rdmts,jdbcType=VARCHAR},
+			</if>
+			<if test="rtrMac != null">
+				rtr_mac = #{rtrMac,jdbcType=INTEGER},
+			</if>
+			<if test="isOnline != null">
+				is_online = #{isOnline,jdbcType=DECIMAL},
+			</if>
+		</set>
+		where dmx_id = #{dmxId,jdbcType=INTEGER}
+	</update>
+</mapper>

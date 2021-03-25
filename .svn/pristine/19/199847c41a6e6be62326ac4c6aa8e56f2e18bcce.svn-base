@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.ErrMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.Err">
+		<id column="err_id" property="errId" jdbcType="INTEGER" />
+		<result column="mac" property="mac" jdbcType="CHAR" />
+		<result column="ip" property="ip" jdbcType="CHAR" />
+		<result column="device_type" property="deviceType" jdbcType="CHAR" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="err_type" property="errType" jdbcType="CHAR" />
+		<result column="type_md5" property="typeMd5" jdbcType="VARCHAR" />
+		<result column="err_state" property="errState" jdbcType="CHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		err_id, mac, ip, device_type, project_id, err_type,
+		type_md5, err_state
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from t_err
+		where err_id = #{errId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from t_err
+		where err_id = #{errId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.Err">
+		insert into t_err
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="errId != null">
+				err_id,
+			</if>
+			<if test="mac != null">
+				mac,
+			</if>
+			<if test="ip != null">
+				ip,
+			</if>
+			<if test="deviceType != null">
+				device_type,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="errType != null">
+				err_type,
+			</if>
+			<if test="typeMd5 != null">
+				type_md5,
+			</if>
+			<if test="errState != null">
+				err_state,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="errId != null">
+				#{errId,jdbcType=INTEGER},
+			</if>
+			<if test="mac != null">
+				#{mac,jdbcType=CHAR},
+			</if>
+			<if test="ip != null">
+				#{ip,jdbcType=CHAR},
+			</if>
+			<if test="deviceType != null">
+				#{deviceType,jdbcType=CHAR},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="errType != null">
+				#{errType,jdbcType=CHAR},
+			</if>
+			<if test="typeMd5 != null">
+				#{typeMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="errState != null">
+				#{errState,jdbcType=CHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.Err">
+		update t_err
+		<set>
+			<if test="mac != null">
+				mac = #{mac,jdbcType=CHAR},
+			</if>
+			<if test="ip != null">
+				ip = #{ip,jdbcType=CHAR},
+			</if>
+			<if test="deviceType != null">
+				device_type = #{deviceType,jdbcType=CHAR},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="errType != null">
+				err_type = #{errType,jdbcType=CHAR},
+			</if>
+			<if test="typeMd5 != null">
+				type_md5 = #{typeMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="errState != null">
+				err_state = #{errState,jdbcType=CHAR},
+			</if>
+		</set>
+		where err_id = #{errId,jdbcType=INTEGER}
+	</update>
+</mapper>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.VideoSpiltMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.VideoSpilt">
+		<id column="spilt_id" property="spiltId" jdbcType="INTEGER" />
+		<result column="main_md5" property="mainMd5" jdbcType="CHAR" />
+		<result column="video_name" property="videoName" jdbcType="CHAR" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="mac" property="mac" jdbcType="VARCHAR" />
+		<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		spilt_id, main_md5, video_name, project_id,
+		mac,rack_id
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_video_spilt
+		where spilt_id = #{spiltId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findCountByMainMd5" resultType="java.lang.Integer">
+		select
+		count(1)
+		from
+		dev_video_spilt
+		where main_md5 =
+		#{md5}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		dev_video_spilt
+		where spilt_id = #{spiltId,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id"
+		parameterType="java.util.List">
+		insert into dev_video_spilt
+		(main_md5,video_name,project_id,mac,rack_id)
+		values
+		<if test="list !=null">
+			<foreach collection="list" item="item" separator="," close=";">
+				(#{item.mainMd5},#{item.videoName},#{item.projectId},#{item.mac},#{item.rackId})
+			</foreach>
+		</if>
+	</insert>
+
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.VideoSpilt">
+		insert into dev_video_spilt
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="spiltId != null">
+				spilt_id,
+			</if>
+			<if test="mainMd5 != null">
+				main_md5,
+			</if>
+			<if test="videoName != null">
+				video_name,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="mac != null">
+				mac,
+			</if>
+			<if test="rackId != null">
+				rack_id,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="spiltId != null">
+				#{spiltId,jdbcType=INTEGER},
+			</if>
+			<if test="mainMd5 != null">
+				#{mainMd5,jdbcType=CHAR},
+			</if>
+			<if test="videoName != null">
+				#{videoName,jdbcType=CHAR},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="mac != null">
+				#{mac,jdbcType=VARCHAR},
+			</if>
+			<if test="rackId != null">
+				#{rackId,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.VideoSpilt">
+		update dev_video_spilt
+		<set>
+			<if test="mainMd5 != null">
+				main_md5 = #{mainMd5,jdbcType=CHAR},
+			</if>
+			<if test="videoName != null">
+				video_name = #{videoName,jdbcType=CHAR},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="mac != null">
+				mac = #{mac,jdbcType=VARCHAR},
+			</if>
+			<if test="rackId != null">
+				rack_id = #{rackId,jdbcType=INTEGER},
+			</if>
+		</set>
+		where spilt_id = #{spiltId,jdbcType=INTEGER}
+	</update>
+</mapper>

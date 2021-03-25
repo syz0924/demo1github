@@ -1,0 +1,41 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.httpVo.AlarmDataVo;
+import com.lovdmx.control.mapper.ProjectMapper;
+import com.lovdmx.control.pojo.Project;
+import com.lovdmx.control.service.ProjectService;
+
+@Service("projectService")
+public class ProjectServiceImpl extends BaseServiceImpl<Project> implements ProjectService {
+
+	@Autowired
+	private ProjectMapper projectMapper;
+
+	@Override
+	public Project findProjectCentreAllDeviceInfo(Integer projectId) {
+		return projectMapper.findProjectCentreAllDeviceInfo(projectId);
+	}
+
+	@Override
+	public List<AlarmDataVo> findRTRNotExistVideoByParentId(Integer projectId) {
+		// TODO Auto-generated method stub
+		return projectMapper.findRTRNotExistVideoByParentId(projectId);
+	}
+
+	@Override
+	public List<AlarmDataVo> findSpriteNotExistLmxByParentId(Integer projectId) {
+		// TODO Auto-generated method stub
+		return projectMapper.findSpriteNotExistLmxByParentId(projectId);
+	}
+
+	@Override
+	public List<AlarmDataVo> findSpriteNotExistTasksByParentId(Integer projectId) {
+		// TODO Auto-generated method stub
+		return projectMapper.findSpriteNotExistTasksByParentId(projectId);
+	}
+}

@@ -1,0 +1,101 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.thread 
+ * @author: Administrator   
+ * @date: 2019年2月21日 下午4:08:45 
+ */
+package com.lovdmx.control.common.thread;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.lovdmx.control.common.socket.WebSocket;
+import com.lovdmx.control.common.utils.JsonUtils;
+import com.lovdmx.control.pojo.RackDevice;
+import com.lovdmx.control.pojo.RtrDevice;
+import com.lovdmx.control.service.Dmx512DeviceService;
+import com.lovdmx.control.service.RackDeviceService;
+import com.lovdmx.control.service.RtrDeviceService;
+import com.lovdmx.control.service.SpriteDeviceService;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RealTimeDeviceInfoThread.java
+ * @Description:线程,发送最新设备信息（每隔十秒）
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月21日 下午4:08:45
+ *
+ */
+public class RealTimeDeviceInfoThread implements Runnable {
+	// 机架
+	@Autowired
+	private RackDeviceService rackDeviceService;
+	// RTR服务器
+	@Autowired
+	private RtrDeviceService rtrDeviceService;
+	// 录放精灵
+	@Autowired
+	private SpriteDeviceService spriteDeviceService;
+	// Dmx512控制盒
+	@Autowired
+	private Dmx512DeviceService dmx512DeviceService;
+	// 启动线程
+	private boolean isOk = true;
+	// 项目ID
+	private Integer projectId;
+
+	/**
+	 * @Function: RealTimeDeviceInfoThread.java
+	 * @Description: 构造函数
+	 *
+	 * @param:参数描述
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年2月21日 下午4:11:47
+	 */
+	public RealTimeDeviceInfoThread(Integer projectId, RackDeviceService rackDeviceService,
+			RtrDeviceService rtrDeviceService, SpriteDeviceService spriteDeviceService,
+			Dmx512DeviceService dmx512DeviceService) {
+		super();
+		this.projectId = projectId;
+		this.rackDeviceService = rackDeviceService;
+		this.rtrDeviceService = rtrDeviceService;
+		this.spriteDeviceService = spriteDeviceService;
+		this.dmx512DeviceService = dmx512DeviceService;
+	}
+
+	@Override
+	public void run() {
+		try {
+			while (isOk) {
+				// 根据项目ID获取 所有机架信息
+				List<RackDevice> rackDeviceList = rackDeviceService.findByParentId(projectId);
+				// 遍历
+				for (RackDevice rackDevice : rackDeviceList) {
+					// 获取所有RTR服务器信息
+					List<RtrDevice> rtrDeviceList = rtrDeviceService.findByParentId(rackDevice.getRackId());
+					// 遍历
+					for (RtrDevice rtrDevice : rtrDeviceList) {
+						// 获取所有dmx512控制盒信息
+						rtrDevice.setSonDmx512DeviceList(dmx512DeviceService.findByParentMac(rtrDevice.getRtrMac()));
+					}
+					rackDevice.setSonRtrDeviceList(rtrDeviceList);
+					// 获取所有录放精灵信息
+					rackDevice.setSonSpriteDeviceList(spriteDeviceService.findByParentId(rackDevice.getRackId()));
+				}
+				String dataJson = JsonUtils.objectToJson(rackDeviceList);
+				WebSocket.sendNewestDeviceInfo("lovdmxControl" + projectId, dataJson);
+				// 休眠10秒
+				Thread.sleep(1000 * 10);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+}

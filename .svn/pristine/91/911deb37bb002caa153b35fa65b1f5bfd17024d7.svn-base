@@ -1,0 +1,104 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var="path" value="${pageContext.request.contextPath }"></c:set>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!DOCTYPE html>
+<html>
+<head>
+<title>雷舞后台-录放精灵账号列表</title>
+<link rel="shortcut icon" href="${path}/img/lei.jpg" type="image/x-icon" />
+<link rel="stylesheet" href="${path}/js/layui/css/layui.css"
+	type="text/css" />
+<link href="${path}/css/style.css" rel="stylesheet" type="text/css" />
+<link href="${path}/css/public.css" rel="stylesheet" type="text/css" />
+<link type="text/css" rel="stylesheet" href="${path }/js/sg/css/sg.css"></link>
+<link type="text/css" rel="stylesheet"
+	href="${path }/js/upload/upload.css"></link>
+<script type="text/javascript" src="${path}/js/jquery.min.js"></script>
+<script type="text/javascript" src="${path}/js/jquery.js"></script>
+</head>
+
+<body>
+	<%@include file="/common/header.jsp"%>
+
+	<div class="container">
+		<%@include file="/common/left.jsp"%>
+		<div class="col-md">
+			<div class="panel-heading">
+				<a class="btn btn-info btn-tit" href="javascript:void(0)">录放精灵账号列表</a>
+			</div>
+			<font style="color: red; font-size: 16px">${sessionScope.flag }<c:remove
+					var="flag" />
+			</font>
+			<table class="table tb">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>登录名</th>
+						<th>添加时间</th>
+						<th>状态</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach items="${requestScope.manageList }" varStatus="random"
+						var="lst">
+						<tr>
+							<td>${random.count }</td>
+							<td>${lst.loginName }</td>
+							<td><fmt:formatDate value="${lst.createTime}"
+									pattern="yyyy-MM-dd HH:mm:ss" /></td>
+							<td>${lst.status eq 1?"启用":"禁用" }</td>
+							<td><a href="${path}/ht/manage/edit.do?id=${lst.id}"><font
+									class="keywords">编辑</font>账号</a>&nbsp;&nbsp;&nbsp;&nbsp;<c:if
+									test="${lst.status eq 1 }">
+									<a href="javascript:void(0)"
+										data-link="${path}/ht/manage/status.do?id=${lst.id}"
+										class="nologin" data-status="0"><font class="keywords">禁用</font>账号</a>&nbsp;&nbsp;&nbsp;&nbsp;
+								</c:if> <c:if test="${lst.status eq 0 }">
+									<a href="javascript:void(0)"
+										data-link="${path}/ht/manage/status.do?id=${lst.id}"
+										class="nologin" data-status="1"><font class="keywords">启用</font>账号</a>&nbsp;&nbsp;&nbsp;&nbsp;
+								</c:if></td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="${path }/js/upload/tz_upload.js"></script>
+<script type="text/javascript" src="${path }/js/sg/tz_util.js"></script>
+<script type="text/javascript" src="${path }/js/sg/sg.js"></script>
+<script type="text/javascript" src="${path }/js/layui/layui.all.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$(".nologin").click(function() {
+			var path = $(this).attr("data-link");
+			var status = $(this).attr("data-status");
+			$.tzAlert({
+				title : "温馨提示 ！",
+				content : "确认操作？",
+				callback : function(ok) {
+					if (ok) {
+						$.ajax({
+							type : "GET",
+							url : path,
+							data : "status=" + status,
+							success : function(msg) {
+								location.reload();
+							}
+						});
+					}
+				}
+			});
+		});
+
+	});
+</script>
+</html>

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.DelTasksMapper">
+	<resultMap id="BaseResultMap"
+		type="com.lovdmx.control.pojo.DelTasks">
+		<id column="del_id" property="delId" jdbcType="INTEGER" />
+		<result column="subtask_ids" property="subtaskIds"
+			jdbcType="VARCHAR" />
+		<result column="task_name" property="taskName"
+			jdbcType="VARCHAR" />
+		<result column="task_md5" property="taskMd5" jdbcType="VARCHAR" />
+		<result column="task_type" property="taskType" jdbcType="CHAR" />
+		<result column="cyclic_mode" property="cyclicMode"
+			jdbcType="CHAR" />
+		<result column="cyclic_date" property="cyclicDate"
+			jdbcType="VARCHAR" />
+		<result column="project_id" property="projectId"
+			jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="start_date" property="startDate"
+			jdbcType="DATE" />
+		<result column="end_date" property="endDate" jdbcType="DATE" />
+		<result column="start_time" property="startTime"
+			jdbcType="TIMESTAMP" />
+		<result column="end_time" property="endTime"
+			jdbcType="TIMESTAMP" />
+		<result column="create_time" property="createTime"
+			jdbcType="TIMESTAMP" />
+		<result column="delete_time" property="deleteTime"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		del_id, subtask_ids, task_name, task_md5, task_type,
+		cyclic_mode,
+		cyclic_date, project_id,
+		status, start_date, end_date,
+		start_time, end_time, create_time,delete_time
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from del_tasks
+		where del_id = #{delId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		delete from del_tasks
+		where del_id =
+		#{delId,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="batchInsert" useGeneratedKeys="true"
+		keyProperty="delId" parameterType="java.util.List">
+		insert into dev_rack_device
+		(subtask_ids, task_name, task_md5,
+		task_type,
+		cyclic_mode,
+		cyclic_date, project_id,
+		status, start_date,
+		end_date,
+		start_time, end_time, create_time,delete_time)
+		values
+		<if test="list !=null">
+			<foreach collection="list" item="item" separator=","
+				close=";">
+				(#{item.subtaskIds},#{item.taskName},#{item.taskMd5}
+				,#{item.taskType},#{item.cyclicMode},#{item.cyclicDate}
+				,#{item.projectId},#{item.status},#{item.startDate},#{item.endDate}
+				,#{item.startTime},#{item.endTime},#{item.createTime},#{item.deleteTime})
+			</foreach>
+		</if>
+	</insert>
+
+	<insert id="insert"
+		parameterType="com.lovdmx.control.pojo.DelTasks">
+		insert into del_tasks
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="delId != null">
+				del_id,
+			</if>
+			<if test="subtaskIds != null">
+				subtask_ids,
+			</if>
+			<if test="taskName != null">
+				task_name,
+			</if>
+			<if test="taskMd5 != null">
+				task_md5,
+			</if>
+			<if test="taskType != null">
+				task_type,
+			</if>
+			<if test="cyclicMode != null">
+				cyclic_mode,
+			</if>
+			<if test="cyclicDate != null">
+				cyclic_date,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="startDate != null">
+				start_date,
+			</if>
+			<if test="endDate != null">
+				end_date,
+			</if>
+			<if test="startTime != null">
+				start_time,
+			</if>
+			<if test="endTime != null">
+				end_time,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="deleteTime != null">
+				delete_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="delId != null">
+				#{delId,jdbcType=INTEGER},
+			</if>
+			<if test="subtaskIds != null">
+				#{subtaskIds,jdbcType=VARCHAR},
+			</if>
+			<if test="taskName != null">
+				#{taskName,jdbcType=VARCHAR},
+			</if>
+			<if test="taskMd5 != null">
+				#{taskMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="taskType != null">
+				#{taskType,jdbcType=CHAR},
+			</if>
+			<if test="cyclicMode != null">
+				#{cyclicMode,jdbcType=CHAR},
+			</if>
+			<if test="cyclicDate != null">
+				#{cyclicDate,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=INTEGER},
+			</if>
+			<if test="startDate != null">
+				#{startDate,jdbcType=DATE},
+			</if>
+			<if test="endDate != null">
+				#{endDate,jdbcType=DATE},
+			</if>
+			<if test="startTime != null">
+				#{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				#{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="deleteTime != null">
+				#{deleteTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="update"
+		parameterType="com.lovdmx.control.pojo.DelTasks">
+		update del_tasks
+		<set>
+			<if test="subtaskIds != null">
+				subtask_ids = #{subtaskIds,jdbcType=VARCHAR},
+			</if>
+			<if test="taskName != null">
+				task_name = #{taskName,jdbcType=VARCHAR},
+			</if>
+			<if test="taskMd5 != null">
+				task_md5 = #{taskMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="taskType != null">
+				task_type = #{taskType,jdbcType=CHAR},
+			</if>
+			<if test="cyclicMode != null">
+				cyclic_mode = #{cyclicMode,jdbcType=CHAR},
+			</if>
+			<if test="cyclicDate != null">
+				cyclic_date = #{cyclicDate,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			<if test="startDate != null">
+				start_date = #{startDate,jdbcType=DATE},
+			</if>
+			<if test="endDate != null">
+				end_date = #{endDate,jdbcType=DATE},
+			</if>
+			<if test="startTime != null">
+				start_time = #{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				end_time = #{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="deleteTime != null">
+				delete_time = #{deleteTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where del_id = #{delId,jdbcType=INTEGER}
+	</update>
+</mapper>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.UploadVideosMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.UploadVideos">
+		<id column="video_id" property="videoId" jdbcType="INTEGER" />
+		<result column="file_path" property="filePath" jdbcType="VARCHAR" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="rtr_loaded" property="rtrLoaded" jdbcType="DECIMAL" />
+		<result column="file_index" property="fileIndex" jdbcType="DECIMAL" />
+		<result column="md5" property="md5" jdbcType="CHAR" />
+		<result column="time" property="time" jdbcType="INTEGER" />
+		<result column="upload_role" property="uploadRole" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		video_id, file_path, project_id, rtr_loaded, file_index,
+		md5, time,upload_role
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_videos
+		where video_id = #{videoId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findCountByProjectIdAndRtrLoaded" parameterType="java.lang.Integer"
+		resultType="Integer">
+		select
+		count(1)
+		from dev_upload_videos
+		where project_id =
+		#{projectId,jdbcType=INTEGER} and rtr_loaded=#{status}
+	</select>
+
+	<select id="findNotSpiltByIds" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_videos
+		where rtr_loaded = 0 and video_id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach> 
+		
+	</select>
+
+	<select id="findSpiltByIds" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_videos
+		where video_id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+		rtr_loaded = 1
+	</select>
+
+	<select id="findByProjectId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_videos
+		where project_id = #{projectId}
+	</select>
+
+	<select id="findByMd5" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_videos
+		where md5 = #{md5,jdbcType=VARCHAR}
+	</select>
+
+	<select id="findWebUploadLastInfoByProjectIdAndUploadRole"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_videos
+		where project_id = #{projectId} and
+		upload_role=#{uploadRole} order by video_id desc limit 1
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		dev_upload_videos
+		where video_id = #{videoId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.UploadVideos">
+		insert into dev_upload_videos
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="videoId != null">
+				video_id,
+			</if>
+			<if test="filePath != null">
+				file_path,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="rtrLoaded != null">
+				rtr_loaded,
+			</if>
+			<if test="fileIndex != null">
+				file_index,
+			</if>
+			<if test="md5 != null">
+				md5,
+			</if>
+			<if test="time != null">
+				time,
+			</if>
+			<if test="uploadRole != null">
+				upload_role,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="videoId != null">
+				#{videoId,jdbcType=INTEGER},
+			</if>
+			<if test="filePath != null">
+				#{filePath,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="rtrLoaded != null">
+				#{rtrLoaded,jdbcType=DECIMAL},
+			</if>
+			<if test="fileIndex != null">
+				#{fileIndex,jdbcType=DECIMAL},
+			</if>
+			<if test="md5 != null">
+				#{md5,jdbcType=CHAR},
+			</if>
+			<if test="time != null">
+				#{time,jdbcType=INTEGER},
+			</if>
+			<if test="uploadRole != null">
+				#{uploadRole,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.UploadVideos">
+		update dev_upload_videos
+		<set>
+			<if test="filePath != null">
+				file_path = #{filePath,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="rtrLoaded != null">
+				rtr_loaded = #{rtrLoaded,jdbcType=DECIMAL},
+			</if>
+			<if test="fileIndex != null">
+				file_index = #{fileIndex,jdbcType=DECIMAL},
+			</if>
+			<if test="md5 != null">
+				md5 = #{md5,jdbcType=CHAR},
+			</if>
+			<if test="time != null">
+				time = #{time,jdbcType=INTEGER},
+			</if>
+			<if test="uploadRole != null">
+				upload_role = #{uploadRole,jdbcType=INTEGER},
+			</if>
+		</set>
+		where video_id = #{videoId,jdbcType=INTEGER}
+	</update>
+</mapper>

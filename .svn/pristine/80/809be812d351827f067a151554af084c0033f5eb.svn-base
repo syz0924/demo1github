@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.SubtasksMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.Subtasks">
+		<id column="subtask_id" property="subtaskId" jdbcType="INTEGER" />
+		<result column="subtask_name" property="subtaskName" jdbcType="VARCHAR" />
+		<result column="file_path" property="filePath" jdbcType="VARCHAR" />
+		<result column="file_type" property="fileType" jdbcType="CHAR" />
+		<result column="manage_id" property="manageId" jdbcType="INTEGER" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="rtr_loaded" property="rtrLoaded" jdbcType="DECIMAL" />
+		<result column="video_times" property="videoTimes" jdbcType="DECIMAL" />
+		<result column="md5" property="md5" jdbcType="CHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		subtask_id, subtask_name, file_path, file_type, manage_id,
+		project_id,
+		rtr_loaded,
+		video_times, md5, create_time
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_subtasks
+		where subtask_id = #{subtaskId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		dev_subtasks
+		where subtask_id = #{subtaskId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.Subtasks">
+		insert into dev_subtasks
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="subtaskId != null">
+				subtask_id,
+			</if>
+			<if test="subtaskName != null">
+				subtask_name,
+			</if>
+			<if test="filePath != null">
+				file_path,
+			</if>
+			<if test="fileType != null">
+				file_type,
+			</if>
+			<if test="manageId != null">
+				manage_id,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="rtrLoaded != null">
+				rtr_loaded,
+			</if>
+			<if test="videoTimes != null">
+				video_times,
+			</if>
+			<if test="md5 != null">
+				md5,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="subtaskId != null">
+				#{subtaskId,jdbcType=INTEGER},
+			</if>
+			<if test="subtaskName != null">
+				#{subtaskName,jdbcType=VARCHAR},
+			</if>
+			<if test="filePath != null">
+				#{filePath,jdbcType=VARCHAR},
+			</if>
+			<if test="fileType != null">
+				#{fileType,jdbcType=CHAR},
+			</if>
+			<if test="manageId != null">
+				#{manageId,jdbcType=INTEGER},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="rtrLoaded != null">
+				#{rtrLoaded,jdbcType=DECIMAL},
+			</if>
+			<if test="videoTimes != null">
+				#{videoTimes,jdbcType=DECIMAL},
+			</if>
+			<if test="md5 != null">
+				#{md5,jdbcType=CHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.Subtasks">
+		update dev_subtasks
+		<set>
+			<if test="subtaskName != null">
+				subtask_name = #{subtaskName,jdbcType=VARCHAR},
+			</if>
+			<if test="filePath != null">
+				file_path = #{filePath,jdbcType=VARCHAR},
+			</if>
+			<if test="fileType != null">
+				file_type = #{fileType,jdbcType=CHAR},
+			</if>
+			<if test="manageId != null">
+				manage_id = #{manageId,jdbcType=INTEGER},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="rtrLoaded != null">
+				rtr_loaded = #{rtrLoaded,jdbcType=DECIMAL},
+			</if>
+			<if test="videoTimes != null">
+				video_times = #{videoTimes,jdbcType=DECIMAL},
+			</if>
+			<if test="md5 != null">
+				md5 = #{md5,jdbcType=CHAR},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where subtask_id = #{subtaskId,jdbcType=INTEGER}
+	</update>
+</mapper>

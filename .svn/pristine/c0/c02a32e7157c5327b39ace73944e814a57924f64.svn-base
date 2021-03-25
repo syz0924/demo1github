@@ -1,0 +1,101 @@
+package com.lovdmx.control.pojo;
+
+import java.io.Serializable;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RtrVideo.java
+ * @Description: 存储RTR服务器视频文件表
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月15日 上午10:49:41
+ *
+ */
+public class RtrVideo implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 4439799366508418878L;
+	// 编号
+	private Integer id;
+	// mac地址
+	private String mac;
+	// 视频文件MD5值
+	private String mainMd5;
+	// 切割视频名
+	private String videoName;
+	// 文件路径
+	private String fileName;
+
+	/**
+	 * @Function: RtrVideo.java
+	 * @Description: 该函数的功能描述
+	 *
+	 * @param:参数描述
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月8日 上午10:32:32
+	 */
+	public RtrVideo(String rtrMac, String mainMd5, String videoName, String fileName) {
+		super();
+		this.mac = rtrMac;
+		this.mainMd5 = mainMd5;
+		this.videoName = videoName;
+		this.fileName = fileName;
+	}
+
+	/**
+	 * @Function: RtrVideo.java
+	 * @Description: 该函数的功能描述
+	 *
+	 * @param:参数描述
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月8日 上午10:38:57
+	 */
+	public RtrVideo() {
+		super();
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getVideoName() {
+		return videoName;
+	}
+
+	public void setVideoName(String videoName) {
+		this.videoName = videoName;
+	}
+
+	public String getMac() {
+		return mac;
+	}
+
+	public String getMainMd5() {
+		return mainMd5;
+	}
+
+	public void setMainMd5(String mainMd5) {
+		this.mainMd5 = mainMd5;
+	}
+
+	public void setMac(String mac) {
+		this.mac = mac;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+}

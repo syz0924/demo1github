@@ -1,0 +1,22 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.SpriteDeviceMapper;
+import com.lovdmx.control.pojo.SpriteDevice;
+import com.lovdmx.control.service.SpriteDeviceService;
+
+@Service("spriteDeviceService")
+public class SpriteDeviceServiceImpl extends BaseServiceImpl<SpriteDevice> implements SpriteDeviceService {
+
+	@Autowired
+	private SpriteDeviceMapper spriteDeviceMapper;
+
+	@Override
+	public List<SpriteDevice> findByParentId(Integer parentId) {
+		return spriteDeviceMapper.findByParentId(parentId);
+	}
+}

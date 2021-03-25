@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.lovdmx.control.mapper.GatewayDeviceDetailsMapper">
+	<resultMap id="BaseResultMap"
+		type="com.lovdmx.control.pojo.GatewayDeviceDetails">
+		<result column="gateway_mac" property="gatewayMac"
+			jdbcType="CHAR" />
+		<result column="ip" property="ip" jdbcType="CHAR" />
+		<result column="device_mac" property="deviceMac"
+			jdbcType="CHAR" />
+		<result column="universe" property="universe"
+			jdbcType="VARCHAR" />
+		<result column="temp" property="temp" jdbcType="INTEGER" />
+		<result column="humi" property="humi" jdbcType="INTEGER" />
+		<result column="fire" property="fire" jdbcType="INTEGER" />
+		<result column="upload_time" property="uploadTime"
+			jdbcType="TIMESTAMP" />
+		<result column="upload_date" property="uploadDate"
+			jdbcType="DATE" />
+		<result column="temps" property="temps" jdbcType="VARCHAR" />
+		<result column="humis" property="humis" jdbcType="VARCHAR" />
+		<result column="fires" property="fires" jdbcType="VARCHAR" />
+		<result column="upload_times" property="uploadTimes"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="BaseResultExcelExportGatewayDeviceMap"
+		type="com.lovdmx.control.httpVo.excelExprot.gatewayDevice.ExcelExportGatewayDeviceVo">
+		<result column="gateway_mac" property="gatewayMac"
+			jdbcType="VARCHAR" />
+		<result column="rack_name" property="rackName"
+			jdbcType="VARCHAR" />
+		<result column="project_name" property="projectName"
+			jdbcType="VARCHAR" />
+		<collection property="gatewayDeviceDateList"
+			ofType="com.lovdmx.control.httpVo.excelExprot.gatewayDevice.GatewayDeviceDateVo">
+			<result column="gateway_device_date"
+				property="gatewayDeviceDate" jdbcType="VARCHAR" />
+			<collection property="gatewayDeviceMacList"
+				ofType="com.lovdmx.control.httpVo.excelExprot.gatewayDevice.GatewayDeviceMacVo">
+				<result column="gateway_device_mac"
+					property="gatewayDeviceMac" jdbcType="VARCHAR" />
+				<collection property="gatewayDeviceDetailsVoList"
+					ofType="com.lovdmx.control.httpVo.excelExprot.gatewayDevice.GatewayDeviceDetailsVo">
+					<result column="temp" property="temp"
+						jdbcType="INTEGER" />
+					<result column="humi" property="humi" jdbcType="INTEGER" />
+					<result column="smokeAlarm_sate" property="smokeAlarmSate"
+						jdbcType="VARCHAR" />
+					<result column="upload_time" property="uploadTime"
+						jdbcType="TIMESTAMP" />
+				</collection>
+			</collection>
+		</collection>
+	</resultMap>
+
+
+	<sql id="Base_Column_List">
+		gateway_mac, ip, device_mac, universe,
+		temp, humi,
+		fire,upload_time,upload_date
+	</sql>
+
+	<select id="findByDmx512MacAndToday" resultMap="BaseResultMap">
+		select
+		device_mac,
+		GROUP_CONCAT(temp ORDER BY upload_time) temps,
+		GROUP_CONCAT(humi ORDER BY upload_time) humis,
+		GROUP_CONCAT(fire ORDER
+		BY upload_time) fires,
+		GROUP_CONCAT(upload_time ORDER BY upload_time)
+		upload_times
+		from
+		ea_gateway_device_details where
+		device_mac =
+		#{deviceMac} and
+		date_format(upload_time,'%Y-%m-%d') =
+		#{today}
+		order
+		by
+		upload_time
+	</select>
+
+	<select id="findLesstodayByToday"
+		resultMap="BaseResultExcelExportGatewayDeviceMap">
+		select
+		prop.project_name,racd.rack_name,gadd.upload_date
+		gateway_device_date,inga.mac gateway_mac,gadd.device_mac gateway_device_mac,gadd.temp,
+		gadd.humi,
+		if(gadd.fire,'报警','无') smokeAlarm_sate,
+		gadd.upload_time
+		from
+		ea_gateway_device_details gadd
+		inner join ea_intelligent_gateway inga
+		on gadd.gateway_mac=inga.mac
+		inner join dev_rack_device racd on
+		inga.rack_id=racd.rack_id
+		inner join pro_project prop on
+		prop.project_id=racd.project_id
+		where
+		gadd.upload_date <![CDATA[<]]>
+		#{today}
+		order by gadd.upload_time
+	</select>
+
+	<delete id="deleteLesstodayByToday"
+		parameterType="java.lang.String">
+		delete from ea_gateway_device_details where upload_date <![CDATA[<]]>
+		#{today}
+	</delete>
+</mapper>

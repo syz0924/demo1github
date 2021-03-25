@@ -1,0 +1,62 @@
+package com.lovdmx.control.pojo;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: DelTasks.java
+ * @Description: 已删除任务表
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月15日 上午10:24:45
+ *
+ */
+public class DelTasks implements Serializable {
+
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 933238780315799082L;
+	// 编号
+	private Integer id;
+	// 任务md5值
+	private Integer taskId;
+	// 项目ID
+	private Integer projectId;
+	// 删除时间
+	private Date deleteTime;
+
+	public Integer getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(Integer taskId) {
+		this.taskId = taskId;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
+	}
+
+	public Date getDeleteTime() {
+		return deleteTime;
+	}
+
+	public void setDeleteTime(Date deleteTime) {
+		this.deleteTime = deleteTime;
+	}
+}

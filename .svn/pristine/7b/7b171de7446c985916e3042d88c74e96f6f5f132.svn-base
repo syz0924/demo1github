@@ -1,0 +1,72 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.httpVo 
+ * @author: syz  
+ * @date: 2019年2月27日 上午10:39:26 
+ */
+package com.lovdmx.control.httpVo;
+
+import com.lovdmx.control.common.thread.SpriteAnalysisDeviceThread;
+import com.lovdmx.control.common.thread.SpriteAnalysisOpCodeThread;
+import com.lovdmx.control.common.thread.SpriteAnalysisSocketThread;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: SpriteAndRealVo.java
+ * @Description: 解析录放精灵客户端和发送设备信息线程(数据)
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月27日 上午10:39:26
+ *
+ */
+public class SpriteDeviceInfoVo {
+
+	// 录放精灵 解析客户端线程
+	private SpriteAnalysisSocketThread spriteAnalysisSocketThread;
+	// 发送最新设备信息 线程
+	private SpriteAnalysisDeviceThread spriteAnalysisDeviceThread;
+	// 根据OpCode解析录放精灵 业务线程
+	private SpriteAnalysisOpCodeThread spriteAnalysisOpCodeThread;
+
+	public SpriteDeviceInfoVo() {
+
+	}
+
+	public SpriteDeviceInfoVo(SpriteAnalysisSocketThread spriteAnalysisSocketThread,
+			SpriteAnalysisDeviceThread spriteAnalysisDeviceThread,
+			SpriteAnalysisOpCodeThread spriteAnalysisOpCodeThread) {
+		super();
+		this.spriteAnalysisSocketThread = spriteAnalysisSocketThread;
+		this.spriteAnalysisDeviceThread = spriteAnalysisDeviceThread;
+		this.spriteAnalysisOpCodeThread = spriteAnalysisOpCodeThread;
+	}
+
+	public SpriteAnalysisSocketThread getSpriteAnalysisSocketThread() {
+		return spriteAnalysisSocketThread;
+	}
+
+	public void setSpriteAnalysisSocketThread(SpriteAnalysisSocketThread spriteAnalysisSocketThread) {
+		this.spriteAnalysisSocketThread = spriteAnalysisSocketThread;
+	}
+
+	public SpriteAnalysisDeviceThread getSpriteAnalysisDeviceThread() {
+		return spriteAnalysisDeviceThread;
+	}
+
+	public void setSpriteAnalysisDeviceThread(SpriteAnalysisDeviceThread spriteAnalysisDeviceThread) {
+		this.spriteAnalysisDeviceThread = spriteAnalysisDeviceThread;
+	}
+
+	public SpriteAnalysisOpCodeThread getSpriteAnalysisOpCodeThread() {
+		return spriteAnalysisOpCodeThread;
+	}
+
+	public void setSpriteAnalysisOpCodeThread(SpriteAnalysisOpCodeThread spriteAnalysisOpCodeThread) {
+		this.spriteAnalysisOpCodeThread = spriteAnalysisOpCodeThread;
+	}
+
+}

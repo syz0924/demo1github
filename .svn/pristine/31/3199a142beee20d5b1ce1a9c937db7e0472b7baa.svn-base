@@ -1,0 +1,51 @@
+package com.lovdmx.control.pojo;
+
+import java.io.Serializable;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: SpriteEdlmx.java
+ * @Description: 存储录放精灵灯光文件表
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月15日 上午10:54:35
+ *
+ */
+public class SpriteEdlmx implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 7616242635286853918L;
+	// 编号
+	private Integer id;
+	// MAC地址
+	private String spriteMac;
+	// 灯光文件MD5值
+	private String lmxMd5;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	
+	public String getSpriteMac() {
+		return spriteMac;
+	}
+
+	public void setSpriteMac(String spriteMac) {
+		this.spriteMac = spriteMac;
+	}
+
+	public String getLmxMd5() {
+		return lmxMd5;
+	}
+
+	public void setLmxMd5(String lmxMd5) {
+		this.lmxMd5 = lmxMd5 == null ? null : lmxMd5.trim();
+	}
+}

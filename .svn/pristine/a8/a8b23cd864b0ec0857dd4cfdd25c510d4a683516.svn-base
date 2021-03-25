@@ -1,0 +1,24 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.thread 
+ * @author: syz  
+ * @date: 2019年3月5日 下午3:27:28 
+ */
+package com.lovdmx.control.common.socket;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RTRAnalysisServiceUtils.java
+ * @Description: 该类的功能描述
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月5日 下午3:27:28
+ *
+ */
+public class RTRAnalysisServiceUtils extends SocketUtils {
+
+}

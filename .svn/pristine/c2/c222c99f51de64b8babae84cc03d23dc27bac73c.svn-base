@@ -1,0 +1,45 @@
+package com.lovdmx.control.service;
+
+import java.util.List;
+
+import com.lovdmx.control.pojo.Tasks;
+
+public interface TasksService extends BaseService<Tasks> {
+	/**
+	 * 
+	 * @Function: TasksService.java
+	 * @Description: 根据父类ID获取所有任务信息
+	 *
+	 * @param:parentId 父类ID
+	 * @return：List<Tasks>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月21日 下午4:46:23
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月21日 Administrator v1.0.0 修改原因
+	 */
+	List<Tasks> findByParentId(Integer parentId);
+
+	/**
+	 * 
+	 * @Function: TasksService.java
+	 * @Description: 根据父类ID获取所有任务总数
+	 *
+	 * @param:parentId 父类ID
+	 * @return：Integer
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月27日 下午4:38:48
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月27日 Administrator v1.0.0 修改原因
+	 */
+	Integer findCountByProjectId(Integer projectId);
+}

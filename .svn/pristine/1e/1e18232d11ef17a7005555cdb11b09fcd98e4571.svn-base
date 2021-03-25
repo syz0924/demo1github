@@ -1,0 +1,6 @@
+package com.lovdmx.control.service;
+
+import com.lovdmx.control.pojo.Tasks;
+
+public interface TasksService extends BaseService<Tasks> {
+}

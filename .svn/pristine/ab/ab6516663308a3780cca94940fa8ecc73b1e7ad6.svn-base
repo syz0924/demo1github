@@ -1,0 +1,121 @@
+package com.lovdmx.control.pojo;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: Subtasks.java
+ * @Description: 子任务表
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月15日 上午10:56:44
+ *
+ */
+public class Subtasks implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = -505737496111255601L;
+	// 编号
+	private Integer subtaskId;
+	// 子任务名
+	private String subtaskName;
+	// 文件路径
+	private String filePath;
+	// 文件格式 (0：灯光文件 1：视频)
+	private String fileType;
+	// 管理员ID
+	private Integer manageId;
+	// 项目ID
+	private Integer projectId;
+	// 分发状态(0:未上传到RTR，1上传)
+	private Short rtrLoaded;
+	// 视频时长
+	private Integer videoTimes;
+	// MD5值
+	private String md5;
+	// 创建时间
+	private Date createTime;
+
+	public Integer getSubtaskId() {
+		return subtaskId;
+	}
+
+	public void setSubtaskId(Integer subtaskId) {
+		this.subtaskId = subtaskId;
+	}
+
+	public String getSubtaskName() {
+		return subtaskName;
+	}
+
+	public void setSubtaskName(String subtaskName) {
+		this.subtaskName = subtaskName == null ? null : subtaskName.trim();
+	}
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
+	public String getFileType() {
+		return fileType;
+	}
+
+	public void setFileType(String fileType) {
+		this.fileType = fileType == null ? null : fileType.trim();
+	}
+
+	public Integer getManageId() {
+		return manageId;
+	}
+
+	public void setManageId(Integer manageId) {
+		this.manageId = manageId;
+	}
+
+	public Integer getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
+	}
+
+	public Short getRtrLoaded() {
+		return rtrLoaded;
+	}
+
+	public void setRtrLoaded(Short rtrLoaded) {
+		this.rtrLoaded = rtrLoaded;
+	}
+
+	public Integer getVideoTimes() {
+		return videoTimes;
+	}
+
+	public void setVideoTimes(Integer videoTimes) {
+		this.videoTimes = videoTimes;
+	}
+
+	public String getMd5() {
+		return md5;
+	}
+
+	public void setMd5(String md5) {
+		this.md5 = md5 == null ? null : md5.trim();
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+}

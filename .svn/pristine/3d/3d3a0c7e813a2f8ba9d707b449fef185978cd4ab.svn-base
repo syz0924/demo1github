@@ -1,0 +1,70 @@
+package com.lovdmx.control.common.utils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: PermissionsHeadInterceptor.java
+ * @Description: (前端)登录 拦截器
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年4月20日 上午9:29:19
+ *
+ */
+public class PermissionsHeadInterceptor extends HandlerInterceptorAdapter {
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
+
+		String path = request.getContextPath();
+		// 验证Session是否过期
+		if (!request.isRequestedSessionIdValid()) {
+			// session过期,转向session过期提示页,最终跳转至登陆页面
+			request.getSession(true);
+			response.sendRedirect(path + "/lovdmx/ht/login.do");
+			return false;
+		} else {
+			HttpSession session = request.getSession();
+			// 用户登陆了就继续
+			if (!isLogin(session)) {
+				// 没登陆就返回到登陆页面
+				response.sendRedirect(path + "/lovdmx/ht/login.do");
+				return false;
+			}
+		}
+		return super.preHandle(request, response, handler);
+	}
+
+	/**
+	 * 
+	 * @Function: PermissionsHeadInterceptor.java
+	 * @Description: 判断账号是否过期
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月20日 上午11:17:08
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月20日 Administrator v1.0.0 修改原因
+	 */
+	private boolean isLogin(HttpSession session) {
+		if (session != null && session.getAttribute("lovdmxAdmin") != null) {
+			return true;
+		}
+
+		return false;
+	}
+
+}

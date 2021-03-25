@@ -1,0 +1,6 @@
+package com.lovdmx.control.service;
+
+import com.lovdmx.control.pojo.Role;
+
+public interface RoleService extends BaseService<Role>{
+}

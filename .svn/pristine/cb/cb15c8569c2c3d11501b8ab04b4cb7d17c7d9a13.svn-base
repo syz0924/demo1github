@@ -1,0 +1,51 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.httpVo 
+ * @author: syz  
+ * @date: 2019年3月7日 上午11:15:12 
+ */
+package com.lovdmx.control.httpVo;
+
+import com.lovdmx.control.common.thread.RTRAnalysisSocketThread;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RTRDeviceInfoVo.java
+ * @Description: 该类的功能描述
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月7日 上午11:15:12
+ *
+ */
+public class RTRDeviceInfoVo {
+
+	// RTR 解析客户端线程
+	private RTRAnalysisSocketThread rtrAnalysisSocketThread;
+
+	public RTRAnalysisSocketThread getRtrAnalysisSocketThread() {
+		return rtrAnalysisSocketThread;
+	}
+
+	public void setRtrAnalysisSocketThread(RTRAnalysisSocketThread rtrAnalysisSocketThread) {
+		this.rtrAnalysisSocketThread = rtrAnalysisSocketThread;
+	}
+
+	/**
+	 * @Function: RTRDeviceInfoVo.java
+	 * @Description: 该函数的功能描述
+	 *
+	 * @param:参数描述
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月7日 上午11:19:53
+	 */
+	public RTRDeviceInfoVo(RTRAnalysisSocketThread rtrAnalysisSocketThread) {
+		super();
+		this.rtrAnalysisSocketThread = rtrAnalysisSocketThread;
+	}
+
+}

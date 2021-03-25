@@ -1,0 +1,6 @@
+package com.lovdmx.control.mapper;
+
+import com.lovdmx.control.pojo.DelTasks;
+
+public interface DelTasksMapper extends BaseMapper<DelTasks> {
+}

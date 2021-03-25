@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+	<!-- 使用annotation 自动注册bean,并检查@Required,@Autowired的属性已被注入 -->
+
+	<context:component-scan base-package="com.lovdmx.control.controller.admin"></context:component-scan>
+
+	<mvc:annotation-driven />
+	<mvc:default-servlet-handler />
+
+	<!-- 定义试图解析器 -->
+	<!-- Example: prefix="/WEB-INF/jsp/", suffix=".jsp", viewname="test" -> 
+		"/WEB-INF/jsp/test.jsp" -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/admin/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- Json返回 乱码处理 -->
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+				<property name="supportedMediaTypes" value="text/plain;charset=UTF-8" />
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/controlServer" />
+			<mvc:mapping path="/lovdmx/ht/account/**" />
+			<mvc:mapping path="/lovdmx/ht/dmx512Device/**" />
+			<mvc:mapping path="/lovdmx/ht/intelligentGateway/**" />
+			<mvc:mapping path="/lovdmx/ht/manage/**" />
+			<mvc:mapping path="/lovdmx/ht/project/**" />
+			<mvc:mapping path="/lovdmx/ht/rackDevice/**" />
+			<mvc:mapping path="/lovdmx/ht/relay/**" />
+			<mvc:mapping path="/lovdmx/ht/relayRealtimeTask/**" />
+			<mvc:mapping path="/lovdmx/ht/relayTaskDetails/**" />
+			<mvc:mapping path="/lovdmx/ht/relayTimedTask/**" />
+			<mvc:mapping path="/lovdmx/ht/rtrDevice/**" />
+			<mvc:mapping path="/lovdmx/ht/spriteDevice/**" />
+			<mvc:mapping path="/lovdmx/ht/index.do" />
+			<bean class="com.lovdmx.control.common.utils.PermissionsAdminInterceptor"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<mvc:cors>
+		<mvc:mapping path="/**" />
+	</mvc:cors>
+	<bean
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionAttribute" value="ex"></property>
+		<property name="exceptionMappings">
+			<props>
+				<prop key="java.lang.Exception">error</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 配置文件上载的工具类 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8"></property>
+		<!-- 文件大小最大值 -->
+		<property name="maxUploadSize" value="5242880000"></property>
+		<!-- 内存中的最大值 -->
+		<property name="maxInMemorySize" value="40960"></property>
+	</bean>
+</beans>

@@ -1,0 +1,47 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.httpVo 
+ * @author: syz  
+ * @date: 2019年2月27日 上午10:39:26 
+ */
+package com.lovdmx.control.httpVo;
+
+import com.lovdmx.control.common.thread.SpriteAnalysisSocketThread;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: SpriteClientInfoVo.java
+ * @Description: 解析录放精灵客户端和发送设备信息线程(数据)
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月27日 上午10:39:26
+ *
+ */
+public class SpriteClientInfoVo {
+
+	// 录放精灵 解析客户端线程
+	private SpriteAnalysisSocketThread spriteAnalysisSocketThread;
+
+	public SpriteClientInfoVo() {
+
+	}
+
+	public SpriteClientInfoVo(SpriteAnalysisSocketThread spriteAnalysisSocketThread) {
+		super();
+		this.spriteAnalysisSocketThread = spriteAnalysisSocketThread;
+
+	}
+
+	public SpriteAnalysisSocketThread getSpriteAnalysisSocketThread() {
+		return spriteAnalysisSocketThread;
+	}
+
+	public void setSpriteAnalysisSocketThread(SpriteAnalysisSocketThread spriteAnalysisSocketThread) {
+		this.spriteAnalysisSocketThread = spriteAnalysisSocketThread;
+	}
+
+}

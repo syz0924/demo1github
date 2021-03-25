@@ -1,0 +1,156 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.controller.head 
+ * @author: syz  
+ * @date: 2019年2月28日 下午2:23:13 
+ */
+package com.lovdmx.control.controller.head;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.lovdmx.control.controller.BaseController;
+import com.lovdmx.control.pojo.Dmx512Device;
+import com.lovdmx.control.pojo.RackDevice;
+import com.lovdmx.control.pojo.RtrDevice;
+import com.lovdmx.control.pojo.RtrVideo;
+import com.lovdmx.control.pojo.SpriteDevice;
+import com.lovdmx.control.pojo.VideoSpilt;
+import com.lovdmx.control.service.Dmx512DeviceService;
+import com.lovdmx.control.service.RackDeviceService;
+import com.lovdmx.control.service.RtrDeviceService;
+import com.lovdmx.control.service.RtrVideoService;
+import com.lovdmx.control.service.SpriteDeviceService;
+import com.lovdmx.control.service.VideoSpiltService;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: InitDeviceController.java
+ * @Description: 该类的功能描述
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月28日 下午2:23:13
+ *
+ */
+@Controller
+@RequestMapping("/initDevice/")
+public class InitDeviceController extends BaseController {
+
+	@Autowired
+	private RackDeviceService rackDeviceService;
+
+	@Autowired
+	private RtrDeviceService rtrDeviceService;
+
+	@Autowired
+	private SpriteDeviceService spriteDeviceService;
+
+	@Autowired
+	private Dmx512DeviceService dmx512DeviceService;
+
+	@Autowired
+	private RtrVideoService rtrVideoService;
+
+	@Autowired
+	private VideoSpiltService videoSpiltService;
+
+	@ResponseBody
+	@RequestMapping("addDeviceData")
+	public String addDeviceData() {
+		// 关闭事务自动提交
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		TransactionStatus status = platformTransactionManager.getTransaction(def);
+		String result = "";
+		try {
+			List<RackDevice> rackDeviceList = new ArrayList<RackDevice>();
+			for (int i = 1; i <= 320; i++) {
+				RackDevice rackDevice = new RackDevice(i, "机架" + i, 1, 36, 40, new Date());
+				rackDeviceList.add(rackDevice);
+			}
+			// 批量插入
+			rackDeviceService.batchInsert(rackDeviceList);
+
+			List<RtrDevice> rtrDeviceList = new ArrayList<RtrDevice>();
+			List<SpriteDevice> spriteDeviceList = new ArrayList<SpriteDevice>();
+			for (RackDevice rackDevice : rackDeviceList) {
+				RtrDevice rtrDevice = new RtrDevice("10.10.10." + rackDevice.getRackId(),
+						"00:E0:4C:68:03:" + rackDevice.getRackId(), "1920*800", "RTR", rackDevice.getRackId(),
+						(short) 1);
+				SpriteDevice spriteDevice = new SpriteDevice("10.10.20." + rackDevice.getRackId(),
+						"00:E0:4C:68:04:" + rackDevice.getRackId(), rackDevice.getRackId(), (short) 1);
+				rtrDeviceList.add(rtrDevice);
+				spriteDeviceList.add(spriteDevice);
+			}
+			// 批量插入
+			rtrDeviceService.batchInsert(rtrDeviceList);
+			// 批量插入
+			spriteDeviceService.batchInsert(spriteDeviceList);
+			List<Dmx512Device> dmx512DeviceList = new ArrayList<Dmx512Device>();
+			for (RtrDevice rtrDevice : rtrDeviceList) {
+				Dmx512Device dmx512Device = new Dmx512Device("10.10.30" + rtrDevice.getRtrId(), "1,2", 3, "",
+						rtrDevice.getMac(), (short) 1);
+				dmx512DeviceList.add(dmx512Device);
+			}
+			// 批量插入
+			dmx512DeviceService.batchInsert(dmx512DeviceList);
+			// 逻辑代码，可以写上你的逻辑处理代码
+			platformTransactionManager.commit(status);
+			result = "成功";
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			platformTransactionManager.rollback(status);
+			result = "失败";
+		}
+		return result;
+	}
+
+	@ResponseBody
+	@RequestMapping("inItRTRFileSpiltInfo")
+	public String inItFileSpiltInfo() {
+		// 关闭事务自动提交
+		String result = "";
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		TransactionStatus status = platformTransactionManager.getTransaction(def);
+		List<RtrDevice> rtrDeviceList = rtrDeviceService.findAll();
+		List<RtrVideo> rtrVideoList = new ArrayList<RtrVideo>();
+		List<VideoSpilt> videoSpiltList = new ArrayList<VideoSpilt>();
+		String number = "c";
+		String md5 = "399bcd49f98b0fdab47cc064cb2691d1";
+		try {
+			for (RtrDevice rtrDevice : rtrDeviceList) {
+				RtrVideo rtrVideo = new RtrVideo(rtrDevice.getMac(), md5, number + "lovdmx" + rtrDevice.getRackId());
+				rtrVideoList.add(rtrVideo);
+				VideoSpilt videoSpilt = new VideoSpilt(md5, number + "lovdmx" + rtrDevice.getRackId(),
+						rtrDevice.getRackId(), 1);
+				videoSpiltList.add(videoSpilt);
+			}
+
+			rtrVideoService.batchInsert(rtrVideoList);
+			videoSpiltService.batchInsert(videoSpiltList);
+
+			platformTransactionManager.commit(status);
+			result = "成功";
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			platformTransactionManager.rollback(status);
+			result = "失败";
+		}
+		return result;
+	}
+
+}

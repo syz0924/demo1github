@@ -1,0 +1,30 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.RelayTasksMapper;
+import com.lovdmx.control.pojo.RelayTasks;
+import com.lovdmx.control.service.RelayTasksService;
+
+@Service("relayTasksService")
+public class RelayTasksServiceImpl extends BaseServiceImpl<RelayTasks> implements RelayTasksService {
+
+	@Autowired
+	private RelayTasksMapper relayTasksMapper;
+
+	@Override
+	public List<RelayTasks> findByRelayId(Integer relayId) {
+		// TODO Auto-generated method stub
+		return relayTasksMapper.findByRelayId(relayId);
+	}
+
+	@Override
+	public Integer batchInsert(List<RelayTasks> relayTasksList) {
+		// TODO Auto-generated method stub
+		return relayTasksMapper.batchInsert(relayTasksList);
+	}
+
+}

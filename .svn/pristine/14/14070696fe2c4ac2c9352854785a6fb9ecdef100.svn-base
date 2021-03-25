@@ -1,0 +1,6 @@
+package com.lovdmx.control.service;
+
+import com.lovdmx.control.pojo.RtrDevice;
+
+public interface RtrDeviceService extends BaseService<RtrDevice>{
+}

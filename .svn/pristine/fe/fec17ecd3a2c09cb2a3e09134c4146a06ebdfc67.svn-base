@@ -1,0 +1,6 @@
+package com.lovdmx.control.mapper;
+
+import com.lovdmx.control.pojo.UploadVideos;
+
+public interface UploadVideosMapper extends BaseMapper<UploadVideos>{
+}

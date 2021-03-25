@@ -1,0 +1,20 @@
+package com.lovdmx.control.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.EdlmxSplitMapper;
+import com.lovdmx.control.pojo.EdlmxSplit;
+import com.lovdmx.control.service.EdlmxSplitService;
+
+@Service("edlmxSplitService")
+public class EdlmxSplitServiceImpl extends BaseServiceImpl<EdlmxSplit> implements EdlmxSplitService {
+
+	@Autowired
+	private EdlmxSplitMapper edlmxSplitMapper;
+
+	@Override
+	public Integer findCountByMainMd5(String md5) {
+		return edlmxSplitMapper.findCountByMainMd5(md5);
+	}
+}

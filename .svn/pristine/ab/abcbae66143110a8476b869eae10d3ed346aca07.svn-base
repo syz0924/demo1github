@@ -1,0 +1,122 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.thread 
+ * @author: syz  
+ * @date: 2019年3月19日 上午10:31:36 
+ */
+package com.lovdmx.control.common.thread;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.socket.WebSocket;
+import com.lovdmx.control.common.utils.SocketUtils;
+import com.lovdmx.control.pojo.Dmx512Device;
+import com.lovdmx.control.pojo.EnumDeviceType;
+import com.lovdmx.control.pojo.EnumErrRank;
+import com.lovdmx.control.pojo.EnumErrType;
+import com.lovdmx.control.pojo.Err;
+import com.lovdmx.control.pojo.Project;
+import com.lovdmx.control.pojo.RackDevice;
+import com.lovdmx.control.pojo.RtrDevice;
+import com.lovdmx.control.pojo.SpriteDevice;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: ProjectAnalysisDeviceThread.java
+ * @Description: 该类的功能描述
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月19日 上午10:31:36
+ *
+ */
+public class ProjectAnalysisDeviceThread extends SocketUtils implements Runnable {
+
+	// 启动线程
+	private boolean isOK = true;
+	// 项目ID
+	private Integer projectId;
+
+	private JSONObject jsonObject = new JSONObject();
+
+	public void setOK(boolean isOK) {
+		this.isOK = isOK;
+	}
+
+	/**
+	 * @Function: RealTimeDeviceInfoThread.java
+	 * @Description: 构造函数
+	 *
+	 * @param:参数描述
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年2月21日 下午4:11:47
+	 */
+	public ProjectAnalysisDeviceThread(Integer projectId) {
+		super();
+		this.projectId = projectId;
+	}
+
+	@Override
+	public void run() {
+		try {
+			// 标识
+			jsonObject.put("opCode", 1111);
+			while (isOK) {
+
+				// List<Err> errList1 =
+				// errService.findAlarmDataByDeviceType("");
+				// 根据项目ID获取 所有机架信息
+				int index = 0;
+				Project projectDeviceInfo = projectService.findProjectCentreAllDeviceInfo(projectId);
+				List<Err> errList = new ArrayList<Err>();
+				for (RackDevice rackDevice : projectDeviceInfo.getSonRackDeviceList()) {
+					for (RtrDevice rtrDevice : rackDevice.getSonRtrDeviceList()) {
+						if (rtrDevice.getIsOnline() == 0) {
+							if (rtrDevice.getOfflineAlarmStatus() == 0) {
+								Err err = new Err(rtrDevice.getMac(), rtrDevice.getIp(), EnumDeviceType.RTR.name(),
+										projectId, rackDevice.getRackId(), EnumErrType.OffLine.name(),
+										EnumErrRank.General.name(), "", 0, "RTR掉线", new Date());
+								errList.add(err);
+							}
+						}
+						for (Dmx512Device dmx512Device : rtrDevice.getSonDmx512DeviceList()) {
+							if (dmx512Device.getIsOnline() == 0) {
+								if (dmx512Device.getOfflineAlarmStatus() == 0) {
+									index++;
+								}
+							}
+						}
+					}
+					for (SpriteDevice spriteDevice : rackDevice.getSonSpriteDeviceList()) {
+						if (spriteDevice.getIsOnline() == 0) {
+							if (spriteDevice.getOfflineAlarmStatus() == 0) {
+								Err err = new Err(spriteDevice.getMac(), spriteDevice.getIp(),
+										EnumDeviceType.Sprite.name(), projectId, rackDevice.getRackId(),
+										EnumErrType.OffLine.name(), EnumErrRank.General.name(), "", 0, "Sprite掉线",
+										new Date());
+								errList.add(err);
+							}
+						}
+					}
+				}
+				if (errList.size() > 0)
+					errService.batchInsert(errList);
+				jsonObject.put("dataJson", projectDeviceInfo);
+				String jsonString = jsonObject.toJSONString();
+				WebSocket.sendDataInfo(jsonString);
+				WebSocket.datJson = jsonString;
+				// 休眠10秒
+				Thread.sleep(1000 * 10);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+}

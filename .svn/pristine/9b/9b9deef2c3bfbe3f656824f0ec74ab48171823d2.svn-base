@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.RtrDeviceMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.RtrDevice">
+		<id column="rtr_id" property="rtrId" jdbcType="INTEGER" />
+		<result column="ip" property="ip" jdbcType="CHAR" />
+		<result column="mac" property="mac" jdbcType="CHAR" />
+		<result column="model_size" property="modelSize" jdbcType="VARCHAR" />
+		<result column="cur_mode" property="curMode" jdbcType="CHAR" />
+		<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+		<result column="is_online" property="isOnline" jdbcType="DECIMAL" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		rtr_id, ip, mac, model_size, cur_mode, rack_id, is_online
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_rtr_device
+		where rtr_id = #{rtrId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		dev_rtr_device
+		where rtr_id = #{rtrId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.RtrDevice">
+		insert into dev_rtr_device
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="rtrId != null">
+				rtr_id,
+			</if>
+			<if test="ip != null">
+				ip,
+			</if>
+			<if test="mac != null">
+				mac,
+			</if>
+			<if test="modelSize != null">
+				model_size,
+			</if>
+			<if test="curMode != null">
+				cur_mode,
+			</if>
+			<if test="rackId != null">
+				rack_id,
+			</if>
+			<if test="isOnline != null">
+				is_online,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="rtrId != null">
+				#{rtrId,jdbcType=INTEGER},
+			</if>
+			<if test="ip != null">
+				#{ip,jdbcType=CHAR},
+			</if>
+			<if test="mac != null">
+				#{mac,jdbcType=CHAR},
+			</if>
+			<if test="modelSize != null">
+				#{modelSize,jdbcType=VARCHAR},
+			</if>
+			<if test="curMode != null">
+				#{curMode,jdbcType=CHAR},
+			</if>
+			<if test="rackId != null">
+				#{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="isOnline != null">
+				#{isOnline,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.RtrDevice">
+		update dev_rtr_device
+		<set>
+			<if test="ip != null">
+				ip = #{ip,jdbcType=CHAR},
+			</if>
+			<if test="mac != null">
+				mac = #{mac,jdbcType=CHAR},
+			</if>
+			<if test="modelSize != null">
+				model_size = #{modelSize,jdbcType=VARCHAR},
+			</if>
+			<if test="curMode != null">
+				cur_mode = #{curMode,jdbcType=CHAR},
+			</if>
+			<if test="rackId != null">
+				rack_id = #{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="isOnline != null">
+				is_online = #{isOnline,jdbcType=DECIMAL},
+			</if>
+		</set>
+		where rtr_id = #{rtrId,jdbcType=INTEGER}
+	</update>
+</mapper>

@@ -1,0 +1,734 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.utils 
+ * @author: syz  
+ * @date: 2019年3月1日 上午11:26:07 
+ */
+package com.lovdmx.control.common.utils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.socket.ServerSocketThread;
+import com.lovdmx.control.httpVo.Directory;
+import com.lovdmx.control.httpVo.LightFile;
+import com.lovdmx.control.httpVo.VideoFile;
+import com.lovdmx.control.pojo.Log;
+import com.lovdmx.control.pojo.RackDevice;
+import com.lovdmx.control.pojo.SpriteTasks;
+import com.lovdmx.control.pojo.Tasks;
+import com.lovdmx.control.pojo.UploadEdlmx;
+import com.lovdmx.control.pojo.UploadVideos;
+import com.lovdmx.control.vo.UploadFileVo;
+
+import net.sf.json.JSONArray;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: SpriteAnalysisServiceUtils.java
+ * @Description: socket业务判断
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月1日 上午11:26:07
+ *
+ */
+public class OpCodeAnalysisServiceUtils extends SocketUtils {
+
+	/**
+	 * 
+	 * @Function: SpriteAnalysisServiceUtils.java
+	 * @Description: 组装设备信息
+	 *
+	 * @param:jsonObject JSON对象
+	 * @return：String
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月1日 下午3:23:01
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月1日 Administrator v1.0.0 修改原因
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
+	public static String getAssembleDeviceInfo(JSONObject jsonObject) throws Exception {
+		// 項目ID
+		Integer projectId = (Integer) jsonObject.get("projectId");
+		// 1、使用JSONArray
+		JSONArray json = JSONArray.fromObject(jsonObject.get("dataJson"));// userStr是json字符串
+		// 2、 添加子类型的class
+		Map classMap = new HashMap();
+		classMap.put("lightFileList", LightFile.class);
+		classMap.put("videoFileList", VideoFile.class);
+		// 3、JOSN数据转 对象
+		List<Directory> directoryList = (List<Directory>) JSONArray.toList(json, Directory.class, classMap);
+		// 获取已上传的视频信息
+		List<UploadVideos> uploadVideosList = uploadVideosService.findByProjectId(projectId);
+		// 获取已上传的灯光文件信息
+		List<UploadEdlmx> uploadEdlmxList = uploadEdlmxService.findByProjectId(projectId);
+		// 4、遍历 组装上传状态
+		for (Directory directory : directoryList) {
+			for (LightFile lightFile : directory.getLightFileList()) {
+				for (UploadEdlmx uploadEdlmx : uploadEdlmxList) {
+					// 判断是否上传
+					if (uploadEdlmx.getMd5().equals(lightFile.getMd5())) {
+						lightFile.setFilePath(uploadEdlmx.getFilePath());
+						lightFile.setUploadId(uploadEdlmx.getEdlmxId());
+						// 判断是否分发
+						if (uploadEdlmx.getRtrLoaded() == 1) {
+							lightFile.setStatus(2);
+						} else {
+							lightFile.setStatus(1);
+						}
+						uploadEdlmx.setExits(true);
+						break;
+					}
+				}
+			}
+
+			for (VideoFile videoFile : directory.getVideoFileList()) {
+				for (UploadVideos uploadVideo : uploadVideosList) {
+					// 判断是否上传
+					if (uploadVideo.getMd5().equals(videoFile.getMd5())) {
+						videoFile.setFilePath(uploadVideo.getFilePath());
+						videoFile.setUploadId(uploadVideo.getVideoId());
+						// 判断是否分发
+						if (uploadVideo.getRtrLoaded() == 1) {
+							videoFile.setStatus(2);
+						} else {
+							videoFile.setStatus(1);
+						}
+						uploadVideo.setExits(true);
+						break;
+					}
+				}
+			}
+		}
+		// 数据库已上传(目录不存在)添加到集合
+
+		List<LightFile> lightFileList = directoryList.get(directoryList.size() - 1).getLightFileList();
+		List<VideoFile> videoFileList = directoryList.get(directoryList.size() - 1).getVideoFileList();
+
+		for (UploadEdlmx uploadEdlmx : uploadEdlmxList) {
+			if (!uploadEdlmx.isExits()) {
+				LightFile lightFile = new LightFile(uploadEdlmx.getFileIndex(), uploadEdlmx.getFilePath(),
+						uploadEdlmx.getFilePath(), uploadEdlmx.getTime(), uploadEdlmx.getMd5(),
+						uploadEdlmx.getRtrLoaded() == 0 ? 1 : 2, "DMX", uploadEdlmx.getEdlmxId());
+				lightFileList.add(lightFile);
+			}
+		}
+		for (UploadVideos uploadVideo : uploadVideosList) {
+			if (!uploadVideo.isExits()) {
+				VideoFile videoFile = new VideoFile(uploadVideo.getFileIndex(), uploadVideo.getFilePath(),
+						uploadVideo.getFilePath(), uploadVideo.getMd5(), uploadVideo.getTime(),
+						uploadVideo.getRtrLoaded() == 0 ? 1 : 2, "VIDEO", uploadVideo.getVideoId());
+				videoFileList.add(videoFile);
+			}
+		}
+
+		return JsonUtils.objectToJson(directoryList);
+	}
+
+	/**
+	 * @Function: SpriteAnalysisServiceUtils.java
+	 * @Description: 添加视频或灯光文件
+	 *
+	 * @param:dataJson 上传成功添加
+	 *                     数据
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月1日 下午2:56:52
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月1日 Administrator v1.0.0 修改原因
+	 */
+	public static void addUploadVideoOrEdlmxFile(JSONObject dataJson, UploadFileVo uploadFileVo) throws Exception {
+		// 文件路径
+		String filePath = (String) dataJson.get("filePath");
+		Integer num = 0;
+		// 灯光
+		if (uploadFileVo.getFileType() == 0) {
+			// JOSN对象转 类对象
+			UploadEdlmx uploadEdlmx = JSON.toJavaObject(dataJson, UploadEdlmx.class);
+			// 获取主录放精灵上传的最后一条信息
+			UploadEdlmx lastUploadEdlmx = uploadEdlmxService
+					.findWebUploadLastInfoByProjectIdAndUploadRole(uploadEdlmx.getProjectId(), 1);
+			int index = 1;
+			if (lastUploadEdlmx != null) {
+				// 下标加一
+				index += lastUploadEdlmx.getFileIndex();
+			}
+			uploadEdlmx.setRtrLoaded(0);
+			uploadEdlmx.setFileIndex(index);
+			uploadEdlmx.setUploadRole(1);
+			uploadEdlmx.setTime(uploadFileVo.getTime());
+			uploadEdlmx.setFilePath(filePath);
+			num = uploadEdlmxService.save(uploadEdlmx);
+			// 视频
+		} else {
+			// JOSN对象转 类对象
+			UploadVideos uploadVideo = JSON.toJavaObject(dataJson, UploadVideos.class);
+			// 获取主录放精灵上传的最后一条信息
+			UploadVideos lastUploadVideo = uploadVideosService
+					.findWebUploadLastInfoByProjectIdAndUploadRole(uploadVideo.getProjectId(), 1);
+			int index = 1;
+			if (lastUploadVideo != null) {
+				// 下标加一
+				index += lastUploadVideo.getFileIndex();
+			}
+			uploadVideo.setRtrLoaded(0);
+			uploadVideo.setFileIndex(index);
+			uploadVideo.setUploadRole(1);
+			uploadVideo.setTime(uploadFileVo.getTime());
+			uploadVideo.setFilePath(filePath);
+			num = uploadVideosService.save(uploadVideo);
+		}
+		// dataJson.put("mac", uploadFileVo.getMac());
+		// 添加状态
+		dataJson.put("result", num == 0 ? true : false);
+	}
+
+	/**
+	 * 
+	 * @Function: SpriteAnalysisServiceUtils.java
+	 * @Description: 添加操作日志信息
+	 *
+	 * @param:jsonObject JSON对象
+	 * @return: boolean
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月5日 下午5:01:11
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月5日 Administrator v1.0.0 修改原因
+	 */
+	public static boolean addLogInfo(Log log) throws Exception {
+		// 添加操作日志
+		Integer save = logService.save(log);
+		return save == 0 ? false : true;
+	}
+
+	/**
+	 * 
+	 * @Function: OpCodeAnalysisServiceUtils.java
+	 * @Description: 添加上传的灯光或视频文件
+	 *
+	 * @param: socketClientData
+	 *             socket客户端反馈数据
+	 * @param webClientData
+	 *            web客户传送数据
+	 * @return: boolean
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月26日 下午3:37:54
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月26日 Administrator v1.0.0 修改原因
+	 */
+	public static boolean addUploadVideoOrLmxInfo(JSONObject socketClientData, JSONObject webClientData,
+			Integer projectId) throws Exception {
+		// 反馈上传状态
+		Integer status = (Integer) socketClientData.get("status");
+		// 判断是否成功
+		if (status == 1 || status == 2) {
+			UploadFileVo uploadFileVo = (UploadFileVo) JSONObject.toJavaObject(webClientData, UploadFileVo.class);
+
+			// 判断是否存在
+			boolean isExits = false;
+			if (status == 2) {
+				String md5 = (String) socketClientData.get("md5");
+				// 判断是否存在
+				if (uploadFileVo.getFileType() == 0) {
+					UploadEdlmx uploadEdlmx = uploadEdlmxService.findByMd5(md5);
+					socketClientData.put("status", 1);
+					isExits = uploadEdlmx != null ? true : false;
+				} else {
+					UploadVideos uploadVideos = uploadVideosService.findByMd5(md5);
+					socketClientData.put("status", 1);
+					isExits = uploadVideos != null ? true : false;
+				}
+			}
+			// 不存在添加
+			if (!isExits) {
+				// 上传成功添加 记录
+				OpCodeAnalysisServiceUtils.addUploadVideoOrEdlmxFile(socketClientData, uploadFileVo);
+				// 日志
+				Log log = (Log) webClientData.get("log");
+
+				OpCodeAnalysisServiceUtils.addLogInfo(log);
+				// 更新 目录文件列表
+				JSONObject directoryDataJson = new JSONObject();
+				directoryDataJson.put("dataJson", ServerSocketThread.getDirectoryListData());
+				directoryDataJson.put("projectId", projectId);
+				String dataJson = OpCodeAnalysisServiceUtils.getAssembleDeviceInfo(directoryDataJson);
+
+				// 赋值最新的文件信息
+				ServerSocketThread.setDirectoryListData(dataJson);
+				socketClientData.put("dataJson", dataJson);
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * 
+	 * @Function: OpCodeAnalysisServiceUtils.java
+	 * @Description: 修改已上传视频分发状态
+	 *
+	 * @param: socketClientData
+	 *             socket客户端反馈数据
+	 * @param webClientData
+	 *            web客户传送数据
+	 * @param uuid
+	 *            md5值
+	 * @param webClientDataMap
+	 *            web信息map对象
+	 * @return: boolean
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月26日 下午3:44:13
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月26日 Administrator v1.0.0 修改原因
+	 *        JSON======>>>{"MAC":"00:E0:AC:CE:35:0D","OrgFileMd5":
+	 *        "0e66e0c78734d14bdebbdc992aafa0aa","Percentage":"100"}
+	 */
+	public static boolean updateUpdateVideoSplitStatus(JSONObject socketClientData, JSONObject webClientData,
+			String uuid, Map<String, JSONObject> webClientDataMap) throws Exception {
+		// state (-1 分发丢失,1 正常分发);
+		Integer state = (Integer) webClientData.get("state");
+		// 进度
+		String percentage = (String) socketClientData.get("Percentage");
+		Log log = (Log) webClientData.get("log");
+		if (percentage.equals("100")) {
+			// 获取md5值
+			String fileMd5 = (String) socketClientData.get("OrgFileMd5");
+			UploadVideos uploadVideos = uploadVideosService.findByMd5(fileMd5);
+			// 日志
+			if (state == 1) {
+				uploadVideos.setRtrLoaded(1);
+				uploadVideosService.update(uploadVideos);
+				log.setContent(uuid + "视频分发成功");
+			} else {
+				log.setContent(uuid + "丢失视频分发成功");
+			}
+			webClientData.put("md5", uploadVideos.getMd5());
+		} else {
+			if (state == 1) {
+				log.setContent(uuid + "视频分发失败");
+			} else {
+				log.setContent(uuid + "丢失视频分发失败");
+			}
+			webClientDataMap.remove(uuid);
+		}
+		// 添加日志
+		OpCodeAnalysisServiceUtils.addLogInfo(log);
+		return true;
+	}
+
+	/**
+	 * 
+	 * @Function: OpCodeAnalysisServiceUtils.java
+	 * @Description: 添加 RTR视频信息
+	 *
+	 * @param: socketClientData
+	 *             socket客户端反馈数据
+	 * @param webClientData
+	 *            web客户传送数据
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月26日 下午4:17:33
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月26日 Administrator v1.0.0 修改原因
+	 */
+	public static JSONObject feedbackRtrVideoInfo(JSONObject socketClientData, JSONObject webClientData,
+			Integer projectId) {
+
+		JSONObject jsonData = new JSONObject();
+		// RTR MAC
+		String rtrMac = (String) socketClientData.get("MAC");
+		// 机架信息
+		RackDevice rackDevice = rackDeviceService.findByAndProjectIdRtrMac(projectId, rtrMac);
+		// 进度
+		String percentage = (String) socketClientData.get("Percentage");
+		if (percentage.equals("-1")) {
+			jsonData.put("result", "false");
+		} else if (percentage.equals("100")) {
+			jsonData.put("result", "true");
+		} else {
+			jsonData.put("result", "download..");
+		}
+		jsonData.put("rackDevice", rackDevice);
+		return jsonData;
+	}
+
+	/**
+	 * 
+	 * @Function: OpCodeAnalysisServiceUtils.java
+	 * @Description: 修改已上传灯光分发状态
+	 *
+	 * @param: socketClientData
+	 *             socket客户端反馈数据
+	 * @param webClientData
+	 *            web客户传送数据
+	 * @param uuid
+	 *            md5值
+	 * @param webClientDataMap
+	 *            web信息map对象
+	 * @return: boolean
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月26日 下午3:44:13
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月26日 Administrator v1.0.0 修改原因
+	 */
+	public static boolean updateUpdateLightingSplitStatus(JSONObject socketClientData, JSONObject webClientData,
+			String uuid, Map<String, JSONObject> webClientDataMap) throws Exception {
+		// state (-1 分发丢失,1 正常分发);
+		Integer state = (Integer) webClientData.get("state");
+		// 进度
+		String percentage = (String) socketClientData.get("Percentage");
+		Log log = (Log) webClientData.get("log");
+		if (percentage.equals("100")) {
+			// 获取md5值
+			String fileMd5 = (String) socketClientData.get("OrgFileMd5");
+			UploadEdlmx uploadEdlmx = uploadEdlmxService.findByMd5(fileMd5);
+			if (state == 1) {
+				uploadEdlmx.setRtrLoaded(1);
+				uploadEdlmxService.update(uploadEdlmx);
+				log.setContent(uuid + "灯光分发成功");
+			} else {
+				log.setContent(uuid + "丢失灯光分发成功");
+			}
+			webClientData.put("uploadEdlmx", uploadEdlmx);
+		} else {
+			if (state == 1) {
+				log.setContent(uuid + "灯光分发失败");
+			} else {
+				log.setContent(uuid + "丢失灯光分发失败");
+			}
+			webClientDataMap.remove(uuid);
+		}
+		// 添加日志
+		OpCodeAnalysisServiceUtils.addLogInfo(log);
+		return true;
+	}
+
+	/**
+	 * 
+	 * @Function: OpCodeAnalysisServiceUtils.java
+	 * @Description: 添加 SpriteLmx信息
+	 *
+	 * @param: socketClientData
+	 *             socket客户端反馈数据
+	 * @param webClientData
+	 *            web客户传送数据
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月26日 下午4:17:33
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月26日 Administrator v1.0.0 修改原因
+	 */
+	public static JSONObject feedbackSpriteLmxInfo(JSONObject socketClientData, JSONObject webClientData,
+			Integer projectId) {
+
+		JSONObject jsonData = new JSONObject();
+		// Sprite MAC
+		String spriteMac = (String) socketClientData.get("MAC");
+		// 机架信息
+		RackDevice rackDevice = rackDeviceService.findByAndProjectIdSpriteMac(projectId, spriteMac);
+		// 进度
+		String percentage = (String) socketClientData.get("Percentage");
+		if (percentage.equals("-1")) {
+			jsonData.put("result", "false");
+		} else if (percentage.equals("100")) {
+			jsonData.put("result", "true");
+		} else {
+			jsonData.put("result", "download..");
+		}
+		jsonData.put("rackDevice", rackDevice);
+		return jsonData;
+	}
+
+	/**
+	 * 
+	 * @Function: OpCodeAnalysisServiceUtils.java
+	 * @Description: 添加定时任务
+	 *
+	 * @param: socketClientData
+	 *             socket客户端反馈数据
+	 * @param webClientData
+	 *            web客户传送数据
+	 * @return: boolean
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月26日 下午3:53:55
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月26日 Administrator v1.0.0 修改原因
+	 */
+	public static boolean addTask(JSONObject socketClientData, JSONObject webClientData, String uuid,
+			Map<String, JSONObject> webClientDataMap) throws Exception {
+		// state (-1 分发丢失,1 正常分发);
+		Integer state = (Integer) webClientData.get("state");
+		// 获取md5值
+		String status = (String) socketClientData.get("status");
+
+		Tasks task = (Tasks) webClientData.get("task");
+		Log log = (Log) webClientData.get("log");
+		if (status.equals("1")) {
+			if (state == 1) {
+				// 添加定时任务
+				tasksService.save(task);
+				log.setContent(task.getTaskName() + "任务添加成功");
+			} else {
+				log.setContent(task.getTaskName() + "丢失任务添加成功");
+			}
+			webClientData.put("taskId", task.getTaskId());
+
+		} else if (status.equals("0")) {
+			if (state == 1) {
+				log.setContent(task.getTaskName() + "任务添加失败");
+			} else {
+				log.setContent(task.getTaskName() + "丢失任务添加失败");
+			}
+			// 移除
+			webClientDataMap.remove(uuid);
+		}
+		// 添加日志
+		OpCodeAnalysisServiceUtils.addLogInfo(log);
+		return true;
+	}
+
+	/**
+	 * 
+	 * @Function: OpCodeAnalysisServiceUtils.java
+	 * @Description: 反馈暂停任务信息
+	 *
+	 * @param: socketClientData
+	 *             socket客户端反馈数据
+	 * @param webClientData
+	 *            web客户传送数据
+	 * @return：JSONObject
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月26日 下午4:44:43
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月26日 Administrator v1.0.0 修改原因
+	 */
+	public static JSONObject feedbackTaskInfo(JSONObject socketClientData, JSONObject webClientData, Integer projectId)
+			throws Exception {
+
+		JSONObject jsonData = new JSONObject();
+		// Sprite MAC
+		String spriteMac = (String) socketClientData.get("MAC");
+		// 机架信息
+		RackDevice rackDevice = rackDeviceService.findByAndProjectIdSpriteMac(projectId, spriteMac);
+		// 进度
+		Integer status = (Integer) socketClientData.get("status");
+		if (status.equals(1)) {
+			Tasks task = (Tasks) webClientData.get("task");
+			SpriteTasks spriteTasks = new SpriteTasks(spriteMac, task.getTaskId());
+			// 保存任务
+			spriteTasksService.save(spriteTasks);
+
+			jsonData.put("result", "true");
+		} else if (status.equals(0)) {
+			jsonData.put("result", "false");
+		}
+		jsonData.put("rackDevice", rackDevice);
+		return jsonData;
+	}
+
+	/**
+	 * 
+	 * @Function: OpCodeAnalysisServiceUtils.java
+	 * @Description: 添加暫停任務信息
+	 *
+	 * @param: socketClientData
+	 *             socket客户端反馈数据
+	 * @param webClientData
+	 *            web客户传送数据
+	 * @return: boolean
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月26日 下午3:57:37
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月26日 Administrator v1.0.0 修改原因
+	 */
+	public static boolean addPauseTaskInfo(JSONObject socketClientData, JSONObject webClientData) throws Exception {
+		// 获取md5值
+		String status = (String) socketClientData.get("status");
+
+		Log log = (Log) webClientData.get("log");
+
+		if (status.equals("1")) {
+			log.setContent("暂停任务策略 成功");
+		} else {
+			log.setContent("暂停任务策略 失败");
+		}
+		OpCodeAnalysisServiceUtils.addLogInfo(log);
+		return true;
+	}
+
+	/**
+	 * 
+	 * @Function: OpCodeAnalysisServiceUtils.java
+	 * @Description: 反馈暂停任务信息
+	 *
+	 * @param: socketClientData
+	 *             socket客户端反馈数据
+	 * @param webClientData
+	 *            web客户传送数据
+	 * @return：JSONObject
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月26日 下午4:44:43
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月26日 Administrator v1.0.0 修改原因
+	 */
+	public static JSONObject feedbackPauseTaskInfo(JSONObject socketClientData, JSONObject webClientData,
+			Integer projectId) throws Exception {
+
+		JSONObject jsonData = new JSONObject();
+		// Sprite MAC
+		String spriteMac = (String) socketClientData.get("MAC");
+		// 机架信息
+		RackDevice rackDevice = rackDeviceService.findByAndProjectIdSpriteMac(projectId, spriteMac);
+		// 进度
+		Integer status = (Integer) socketClientData.get("status");
+		if (status.equals(1)) {
+			jsonData.put("result", "true");
+		} else if (status.equals(0)) {
+			jsonData.put("result", "false");
+		}
+		jsonData.put("rackDevice", rackDevice);
+		return jsonData;
+	}
+
+	/**
+	 * 
+	 * @Function: OpCodeAnalysisServiceUtils.java
+	 * @Description: 添加恢复任務信息
+	 *
+	 * @param: socketClientData
+	 *             socket客户端反馈数据
+	 * @param webClientData
+	 *            web客户传送数据
+	 * @return: boolean
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月26日 下午3:57:37
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月26日 Administrator v1.0.0 修改原因
+	 */
+	public static boolean addRestoreTaskInfo(JSONObject socketClientData, JSONObject webClientData) throws Exception {
+		// 获取md5值
+		String status = (String) socketClientData.get("status");
+
+		Log log = (Log) webClientData.get("log");
+
+		if (status.equals("1")) {
+			log.setContent("恢复任务策略 成功");
+		} else {
+			log.setContent("恢复任务策略 失败");
+		}
+		OpCodeAnalysisServiceUtils.addLogInfo(log);
+		return true;
+	}
+
+	/**
+	 * 
+	 * @Function: OpCodeAnalysisServiceUtils.java
+	 * @Description: 反馈暂停任务信息
+	 *
+	 * @param: socketClientData
+	 *             socket客户端反馈数据
+	 * @param webClientData
+	 *            web客户传送数据
+	 * @return：JSONObject
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月26日 下午4:44:43
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月26日 Administrator v1.0.0 修改原因
+	 */
+	public static JSONObject feedbackRestoreTaskInfo(JSONObject socketClientData, JSONObject webClientData,
+			Integer projectId) throws Exception {
+
+		JSONObject jsonData = new JSONObject();
+		// Sprite MAC
+		String spriteMac = (String) socketClientData.get("MAC");
+		// 机架信息
+		RackDevice rackDevice = rackDeviceService.findByAndProjectIdSpriteMac(projectId, spriteMac);
+		// 进度
+		Integer status = (Integer) socketClientData.get("status");
+		if (status.equals(1)) {
+			jsonData.put("result", "true");
+		} else if (status.equals(0)) {
+			jsonData.put("result", "false");
+		}
+		jsonData.put("rackDevice", rackDevice);
+		return jsonData;
+	}
+
+}

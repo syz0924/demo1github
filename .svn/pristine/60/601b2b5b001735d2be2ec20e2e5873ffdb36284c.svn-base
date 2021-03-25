@@ -1,0 +1,50 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.RackDeviceMapper;
+import com.lovdmx.control.pojo.RackDevice;
+import com.lovdmx.control.service.RackDeviceService;
+
+@Service("rackDeviceService")
+public class RackDeviceServiceImpl extends BaseServiceImpl<RackDevice> implements RackDeviceService {
+	@Autowired
+	private RackDeviceMapper rackDeviceMapper;
+
+	@Override
+	public List<RackDevice> findByParentId(Integer parentId) {
+		return rackDeviceMapper.findByParentId(parentId);
+	}
+
+	@Override
+	public Integer batchInsert(List<RackDevice> list) {
+		// TODO Auto-generated method stub
+		return rackDeviceMapper.batchInsert(list);
+	}
+
+	@Override
+	public Integer countByProjectId(Integer projectId) {
+		return rackDeviceMapper.countByProjectId(projectId);
+	}
+
+	@Override
+	public String findGroupCounatRackIdByParojectId(Integer projectId) {
+		// TODO Auto-generated method stub
+		return rackDeviceMapper.findGroupCounatRackIdByParojectId(projectId);
+	}
+
+	@Override
+	public String findRTRNotExistVideoGroupCounatRackIdByParentIdAndMd5(Integer projectId, String md5) {
+		// TODO Auto-generated method stub
+		return rackDeviceMapper.findRTRNotExistVideoGroupCounatRackIdByParentIdAndMd5(projectId, md5);
+	}
+
+	@Override
+	public String findSpriteNotExistVideoGroupCounatRackIdByParentIdAndMd5(Integer projectId,
+			String md5) {
+		return rackDeviceMapper.findSpriteNotExistVideoGroupCounatRackIdByParentIdAndMd5(projectId, md5);
+	}
+}

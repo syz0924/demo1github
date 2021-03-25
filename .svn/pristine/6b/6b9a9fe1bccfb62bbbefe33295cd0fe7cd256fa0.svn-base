@@ -1,0 +1,206 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.utils 
+ * @author: syz  
+ * @date: 2019年3月1日 上午11:26:07 
+ */
+package com.lovdmx.control.common.utils;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.httpVo.Directory;
+import com.lovdmx.control.httpVo.LightFile;
+import com.lovdmx.control.httpVo.VideoFile;
+import com.lovdmx.control.pojo.Log;
+import com.lovdmx.control.pojo.UploadEdlmx;
+import com.lovdmx.control.pojo.UploadVideos;
+
+import net.sf.json.JSONArray;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: SpriteAnalysisServiceUtils.java
+ * @Description: socket业务判断
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月1日 上午11:26:07
+ *
+ */
+public class OpCodeAnalysisServiceUtils extends SocketUtils {
+
+	/**
+	 * 
+	 * @Function: SpriteAnalysisServiceUtils.java
+	 * @Description: 组装设备信息
+	 *
+	 * @param:jsonObject JSON对象
+	 * @return：String
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月1日 下午3:23:01
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月1日 Administrator v1.0.0 修改原因
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
+	public static String getAssembleDeviceInfo(JSONObject jsonObject) throws Exception {
+		// 項目ID
+		Integer projectId = (Integer) jsonObject.get("projectId");
+		// 1、使用JSONArray
+		JSONArray json = JSONArray.fromObject(jsonObject.get("dataJson"));// userStr是json字符串
+		// 2、 添加子类型的class
+		Map classMap = new HashMap();
+		classMap.put("lightFileList", LightFile.class);
+		classMap.put("videoFileList", VideoFile.class);
+		// 3、JOSN数据转 对象
+		List<Directory> directoryList = (List<Directory>) JSONArray.toList(json, Directory.class, classMap);
+		// 获取已上传的视频信息
+		List<UploadVideos> uploadVideosList = uploadVideosService.findByProjectId(projectId);
+		// 获取已上传的灯光文件信息
+		List<UploadEdlmx> uploadEdlmxList = uploadEdlmxService.findByProjectId(projectId);
+		// 4、遍历 组装上传状态
+		for (Directory directory : directoryList) {
+			for (LightFile lightFile : directory.getLightFileList()) {
+				for (UploadEdlmx uploadEdlmx : uploadEdlmxList) {
+					// 判断是否上传
+					if (uploadEdlmx.getMd5().equals(lightFile.getMd5())) {
+						// 判断是否分发
+						if (uploadEdlmx.getRtrLoaded() == 1) {
+							lightFile.setStatus(2);
+						} else {
+							lightFile.setStatus(1);
+						}
+					}
+				}
+			}
+			for (VideoFile videoFile : directory.getVideoFileList()) {
+				for (UploadVideos uploadVideo : uploadVideosList) {
+					// 判断是否上传
+					if (uploadVideo.getMd5().equals(videoFile.getMd5())) {
+						// 判断是否分发
+						if (uploadVideo.getRtrLoaded() == 1) {
+							videoFile.setStatus(2);
+						} else {
+							videoFile.setStatus(1);
+						}
+					}
+				}
+			}
+		}
+		return JsonUtils.objectToJson(directoryList);
+	}
+
+	/**
+	 * @Function: SpriteAnalysisServiceUtils.java
+	 * @Description: 添加视频或灯光文件
+	 *
+	 * @param:dataJson 上传成功添加
+	 *                     数据
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月1日 下午2:56:52
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月1日 Administrator v1.0.0 修改原因
+	 */
+	public static void addUploadVideoOrEdlmxFile(JSONObject dataJson, JSONObject clientData) throws Exception {
+		// 上传类型
+		Integer typeId = (Integer) clientData.get("fileType");
+		// 时长
+		Integer times = (Integer) clientData.get("times");
+		// 文件路径
+		String filePath = (String) dataJson.get("filePath");
+		Integer num = 0;
+		// 灯光
+		if (typeId == 0) {
+			// JOSN对象转 类对象
+			UploadEdlmx uploadEdlmx = JSON.toJavaObject(dataJson, UploadEdlmx.class);
+			// 获取主录放精灵上传的最后一条信息
+			UploadEdlmx lastUploadEdlmx = uploadEdlmxService
+					.findWebUploadLastInfoByProjectIdAndUploadRole(uploadEdlmx.getProjectId(), 1);
+			int index = 1;
+			if (lastUploadEdlmx != null) {
+				// 下标加一
+				index += lastUploadEdlmx.getFileIndex();
+			}
+			uploadEdlmx.setRtrLoaded(0);
+			uploadEdlmx.setFileIndex(index);
+			uploadEdlmx.setUploadRole(1);
+			uploadEdlmx.setLmxTimes(times);
+			uploadEdlmx.setFilePath(filePath);
+			num = uploadEdlmxService.save(uploadEdlmx);
+			// 视频
+		} else {
+			// JOSN对象转 类对象
+			UploadVideos uploadVideo = JSON.toJavaObject(dataJson, UploadVideos.class);
+			// 获取主录放精灵上传的最后一条信息
+			UploadVideos lastUploadVideo = uploadVideosService
+					.findWebUploadLastInfoByProjectIdAndUploadRole(uploadVideo.getProjectId(), 1);
+			int index = 1;
+			if (lastUploadVideo != null) {
+				// 下标加一
+				index += lastUploadVideo.getFileIndex();
+			}
+			uploadVideo.setRtrLoaded(0);
+			uploadVideo.setFileIndex(index);
+			uploadVideo.setUploadRole(1);
+			uploadVideo.setVideoTimes(times);
+			uploadVideo.setFilePath(filePath);
+			num = uploadVideosService.save(uploadVideo);
+		}
+		dataJson.put("mac", clientData.get("mac"));
+		// 添加状态
+		dataJson.put("result", num == 0 ? true : false);
+	}
+
+	/**
+	 * 
+	 * @Function: SpriteAnalysisServiceUtils.java
+	 * @Description: 添加操作日志信息
+	 *
+	 * @param:jsonObject JSON对象
+	 * @return: boolean
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月5日 下午5:01:11
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月5日 Administrator v1.0.0 修改原因
+	 */
+	public static boolean addLogInfo(JSONObject jsonObject) throws Exception {
+		// 项目
+		Integer projectId = (Integer) jsonObject.get("projectId");
+		// 账号ID
+		Integer accountId = (Integer) jsonObject.get("accountId");
+		// 操作模式
+		String operationMode = (String) jsonObject.get("operationMode");
+		// 操作描述
+		String content = (String) jsonObject.get("logInfo");
+		// 初始化构造函数
+		Log log = new Log(projectId, accountId, operationMode, content, new Date());
+		// 添加操作日志
+		Integer save = logService.save(log);
+
+		return save == 0 ? false : true;
+	}
+
+}

@@ -1,0 +1,10 @@
+package com.lovdmx.control.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.pojo.RtrDevice;
+import com.lovdmx.control.service.RtrDeviceService;
+
+@Service("rtrDeviceService")
+public class RtrDeviceServiceImpl extends BaseServiceImpl<RtrDevice> implements RtrDeviceService {
+}

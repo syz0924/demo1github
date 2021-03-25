@@ -1,0 +1,782 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.controller.head 
+ * @author: syz  
+ * @date: 2019年2月21日 下午5:32:48 
+ */
+package com.lovdmx.control.controller.head;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.socket.ServerSocketThread;
+import com.lovdmx.control.common.thread.AnalysisClientSocketThread;
+import com.lovdmx.control.common.utils.DateUtils;
+import com.lovdmx.control.common.utils.JsonUtils;
+import com.lovdmx.control.common.utils.OnLineClientUtils;
+import com.lovdmx.control.common.utils.PageageUtils;
+import com.lovdmx.control.common.utils.SocketUtils;
+import com.lovdmx.control.controller.BaseController;
+import com.lovdmx.control.httpVo.FilePathVo;
+import com.lovdmx.control.httpVo.LightFile;
+import com.lovdmx.control.httpVo.SocketClientInfoVo;
+import com.lovdmx.control.httpVo.SplitFileVo;
+import com.lovdmx.control.httpVo.TimedTaskVo;
+import com.lovdmx.control.httpVo.VideoFile;
+import com.lovdmx.control.pojo.Account;
+import com.lovdmx.control.pojo.EnumCyclicMode;
+import com.lovdmx.control.pojo.EnumFileType;
+import com.lovdmx.control.pojo.EnumOperationMode;
+import com.lovdmx.control.pojo.EnumTaskType;
+import com.lovdmx.control.pojo.Err;
+import com.lovdmx.control.pojo.Log;
+import com.lovdmx.control.pojo.Subtasks;
+import com.lovdmx.control.pojo.Tasks;
+import com.lovdmx.control.pojo.UploadEdlmx;
+import com.lovdmx.control.pojo.UploadVideos;
+import com.lovdmx.control.service.ErrService;
+import com.lovdmx.control.service.RackDeviceService;
+import com.lovdmx.control.service.SubtasksService;
+import com.lovdmx.control.service.TasksService;
+import com.lovdmx.control.service.UploadEdlmxService;
+import com.lovdmx.control.service.UploadVideosService;
+import com.lovdmx.control.vo.SendSplitVo;
+import com.lovdmx.control.vo.UploadFileVo;
+import com.lovdmx.control.vo.VideoOrLmxTaskNameVo;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: ControlServerController.java
+ * @Description: 中控服务端控制器
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月21日 下午5:32:48
+ *
+ */
+@RequestMapping("/controlServer/")
+@CrossOrigin
+@Controller
+public class ControlServerController extends BaseController {
+
+	@Autowired
+	private SubtasksService subtasksService; // 子任务
+
+	@Autowired
+	private TasksService tasksService; // 定时任务
+
+	@Autowired
+	private UploadVideosService uploadVideosService; // 已上传视频
+
+	@Autowired
+	private UploadEdlmxService uploadEdlmxService; // 已上传灯光文件
+
+	@Autowired
+	private RackDeviceService rackDeviceService; // 机架
+
+	@Autowired
+	private ErrService errService; // 报警
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 获取目录信息
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @throws Exception
+	 * @date: 2019年4月1日 下午4:02:00
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月1日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getDirectoryDataList", method = RequestMethod.GET)
+	public JSONObject getDirectoryDataList(HttpSession session) throws Exception {
+		JSONObject jsonObject = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+			jsonObject.put("result", "false");
+			return jsonObject;
+		}
+		// 获取主录放精灵客户端信息
+		SocketClientInfoVo socketClientInfoVo = OnLineClientUtils.getSpriteClient();
+		// 判断是否在线
+		if (socketClientInfoVo != null) {
+			// 组装数据
+			byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1021, null);
+			// 发送
+			AnalysisClientSocketThread.transmit(socketClientInfoVo.getAnalysisSocketThread(), dataBytes);
+			jsonObject.put("directoryList", ServerSocketThread.getDirectoryListData());
+			result = "send successful";
+		} else {
+			result = "not online";
+			// 已上传的灯光文件列表
+			List<LightFile> lightFileList = uploadEdlmxService.findByLmxProjectId(account.getProjectId());
+			// 已上传的视频文件列表
+			List<VideoFile> videoFileList = uploadVideosService.findByVideoProjectId(account.getProjectId());
+			jsonObject.put("uploadEdlmxList", lightFileList);
+			jsonObject.put("uploadVideoList", videoFileList);
+		}
+		jsonObject.put("result", result);
+		return jsonObject;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 获取任务信息
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月1日 下午4:01:46
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月1日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getTasksDataList", method = RequestMethod.GET)
+	public JSONObject getTasksDataList(HttpSession session) throws Exception {
+		JSONObject jsonObject = new JSONObject();
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+			jsonObject.put("result", "false");
+			return jsonObject;
+		}
+		List<Tasks> tasksList = tasksService.findByParentId(account.getProjectId());
+		jsonObject.put("tasksList", tasksList);
+		return jsonObject;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 获取子任务信息
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月1日 下午4:01:27
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月1日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getSubtasksDataList", method = RequestMethod.GET)
+	public JSONObject getSubtasksDataList(HttpSession session) throws Exception {
+		JSONObject jsonObject = new JSONObject();
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+			jsonObject.put("result", "false");
+			return jsonObject;
+		}
+
+		// 所有子任务
+		List<Subtasks> subtasksList = subtasksService.findByParentId(account.getProjectId());
+		jsonObject.put("subtasksList", subtasksList);
+		return jsonObject;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 修改子任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月22日 下午4:22:34
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月22日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "updateSubtask", method = RequestMethod.GET)
+	public String updateSubtask(Subtasks subtask, HttpSession session) {
+		String result = "";
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		TransactionStatus status = platformTransactionManager.getTransaction(def);
+		try {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+			// 判断是否在线
+			if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+				return "false";
+			}
+			Subtasks isExitsSubtasks = subtasksService.findSubtaskNameIsExitsBySubtaskName(subtask.getSubtaskName(),
+					account.getAccountId());
+			if (isExitsSubtasks == null || isExitsSubtasks.getSubtaskId() == subtask.getSubtaskId()) {
+				// 保存
+				Integer num = subtasksService.update(subtask);
+				result = num == 0 ? "fail" : "succeed";
+			} else {
+				result = "already exists";
+			}
+			Log log = new Log(account.getProjectId(), account.getAccountId(), EnumOperationMode.UPDATE.name(), "修改子任务",
+					new Date());
+			// 添加操作日志
+			addlogInfo(log);
+
+			platformTransactionManager.commit(status);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			platformTransactionManager.rollback(status);
+		}
+
+		// 反馈客户端状态
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 添加子任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月22日 下午4:22:34
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月22日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "addSubtask", method = RequestMethod.GET)
+	public String addSubtask(Subtasks subtask, HttpSession session) {
+		String result = "";
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		TransactionStatus status = platformTransactionManager.getTransaction(def);
+		try {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+
+			// 判断是否在线
+			if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+				return "false";
+			}
+			// 判断子任务名是否存在
+			Subtasks subtasks = subtasksService.findSubtaskNameIsExitsBySubtaskName(subtask.getSubtaskName(),
+					account.getProjectId());
+			if (subtasks == null) {
+				// 判断是灯光文件还是视频文件
+				if (subtask.getType() == 0) {
+					subtask.setFileType(EnumFileType.LightingFile.name());
+					// 根据md5值查询 灯光是否存在
+					UploadEdlmx uploadEdlmx = uploadEdlmxService.findByMd5(subtask.getMd5());
+					// 灯光文件存在状态改为1（上传）,路径改为 上传的路径
+					if (uploadEdlmx != null) {
+						subtask.setRtrLoaded(uploadEdlmx.getRtrLoaded());
+					}
+				} else {
+					subtask.setFileType(EnumFileType.VideoFile.name());
+					// 根据md5值查询 视频是否存在
+					UploadVideos uploadVideo = uploadVideosService.findByMd5(subtask.getMd5());
+					// 视频文件存在状态改为1（上传）,路径改为 上传的路径
+					if (uploadVideo != null) {
+						subtask.setRtrLoaded(uploadVideo.getRtrLoaded());
+					}
+				}
+				subtask.setProjectId(account.getProjectId());
+				// 创建时间
+				subtask.setCreateTime(new Date());
+				// 保存
+				Integer num = subtasksService.save(subtask);
+
+				Log log = new Log(account.getProjectId(), account.getAccountId(), EnumOperationMode.ADD.name(), "添加子任务",
+						new Date());
+				// 添加操作日志
+				addlogInfo(log);
+				result = num == 0 ? "fail" : "succeed";
+				platformTransactionManager.commit(status);
+			} else {
+				result = "already exists";
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			platformTransactionManager.rollback(status);
+		}
+		// 反馈客户端状态
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: (主)录放精灵上传文件
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月2日 下午5:24:35
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月2日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("uploadSpriteFile")
+	public String uploadSpriteFile(UploadFileVo uploadFileVo, HttpSession session) throws Exception {
+		String result = "";
+		SocketClientInfoVo socketClientInfoVo = OnLineClientUtils.getSpriteClient();
+		// 判断是否在线
+		if (socketClientInfoVo != null) {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+			// 判断是否在线
+			if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+				return "false";
+			}
+			uploadFileVo.setAccountId(account.getAccountId());
+			uploadFileVo.setProjectId(account.getProjectId());
+			boolean uploadStatus = false;
+			if (uploadFileVo.getFileType() == 0) {
+				UploadVideos uploadVideo = uploadVideosService.findByMd5(uploadFileVo.getMd5());
+				uploadStatus = uploadVideo == null ? true : false;
+			} else {
+				UploadEdlmx uploadEdlmx = uploadEdlmxService.findByMd5(uploadFileVo.getMd5());
+				uploadStatus = uploadEdlmx == null ? true : false;
+			}
+			// 判断是否存在
+			if (uploadStatus) {
+				JSONObject json = (JSONObject) JSONObject.toJSON(uploadFileVo);
+				// 获取UUID
+				String uuid = UUID.randomUUID().toString();
+				json.put("uuid", uuid);
+				// 添加ProjectAnalysisOpCodeThread对象的map中
+				SocketUtils.projectThreadMap.get(SocketUtils.key + "1").getProjectAnalysisOpCodeThread()
+						.addMapInfo(uuid, json);
+				// 组装发送客户端json
+				JSONObject sendClientJson = new JSONObject();
+				sendClientJson.put("filePath", uploadFileVo.getFilePath());
+				sendClientJson.put("uuid", uuid);
+				// 组装数据
+				byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1025, sendClientJson.toJSONString());
+				// 发送
+				AnalysisClientSocketThread.transmit(socketClientInfoVo.getAnalysisSocketThread(), dataBytes);
+				result = "send successful";
+			} else {
+				result = "already exists";
+			}
+		} else {
+			result = "not online";
+		}
+
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 切割指定视频
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月21日 上午10:13:09
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月21日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("sendVideoSplit")
+	public String sendVideoSplit(SendSplitVo sendSplitVo, HttpSession session) throws Exception {
+
+		String result = "";
+		// 判断是否在线
+		SocketClientInfoVo socketClientInfoVo = OnLineClientUtils.getControlClient();
+		if (socketClientInfoVo != null) {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+			// 判断是否在线
+			if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+				return "false";
+			}
+			sendSplitVo.setAccountId(account.getAccountId());
+			sendSplitVo.setProjectId(account.getProjectId());
+			// 分割为数组ID
+			String[] arrayId = sendSplitVo.getIds().split(",");
+			// 所有机架ID(逗号隔开)
+			String cabinetNums = rackDeviceService.findGroupCounatRackIdByProjectId(sendSplitVo.getProjectId());
+			// 根据数组id 获取为切割的视频数据
+			List<UploadVideos> uploadVideosList = uploadVideosService.findNotSpiltByIds(arrayId);
+			List<FilePathVo> filePathList = new ArrayList<FilePathVo>();
+			// 遍历组装
+			for (UploadVideos uploadVideo : uploadVideosList) {
+				FilePathVo filePath = new FilePathVo(uploadVideo.getFilePath(), uploadVideo.getMd5());
+				filePathList.add(filePath);
+			}
+			SplitFileVo splitFile = new SplitFileVo(cabinetNums, filePathList);
+			// 转成JSON格式数据
+			net.sf.json.JSONObject dataJson = net.sf.json.JSONObject.fromObject(splitFile);
+			// 获取UUID
+			String uuid = UUID.randomUUID().toString();
+			dataJson.put("uuid", uuid);
+			JSONObject json = (JSONObject) JSONObject.toJSON(sendSplitVo);
+			// 添加ProjectAnalysisOpCodeThread对象的map中
+			SocketUtils.projectThreadMap.get(SocketUtils.key + "1").getProjectAnalysisOpCodeThread().addMapInfo(uuid,
+					json);
+			System.err.println(dataJson.toString());
+			// 组装数据
+			byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1001, dataJson.toString());
+			// 发送数据
+			AnalysisClientSocketThread.transmit(socketClientInfoVo.getAnalysisSocketThread(), dataBytes);
+			result = "send successful";
+		} else {
+			result = "not online";
+		}
+
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 切割指定灯光
+	 *
+	 * @param:
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月21日 上午10:13:52
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月21日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("sendEdlmxSplit")
+	public String sendEdlmxSplit(SendSplitVo sendSplitVo, HttpSession session) throws Exception {
+
+		String result = "";
+		// 判断是否在线
+		SocketClientInfoVo socketClientInfoVo = OnLineClientUtils.getControlClient();
+		if (socketClientInfoVo != null) {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+
+			// 判断是否在线
+			if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+				return "false";
+			}
+			sendSplitVo.setAccountId(account.getAccountId());
+			sendSplitVo.setProjectId(account.getProjectId());
+			// 分割为数组ID
+			String[] arrayId = sendSplitVo.getIds().split(",");
+			// 所有机架ID(逗号隔开)
+			String cabinetNums = rackDeviceService.findGroupCounatRackIdByProjectId(sendSplitVo.getProjectId());
+			// 根据数组id 获取为切割的视频数据
+			List<UploadEdlmx> uploadEdlmxList = uploadEdlmxService.findNotSpiltByIds(arrayId);
+			List<FilePathVo> filePathList = new ArrayList<FilePathVo>();
+			// 遍历组装
+			for (UploadEdlmx uploadEdlmx : uploadEdlmxList) {
+				FilePathVo filePath = new FilePathVo(uploadEdlmx.getFilePath(), uploadEdlmx.getMd5());
+				filePathList.add(filePath);
+			}
+			SplitFileVo splitFile = new SplitFileVo(cabinetNums, filePathList);
+			// 转成JSON格式数据
+			net.sf.json.JSONObject dataJson = net.sf.json.JSONObject.fromObject(splitFile);
+			// 获取UUID
+			String uuid = UUID.randomUUID().toString();
+			dataJson.put("uuid", uuid);
+			JSONObject json = (JSONObject) JSONObject.toJSON(sendSplitVo);
+			// 添加ProjectAnalysisOpCodeThread对象的map中
+			SocketUtils.projectThreadMap.get(SocketUtils.key + "1").getProjectAnalysisOpCodeThread().addMapInfo(uuid,
+					json);
+			result = "send successful";
+			System.out.println(dataJson.toString());
+			// 组装数据
+			byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1002, dataJson.toString());
+			// 发送数据
+			AnalysisClientSocketThread.transmit(socketClientInfoVo.getAnalysisSocketThread(), dataBytes);
+		} else {
+			result = "not online";
+		}
+
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 添加定时任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @throws Exception
+	 * @date: 2019年3月21日 上午10:11:43
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月21日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "addTimedTask", method = RequestMethod.GET)
+	public String addTimedTask(Tasks task, HttpSession session) throws Exception {
+		String result = "";
+		// 获取中控客户端信息
+		SocketClientInfoVo socketClientInfoVo = OnLineClientUtils.getControlClient();
+		if (socketClientInfoVo != null) {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+
+			// 判断是否在线
+			if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+				return "false";
+			}
+			// 所有机架ID(逗号隔开)
+			String cabinetNums = rackDeviceService.findGroupCounatRackIdByProjectId(account.getProjectId());
+			// 赋值数据
+			task.initTaskDate(EnumTaskType.getTaskTypeName(task.getType()),
+					EnumCyclicMode.getCyclicModeName(task.getMode()), account.getProjectId(),
+					DateUtils.currentlyDate(DateUtils.stampToDate(task.getStartTimestamp())),
+					DateUtils.currentlyDate(DateUtils.stampToDate(task.getEndTimestamp())),
+					DateUtils.fmtStrDateToTime(task.getStrStartTime()),
+					DateUtils.fmtStrDateToTime(task.getStrEndTime()), cabinetNums);
+
+			String[] arrayIds = task.getSubtaskIds().split(",");
+			StringBuilder sbld = new StringBuilder();
+
+			List<VideoOrLmxTaskNameVo> videoOrLmxTaskNameList = subtasksService.findSpiltVideoOrLmxDataByIds(arrayIds);
+			for (VideoOrLmxTaskNameVo videoOrLmxTaskNameVo : videoOrLmxTaskNameList) {
+				if (EnumFileType.LightingFile.name().equals(videoOrLmxTaskNameVo.getFileType())) {
+					sbld.append(videoOrLmxTaskNameVo.getLmxName()).append(",");
+				} else {
+					sbld.append(videoOrLmxTaskNameVo.getVideoName()).append(",");
+				}
+			}
+			// 获取UUID
+			String uuid = UUID.randomUUID().toString();
+			TimedTaskVo taskVo = new TimedTaskVo(task.getTaskName(), task.getType(), task.getMode(),
+					task.getCyclicDate(), DateUtils.currentlyStrDate(task.getStartDate()),
+					DateUtils.currentlyStrDate(task.getEndDate()), task.getStrStartTime(), task.getStrEndTime(),
+					sbld.toString(), uuid);
+
+			List<TimedTaskVo> list = new ArrayList<TimedTaskVo>();
+			list.add(taskVo);
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("data", list);
+			jsonObject.put("cabinetNums", cabinetNums);
+			jsonObject.put("taskMsg", "");
+
+			JSONObject jsonData = new JSONObject();
+			jsonData.put("task", task);
+			jsonData.put("accountId", account.getAccountId());
+			// 添加ProjectAnalysisOpCodeThread对象的map中
+			SocketUtils.projectThreadMap.get(SocketUtils.key + "1").getProjectAnalysisOpCodeThread().addMapInfo(uuid,
+					jsonData);
+
+			// 组装数据
+			byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1027, jsonObject.toJSONString());
+			// 发送数据
+			AnalysisClientSocketThread.transmit(socketClientInfoVo.getAnalysisSocketThread(), dataBytes);
+			result = "send successful";
+		} else {
+			result = "not online";
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 发送暂停任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月21日 上午10:45:01
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月21日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("sendPauseTask")
+	public String sendPauseTask(HttpSession session) throws Exception {
+		String result = "";
+		// 获取中控客户端信息
+		SocketClientInfoVo socketClientInfoVo = OnLineClientUtils.getControlClient();
+		if (socketClientInfoVo != null) {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+
+			// 判断是否在线
+			if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+				return "false";
+			}
+			// 所有机架ID(逗号隔开)
+			String cabinetNums = rackDeviceService.findGroupCounatRackIdByProjectId(account.getProjectId());
+			// 获取UUID
+			String uuid = UUID.randomUUID().toString();
+			JSONObject jsonData = new JSONObject();
+			jsonData.put("cabinetNums", cabinetNums);
+			jsonData.put("uuid", uuid);
+			// 添加ProjectAnalysisOpCodeThread对象的map中
+			SocketUtils.projectThreadMap.get(SocketUtils.key + "1").getProjectAnalysisOpCodeThread().addMapInfo(uuid,
+					jsonData);
+			// 组装数据
+			byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1004, jsonData.toJSONString());
+			// 发送数据
+			AnalysisClientSocketThread.transmit(socketClientInfoVo.getAnalysisSocketThread(), dataBytes);
+			result = "send successful";
+		} else {
+			result = "not online";
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 发送恢复任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月21日 上午10:45:01
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月21日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("sendRestoreTask")
+	public String sendRestoreTask(HttpSession session) throws Exception {
+		String result = "";
+		// 获取中控客户端信息
+		SocketClientInfoVo socketClientInfoVo = OnLineClientUtils.getControlClient();
+		if (socketClientInfoVo != null) {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+			// 判断是否在线
+			if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+				return "false";
+			}
+			// 所有机架ID(逗号隔开)
+			String cabinetNums = rackDeviceService.findGroupCounatRackIdByProjectId(account.getProjectId());
+			// 获取UUID
+			String uuid = UUID.randomUUID().toString();
+			JSONObject jsonData = new JSONObject();
+			jsonData.put("cabinetNums", cabinetNums);
+			jsonData.put("uuid", uuid);
+			// 添加ProjectAnalysisOpCodeThread对象的map中
+			SocketUtils.projectThreadMap.get(SocketUtils.key + "1").getProjectAnalysisOpCodeThread().addMapInfo(uuid,
+					jsonData);
+			// 组装数据
+			byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1005, jsonData.toJSONString());
+			// 发送数据
+			AnalysisClientSocketThread.transmit(socketClientInfoVo.getAnalysisSocketThread(), dataBytes);
+			result = "send successful";
+		} else {
+			result = "not online";
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 该函数的功能描述
+	 *
+	 * @param:deviceType 设备类型
+	 * @param: resolutionState
+	 *             解决状态
+	 * @param: startTime
+	 *             开始时间
+	 * @param: endTime
+	 *             结束时间
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月10日 下午1:43:48
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月10日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("findConditionQueryAlarmData")
+	public String findConditionQueryAlarmData(String deviceType, Integer resolutionState, String startTime,
+			String endTime, HttpSession session) throws Exception {
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (!OnLineClientUtils.judgeAccountIsOnline(account)) {
+			return "false";
+		}
+		// 根据条件获取报警信息
+		List<Err> errList = errService.findConditionQueryAlarmData(deviceType, resolutionState, startTime, endTime);
+		return JsonUtils.objectToJson(errList);
+	}
+
+}

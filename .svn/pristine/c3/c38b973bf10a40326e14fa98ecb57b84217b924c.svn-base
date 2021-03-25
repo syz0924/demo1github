@@ -1,0 +1,80 @@
+package com.lovdmx.control.pojo;
+
+import java.io.Serializable;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: EdlmxSplit.java
+ * @Description: 灯光文件分割表
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月15日 上午10:29:45
+ *
+ */
+public class EdlmxSplit implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 1836781922308833847L;
+	// 编号
+	private Integer splitId;
+	// 灯光文件MD5值
+	private String mainMd5;
+	// 灯光文件分割成的小文件的MD5值
+	private String partsMd5;
+	// 项目ID
+	private Integer projectId;
+	// 文件路径
+	private String filePath;
+	// 机架ID
+	private String rackId;
+
+	public Integer getSplitId() {
+		return splitId;
+	}
+
+	public void setSplitId(Integer splitId) {
+		this.splitId = splitId;
+	}
+
+	public String getMainMd5() {
+		return mainMd5;
+	}
+
+	public void setMainMd5(String mainMd5) {
+		this.mainMd5 = mainMd5 == null ? null : mainMd5.trim();
+	}
+
+	public String getPartsMd5() {
+		return partsMd5;
+	}
+
+	public void setPartsMd5(String partsMd5) {
+		this.partsMd5 = partsMd5 == null ? null : partsMd5.trim();
+	}
+
+	public String getRackId() {
+		return rackId;
+	}
+
+	public void setRackId(String rackId) {
+		this.rackId = rackId;
+	}
+
+	public Integer getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
+	}
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath == null ? null : filePath.trim();
+	}
+}

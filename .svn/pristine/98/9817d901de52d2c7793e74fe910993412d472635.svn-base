@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.TimedTasksMapper">
+	<resultMap id="BaseResultMap"
+		type="com.lovdmx.control.pojo.TimedTasks">
+		<id column="task_id" property="taskId" jdbcType="INTEGER" />
+		<result column="task_name" property="taskName"
+			jdbcType="VARCHAR" />
+		<result column="task_md5" property="taskMd5" jdbcType="VARCHAR" />
+		<result column="task_mode" property="taskMode"
+			jdbcType="INTEGER" />
+		<result column="delay_time" property="delayTime"
+			jdbcType="INTEGER" />
+		<result column="rack_ids" property="rackIds" jdbcType="VARCHAR" />
+		<result column="week_ids" property="weekIds" jdbcType="VARCHAR" />
+		<result column="rack_names" property="rackNames"
+			jdbcType="VARCHAR" />
+		<result column="weeks" property="weeks" jdbcType="VARCHAR" />
+		<result column="task_content" property="taskContent"
+			jdbcType="VARCHAR" />
+		<result column="project_id" property="projectId"
+			jdbcType="INTEGER" />
+		<result column="project_name" property="projectName"
+			jdbcType="VARCHAR" />
+		<result column="start_time" property="startTime"
+			jdbcType="TIMESTAMP" />
+		<result column="end_time" property="endTime"
+			jdbcType="TIMESTAMP" />
+		<result column="create_time" property="createTime"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		task_id, task_name, task_md5,task_mode,
+		delay_time,rack_ids,week_ids,task_content, project_id,
+		start_time,
+		end_time,
+		create_time
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from ea_timed_tasks
+		where task_id =
+		#{taskId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findByProjectId" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		task_id, task_name, task_md5,task_mode,
+		delay_time,rack_ids,(select
+		GROUP_CONCAT(rack_name order by
+		FIND_IN_SET(rack_id,rack_ids)) from
+		dev_rack_device where
+		FIND_IN_SET(rack_id,rack_ids))rack_names,(select
+		GROUP_CONCAT(w_week
+		order by
+		FIND_IN_SET(w_id,week_ids)) from date_week
+		where
+		FIND_IN_SET(w_id,week_ids))weeks,task_content, project_id,
+		start_time,
+		end_time,
+		create_time
+		from ea_timed_tasks
+		where project_id =
+		#{projectId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findByTaskNameOrStartTimeOrEndTime"
+		resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.TimedTasks">
+		select
+		task_id, task_name, task_md5,task_mode,
+		delay_time,rack_ids,(select
+		GROUP_CONCAT(rack_name order by
+		FIND_IN_SET(rack_id,rack_ids)) from
+		dev_rack_device where
+		FIND_IN_SET(rack_id,rack_ids))rack_names,(select
+		GROUP_CONCAT(w_week
+		order by
+		FIND_IN_SET(w_id,week_ids)) from date_week
+		where
+		FIND_IN_SET(w_id,week_ids))weeks,task_content,
+		timt.project_id,prop.project_name,
+		start_time,
+		end_time,
+		timt.create_time
+		from
+		ea_timed_tasks timt inner join pro_project prop on
+		timt.project_id =
+		prop.project_id
+		<where>
+			<if test="openTime !=null and openTime !=''">
+				and time(start_time) <![CDATA[>=]]>
+				#{openTime}
+			</if>
+			<if test="closeTime !=null and closeTime !=''">
+				and time(end_time) <![CDATA[<=]]>
+				#{closeTime}
+			</if>
+		</where>
+		order by timt.create_time desc
+	</select>
+
+	<select id="findByTaskMd5" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from ea_timed_tasks
+		where task_md5 =
+		#{taskMd5,jdbcType=VARCHAR} and
+		project_id=#{projectId}
+	</select>
+
+	<select id="findByTaskName" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from ea_timed_tasks
+		where task_name =
+		#{taskName,jdbcType=VARCHAR}
+	</select>
+
+	<select id="queryListByConditionIf" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from ea_timed_tasks
+		<where>
+			<if test="projectId!=null">
+				AND project_id =#{projectId}
+			</if>
+			<if test="taskMode!=null">
+				AND task_mode =#{taskMode}
+			</if>
+			<if test="rackId!=null">
+				AND find_in_set(#{rackId},rack_ids)
+			</if>
+		</where>
+	</select>
+
+	<delete id="batchDelete" parameterType="java.util.List">
+		delete from
+		ea_timed_tasks
+		where task_id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		delete from
+		ea_timed_tasks
+		where task_id =
+		#{taskId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert"
+		parameterType="com.lovdmx.control.pojo.TimedTasks"
+		useGeneratedKeys="true" keyProperty="taskId">
+		insert into ea_timed_tasks
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="taskId != null">
+				task_id,
+			</if>
+			<if test="taskName != null">
+				task_name,
+			</if>
+			<if test="taskMd5 != null">
+				task_md5,
+			</if>
+			<if test="taskMode != null">
+				task_mode,
+			</if>
+			<if test="delayTime != null">
+				delay_time,
+			</if>
+			<if test="rackIds != null">
+				rack_ids,
+			</if>
+			<if test="weekIds != null">
+				week_ids,
+			</if>
+			<if test="taskContent != null">
+				task_content,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="startTime != null">
+				start_time,
+			</if>
+			<if test="endTime != null">
+				end_time,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="taskId != null">
+				#{taskId,jdbcType=INTEGER},
+			</if>
+			<if test="taskName != null">
+				#{taskName,jdbcType=VARCHAR},
+			</if>
+			<if test="taskMd5 != null">
+				#{taskMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="taskMode != null">
+				#{taskMode,jdbcType=INTEGER},
+			</if>
+			<if test="delayTime != null">
+				#{delayTime,jdbcType=INTEGER},
+			</if>
+			<if test="rackIds != null">
+				#{rackIds,jdbcType=VARCHAR},
+			</if>
+			<if test="weekIds != null">
+				#{weekIds,jdbcType=VARCHAR},
+			</if>
+			<if test="taskContent != null">
+				#{taskContent,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="startTime != null">
+				#{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				#{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="update"
+		parameterType="com.lovdmx.control.pojo.TimedTasks">
+		update ea_timed_tasks
+		<set>
+			<if test="taskName != null">
+				task_name = #{taskName,jdbcType=VARCHAR},
+			</if>
+			<if test="taskMd5 != null">
+				task_md5 = #{taskMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="taskMode != null">
+				task_mode = #{taskMode,jdbcType=INTEGER},
+			</if>
+			<if test="delayTime != null">
+				delay_time = #{delayTime,jdbcType=INTEGER},
+			</if>
+			<if test="rackIds != null">
+				rack_ids = #{rackIds,jdbcType=VARCHAR},
+			</if>
+			<if test="weekIds != null">
+				week_ids = #{weekIds,jdbcType=VARCHAR},
+			</if>
+			<if test="taskContent != null">
+				task_content = #{taskContent,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="startTime != null">
+				start_time = #{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				end_time = #{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where task_id = #{taskId,jdbcType=INTEGER}
+	</update>
+
+	<update id="batchUpdateRackIds" parameterType="java.util.List">
+		update ea_timed_tasks set rack_ids=
+		<foreach collection="list" item="item" separator=" "
+			open="case rack_ids" close="end">
+			when #{item.taskId} then #{item.rackIds}
+		</foreach>
+		where task_id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item.taskId}
+		</foreach>
+	</update>
+
+</mapper>

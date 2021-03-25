@@ -1,0 +1,22 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.SubtasksMapper;
+import com.lovdmx.control.pojo.Subtasks;
+import com.lovdmx.control.service.SubtasksService;
+
+@Service("subtasksService")
+public class SubtasksServiceImpl extends BaseServiceImpl<Subtasks> implements SubtasksService {
+
+	@Autowired
+	private SubtasksMapper subtasksMapper;
+	
+	@Override
+	public List<Subtasks> findByParentId(Integer parentId) {
+		return subtasksMapper.findByParentId(parentId);
+	}
+}

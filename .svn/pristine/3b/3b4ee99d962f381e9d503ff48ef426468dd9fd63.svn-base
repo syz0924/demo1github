@@ -1,0 +1,10 @@
+package com.lovdmx.control.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.pojo.SpriteTasks;
+import com.lovdmx.control.service.SpriteTasksService;
+
+@Service("spriteTasksService")
+public class SpriteTasksServiceImpl extends BaseServiceImpl<SpriteTasks> implements SpriteTasksService{
+}

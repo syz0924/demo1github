@@ -1,0 +1,48 @@
+package com.lovdmx.control.service;
+
+import java.util.List;
+
+import com.lovdmx.control.pojo.RelayTasks;
+
+public interface RelayTasksService extends BaseService<RelayTasks> {
+
+	/**
+	 * 
+	 * @Function: RelayTasksService.java
+	 * @Description: 根据继电器id 获取 已存在的定时任务
+	 *
+	 * @param: relayId
+	 *             继电器ID
+	 * @return：List<RelayTasks>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月14日 下午2:42:58
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年5月14日 Administrator v1.0.0 修改原因
+	 */
+	List<RelayTasks> findByRelayId(Integer relayId);
+
+	/**
+	 * 
+	 * @Function: RelayTasksService.java
+	 * @Description: 批量添加继电器定时任务
+	 *
+	 * @param: List<RelayTasks>
+	 *             relayTasksList 一个或多个定时任务
+	 * @return：Integer
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月14日 下午2:49:07
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年5月14日 Administrator v1.0.0 修改原因
+	 */
+	Integer batchInsert(List<RelayTasks> relayTasksList);
+}

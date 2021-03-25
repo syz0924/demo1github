@@ -1,0 +1,29 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.VideoSpiltMapper;
+import com.lovdmx.control.pojo.VideoSpilt;
+import com.lovdmx.control.service.VideoSpiltService;
+
+@Service("videoSpiltService")
+public class VideoSpiltServiceImpl extends BaseServiceImpl<VideoSpilt> implements VideoSpiltService {
+
+	@Autowired
+	private VideoSpiltMapper videoSpiltMapper;
+
+	@Override
+	public Integer batchInsert(List<VideoSpilt> videoSpiltList) {
+		// TODO Auto-generated method stub
+		return videoSpiltMapper.batchInsert(videoSpiltList);
+	}
+
+	@Override
+	public Integer findCountByMainMd5(String md5) {
+		// TODO Auto-generated method stub
+		return videoSpiltMapper.findCountByMainMd5(md5);
+	}
+}

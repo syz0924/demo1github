@@ -1,0 +1,51 @@
+package com.lovdmx.control.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.lovdmx.control.pojo.RelayTasks;
+
+public interface RelayTasksMapper extends BaseMapper<RelayTasks> {
+
+	/**
+	 * 
+	 * @Function: RelayTasksMapper.java
+	 * @Description: 根据继电器id 获取 已存在的定时任务
+	 *
+	 * @param: relayId
+	 *             继电器ID
+	 * @return：List<RelayTasks>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月14日 下午2:42:58
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年5月14日 Administrator v1.0.0 修改原因
+	 */
+	List<RelayTasks> findByRelayId(@Param("relayId") Integer relayId);
+
+	/**
+	 * 
+	 * @Function: RelayTasksMapper.java
+	 * @Description: 批量添加继电器定时任务
+	 *
+	 * @param: List<RelayTasks>
+	 *             relayTasksList 一个或多个定时任务
+	 * @return：Integer
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月14日 下午2:49:07
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年5月14日 Administrator v1.0.0 修改原因
+	 */
+	Integer batchInsert(@Param("list") List<RelayTasks> relayTasksList);
+
+}

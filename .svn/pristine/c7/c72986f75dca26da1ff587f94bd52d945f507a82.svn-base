@@ -1,0 +1,90 @@
+package com.lovdmx.control.vo;
+
+import java.util.List;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: IntelligentGatewayVo.java
+ * @Description: 智能网关 实体类
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年5月11日 下午3:29:08
+ *
+ */
+public class IntelligentGatewayVo {
+
+	// 选中的星期几（多选）,逗号隔开
+	private String whichDayOfTheWeek;
+	// 开始时间
+	private String startTime;
+	// 结束时间
+	private String endTime;
+	// 从站地址，表示哪个继电器
+	private String slaveAddr;
+	// 开回路列表
+	private String loopNums_ON;
+	// 关回路
+	private String loopNums_OFF;
+	// IP地址
+	private List<String> ips;
+
+	public String getWhichDayOfTheWeek() {
+		return whichDayOfTheWeek;
+	}
+
+	public void setWhichDayOfTheWeek(String whichDayOfTheWeek) {
+		this.whichDayOfTheWeek = whichDayOfTheWeek;
+	}
+
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
+	public String getSlaveAddr() {
+		return slaveAddr;
+	}
+
+	public void setSlaveAddr(String slaveAddr) {
+		this.slaveAddr = slaveAddr;
+	}
+
+	public String getLoopNums_ON() {
+		return loopNums_ON;
+	}
+
+	public void setLoopNums_ON(String loopNums_ON) {
+		this.loopNums_ON = loopNums_ON;
+	}
+
+	public String getLoopNums_OFF() {
+		return loopNums_OFF;
+	}
+
+	public void setLoopNums_OFF(String loopNums_OFF) {
+		this.loopNums_OFF = loopNums_OFF;
+	}
+
+	public List<String> getIps() {
+		return ips;
+	}
+
+	public void setIps(List<String> ips) {
+		this.ips = ips;
+	}
+
+}

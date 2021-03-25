@@ -1,0 +1,480 @@
+package com.lovdmx.control.controller.head1;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.thread.AnalysisClientSocketThread;
+import com.lovdmx.control.common.thread.ProjectAnalysisOpCodeThread;
+import com.lovdmx.control.common.utils.DateUtils;
+import com.lovdmx.control.common.utils.OnLineClientUtils;
+import com.lovdmx.control.common.utils.PageageUtils;
+import com.lovdmx.control.common.utils.SFTPUtil;
+import com.lovdmx.control.common.utils.StringJudgeUtils;
+import com.lovdmx.control.controller.BaseController;
+import com.lovdmx.control.pojo.Account;
+import com.lovdmx.control.pojo.Err;
+import com.lovdmx.control.pojo.Log;
+import com.lovdmx.control.pojo.Role;
+import com.lovdmx.control.pojo.Subtasks;
+import com.lovdmx.control.pojo.Tasks;
+import com.lovdmx.control.pojo.UploadEdlmx;
+import com.lovdmx.control.pojo.UploadVideos;
+import com.lovdmx.control.pojo.enums.EnumCyclicMode;
+import com.lovdmx.control.pojo.enums.EnumErrType;
+import com.lovdmx.control.pojo.enums.EnumFileType;
+import com.lovdmx.control.pojo.enums.EnumOperationMode;
+import com.lovdmx.control.pojo.enums.EnumTaskType;
+import com.lovdmx.control.service.ErrService;
+import com.lovdmx.control.service.SubtasksService;
+import com.lovdmx.control.service.TasksService;
+import com.lovdmx.control.service.UploadEdlmxService;
+import com.lovdmx.control.service.UploadVideosService;
+import com.lovdmx.control.vo.FilePathVo;
+import com.lovdmx.control.vo.SocketClientInfoVo;
+import com.lovdmx.control.vo.SplitFileVo;
+import com.lovdmx.control.vo.TaskFileTypeInfoVo;
+import com.lovdmx.control.vo.TimedTaskVo;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: SystemMaintenanceController.java
+ * @Description: 系统维护控制器
+ *
+ * @version: v1.1.0
+ * @author: syz
+ * @date: 2019年10月15日 下午2:03:24
+ *
+ */
+@Controller
+@CrossOrigin
+@RequestMapping("/systemMaintenance/")
+public class SystemMaintenanceController extends BaseController {
+
+	// 报警
+	@Autowired
+	private ErrService errService;
+
+	// 上传灯光文件
+	@Autowired
+	private UploadEdlmxService uploadEdlmxService;
+
+	// 上传视频文件
+	@Autowired
+	private UploadVideosService uploadVideosService;
+
+	// 录放精灵定时任务
+	@Autowired
+	private TasksService tasksService;
+
+	// 录放精灵 子任务
+	@Autowired
+	private SubtasksService subtasksService;
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 根据 参数获取报警信息
+	 *
+	 * @param:deviceType 设备类型
+	 * @param: resolutionState 解决状态
+	 * @param: startTime 开始时间
+	 * @param: endTime 结束时间
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月10日 下午1:43:48
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年4月10日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("findConditionQueryAlarmData")
+	public JSONObject findConditionQueryAlarmData(String deviceType, Integer resolutionState, String startTime,
+			String endTime, HttpServletRequest request, HttpSession session) throws Exception {
+		// 反馈
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 登录状态
+		boolean loginStatus = (boolean) request.getAttribute("login_Status");
+		// 判断是否在线
+		if (loginStatus) {
+			// 获取角色
+			Role role = (Role) session.getAttribute("role");
+			// 判断是否有权限
+			if (role.getRoleId() == 1 || role.getRoleId() == 2
+					|| StringJudgeUtils.judgeWhetherIsLimits(role.getRoleLimit(), 4)) {
+				// 账号
+				Account account = (Account) session.getAttribute("lovdmxAdmin");
+				// 根据条件获取报警信息
+				List<Err> errList = errService.findConditionQueryAlarmData(account.getProjectId(), deviceType,
+						resolutionState, startTime, endTime);
+				// 根据条件查询 分组获取报警日期的数量
+				List<Err> alarmDateList = errService.findAlarmDateNumber(account.getProjectId(), deviceType,
+						resolutionState, startTime, endTime);
+
+				resultJson.put("errList", errList);
+				resultJson.put("alarmDateList", alarmDateList);
+				result = "true";
+			} else {
+				result = "not online";
+			}
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: SendControlServerController.java
+	 * @Description:发送（指定录放精灵）丢失的 切割灯光文件
+	 *
+	 * @param:fileMd5 丢失文件 md5值
+	 * 
+	 * @return：JSONObject
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月10日 下午1:43:48
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年4月10日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("sendLoseEdlmxFileSpilt")
+	public JSONObject sendLoseEdlmxFileSpilt(String fileMd5, HttpServletRequest request, HttpSession session)
+			throws Exception {
+		// 反馈
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 登录状态
+		boolean loginStatus = (boolean) request.getAttribute("login_Status");
+		// 判断是否在线
+		if (loginStatus) {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+			// 中控狀態
+			boolean controlOnlineStatus = (boolean) request.getAttribute("control_Online_Status");
+			// 判断是否在线
+			if (controlOnlineStatus) {
+				// 获取角色
+				Role role = (Role) session.getAttribute("role");
+				// 判断是否有权限
+				if (role.getRoleId() == 1 || role.getRoleId() == 2
+						|| StringJudgeUtils.judgeWhetherIsLimits(role.getRoleLimit(), 5)) {
+					// 获取主录放精灵客户端信息
+					SocketClientInfoVo controlSocketClient = OnLineClientUtils.getControlClient();
+					// 所有丢失机柜ID(逗号隔开)
+					String cabinetNums = errService.findLoseGroupCounatRackIdByTypeMd5AndErrType(account.getProjectId(),
+							fileMd5, EnumErrType.Lmx.name());
+					// 获取已上传的灯光文件信息
+					UploadEdlmx uploadEdlmx = uploadEdlmxService.findByMd5(fileMd5);
+					// 组装数据
+					List<FilePathVo> filePathList = new ArrayList<FilePathVo>();
+
+					// 路径
+					String path = uploadEdlmx.getFilePath();
+					// 组装中控路径
+					path = SFTPUtil.controlBasePath
+							+ path.substring(path.lastIndexOf("/", path.lastIndexOf("/") - 1) + 1);
+
+					FilePathVo filePath = new FilePathVo(path, uploadEdlmx.getMd5());
+					filePathList.add(filePath);
+					SplitFileVo splitFile = new SplitFileVo(cabinetNums, filePathList);
+					// 转成JSON格式数据
+					net.sf.json.JSONObject dataJson = net.sf.json.JSONObject.fromObject(splitFile);
+					dataJson.put("uuid", fileMd5);
+					dataJson.put("projectId", account.getProjectId());
+					// 组装web数据（用于后续操作）
+					JSONObject webJsonData = new JSONObject();
+					// 日志
+					Log log = new Log(account.getProjectId(), account.getAccountId(), EnumOperationMode.UPDATE.name(),
+							"添加上传信息", new Date(), new Date());
+					webJsonData.put("log", log);
+					// state (-1 分发丢失,1 正常分发);
+					webJsonData.put("state", -1);
+					webJsonData.put("projectId", account.getProjectId());
+					// 添加ProjectAnalysisOpCodeThread对象的map中
+					ProjectAnalysisOpCodeThread.addMapInfo(fileMd5, webJsonData);
+					// 组装数据
+					byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1002, dataJson.toString());
+
+					// 发送数据
+					AnalysisClientSocketThread.transmit(controlSocketClient.getAnalysisSocketThread(), dataBytes);
+					result = "send successful";
+				} else {
+					result = "no permission";
+				}
+			} else {
+				result = "not online";
+			}
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: SendControlServerController.java
+	 * @Description:发送（指定RTR服务器）丢失的 切割视频文件
+	 *
+	 * @param:fileMd5 丢失文件 md5值
+	 * 
+	 * @return：JSONObject
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月10日 下午1:43:48
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年4月10日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("sendLoseVideoFileSpilt")
+	public JSONObject sendLoseVideoFileSpilt(String fileMd5, HttpServletRequest request, HttpSession session)
+			throws Exception {
+		// 反馈
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 登录状态
+		boolean loginStatus = (boolean) request.getAttribute("login_Status");
+		// 判断是否在线
+		if (loginStatus) {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+			// 中控狀態
+			boolean controlOnlineStatus = (boolean) request.getAttribute("control_Online_Status");
+			// 判断是否在线
+			if (controlOnlineStatus) {
+				// 获取角色
+				Role role = (Role) session.getAttribute("role");
+				// 判断是否有权限
+				if (role.getRoleId() == 1 || role.getRoleId() == 2
+						|| StringJudgeUtils.judgeWhetherIsLimits(role.getRoleLimit(), 5)) {
+					// 获取主录放精灵客户端信息
+					SocketClientInfoVo controlSocketClient = OnLineClientUtils.getControlClient();
+					// 所有丢失机柜ID(逗号隔开)
+					String cabinetNums = errService.findLoseGroupCounatRackIdByTypeMd5AndErrType(account.getProjectId(),
+							fileMd5, EnumErrType.Video.name());
+					// 获取已上传的灯光文件信息
+					UploadVideos uploadVideo = uploadVideosService.findByMd5(fileMd5);
+					// 组装数据
+					List<FilePathVo> filePathList = new ArrayList<FilePathVo>();
+
+					// 路径
+					String path = uploadVideo.getFilePath();
+					// 组装中控路径
+					path = SFTPUtil.controlBasePath
+							+ path.substring(path.lastIndexOf("/", path.lastIndexOf("/") - 1) + 1);
+
+					FilePathVo filePath = new FilePathVo(path, uploadVideo.getMd5());
+					filePathList.add(filePath);
+					SplitFileVo splitFile = new SplitFileVo(cabinetNums, filePathList);
+					// 转成JSON格式数据
+					net.sf.json.JSONObject dataJson = net.sf.json.JSONObject.fromObject(splitFile);
+					dataJson.put("uuid", fileMd5);
+					dataJson.put("projectId", account.getProjectId());
+					// 组装web数据（用于后续操作）
+					JSONObject webJsonData = new JSONObject();
+					// 日志
+					Log log = new Log(account.getProjectId(), account.getAccountId(), EnumOperationMode.UPDATE.name(),
+							"添加上传信息", new Date(), new Date());
+					webJsonData.put("log", log);
+					// state (-1 分发丢失,1 正常分发);
+					webJsonData.put("state", -1);
+					webJsonData.put("projectId", account.getProjectId());
+					// 添加ProjectAnalysisOpCodeThread对象的map中
+					ProjectAnalysisOpCodeThread.addMapInfo(fileMd5, webJsonData);
+					// 组装数据
+					byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1001, dataJson.toString());
+					// 发送数据
+					AnalysisClientSocketThread.transmit(controlSocketClient.getAnalysisSocketThread(), dataBytes);
+					result = "send successful";
+				} else {
+					result = "no permission";
+				}
+			} else {
+				result = "not online";
+			}
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: SendControlServerController.java
+	 * @Description:发送（指定录放精灵）丢失的 定时任务
+	 *
+	 * @param:taskName 丢失的定时任务名
+	 * 
+	 * @return：JSONObject
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月10日 下午1:43:48
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年4月10日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("sendLoseTimedTask")
+	public JSONObject sendLoseTimedTask(String taskName, HttpServletRequest request, HttpSession session)
+			throws Exception {
+		// 反馈
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 登录状态
+		boolean loginStatus = (boolean) request.getAttribute("login_Status");
+		// 判断是否在线
+		if (loginStatus) {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+			// 中控狀態
+			boolean controlOnlineStatus = (boolean) request.getAttribute("control_Online_Status");
+			// 判断是否在线
+			if (controlOnlineStatus) {
+				// 获取角色
+				Role role = (Role) session.getAttribute("role");
+				// 判断是否有权限
+				if (role.getRoleId() == 1 || role.getRoleId() == 2
+						|| StringJudgeUtils.judgeWhetherIsLimits(role.getRoleLimit(), 5)) {
+					// 获取主录放精灵客户端信息
+					SocketClientInfoVo controlSocketClient = OnLineClientUtils.getControlClient();
+
+					// 所有丢失报警机柜ID(逗号隔开)
+					String cabinetNums = errService.findLoseGroupCounatRackIdByTaskNameAndErrType(
+							account.getProjectId(), taskName, EnumErrType.Task.name());
+					// 跟项目id和任务名获取 任务信息
+					Tasks task = tasksService.findByProjectIdAndTaskName(account.getProjectId(), taskName);
+
+					String[] arrayIds = task.getSubtaskIds().split(",");
+					// 根据ids 获取子任务信息
+					List<Subtasks> subtskList = subtasksService.findByIds(arrayIds);
+					// 根据ids 获取子任务只获取LightingFile类型信息
+					List<Subtasks> lmxSubtskList = subtasksService.findByIdsAndFileType(arrayIds,
+							EnumFileType.LightingFile.name());
+					// 根据ids 获取子任务只获取VideoFile类型信息
+					List<Subtasks> videoSubtskList = subtasksService.findByIdsAndFileType(arrayIds,
+							EnumFileType.VideoFile.name());
+					// 组装灯光文件的 md5值（逗号隔开）
+					StringBuilder lmxsbl = new StringBuilder();
+					// 组装视频文件的 md5值（逗号隔开）
+					StringBuilder videosbl = new StringBuilder();
+					for (Subtasks subtasks : lmxSubtskList) {
+						lmxsbl.append(subtasks.getMd5()).append(",");
+					}
+
+					for (Subtasks subtasks : videoSubtskList) {
+						videosbl.append(subtasks.getMd5()).append(",");
+					}
+
+					// 根据md5 获取已上传的视频信息
+					List<UploadVideos> uploadVideosList = uploadVideosService
+							.findByMd5s(videosbl.toString().split(","));
+					// 根据md5 获取已上传的灯光信息
+					List<UploadEdlmx> uploadEdlmxList = uploadEdlmxService.findByMd5s(lmxsbl.toString().split(","));
+					// 遍历组装 任务信息
+					List<TaskFileTypeInfoVo> taskFileTypeInfoList = new ArrayList<TaskFileTypeInfoVo>();
+					for (Subtasks subtask : subtskList) {
+						TaskFileTypeInfoVo taskFileTypeInfo = new TaskFileTypeInfoVo();
+						taskFileTypeInfo.setFileType(subtask.getFileType());
+						// 视频组装
+						if (subtask.getFileType().equals(EnumFileType.VideoFile.name())) {
+							for (UploadVideos uploadVideo : uploadVideosList) {
+								if (subtask.getMd5().equals(uploadVideo.getMd5())) {
+									taskFileTypeInfo.setFileInfo("" + uploadVideo.getFileIndex());
+									taskFileTypeInfo.setFileDuration("" + uploadVideo.getTime());
+									break;
+								}
+							}
+							// 灯光组装
+						} else {
+							for (UploadEdlmx uploadEdlmx : uploadEdlmxList) {
+								if (subtask.getMd5().equals(uploadEdlmx.getMd5())) {
+									taskFileTypeInfo.setFileInfo("" + uploadEdlmx.getMd5());
+									taskFileTypeInfo.setFileDuration("" + uploadEdlmx.getTime());
+									break;
+								}
+							}
+						}
+						taskFileTypeInfoList.add(taskFileTypeInfo);
+					}
+
+					// 获取UUID
+					String uuid = UUID.randomUUID().toString();
+					TimedTaskVo taskVo = new TimedTaskVo(task.getTaskName(), task.getTaskMd5(),
+							EnumTaskType.getEnumNameByIndex(task.getTaskType()),
+							EnumCyclicMode.getEnumNameByIndex(task.getCyclicMode()), task.getCyclicDate(),
+							DateUtils.currentlyStrDate(task.getStartDate()),
+							DateUtils.currentlyStrDate(task.getEndDate()),
+							DateUtils.fmtDateToStrTime(task.getStartTime()),
+							DateUtils.fmtDateToStrTime(task.getEndTime()), taskFileTypeInfoList, uuid);
+
+					// 组装发送数据
+					JSONObject dataJson = new JSONObject();
+					dataJson.put("taskMsg", taskVo);
+					dataJson.put("rackId", cabinetNums);
+					dataJson.put("uuid", uuid);
+					dataJson.put("projectId", account.getProjectId());
+
+					// 组装web数据（用于后续操作）
+					JSONObject webJsonData = new JSONObject();
+					// 日志
+					Log log = new Log(account.getProjectId(), account.getAccountId(), EnumOperationMode.ADD.name(),
+							"添加上传信息", new Date(), new Date());
+					webJsonData.put("task", task);
+					webJsonData.put("accountId", account.getAccountId());
+					webJsonData.put("projectId", account.getProjectId());
+					webJsonData.put("log", log);
+					// state (-1 分发丢失,1 正常分发);
+					webJsonData.put("state", -1);
+					// 添加ProjectAnalysisOpCodeThread对象的map中
+					ProjectAnalysisOpCodeThread.addMapInfo(uuid, webJsonData);
+					// 组装数据
+					byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1003, dataJson.toJSONString());
+					// 发送数据
+					AnalysisClientSocketThread.transmit(controlSocketClient.getAnalysisSocketThread(), dataBytes);
+					result = "send successful";
+				} else {
+					result = "no permission";
+				}
+			} else {
+				result = "not online";
+			}
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+}

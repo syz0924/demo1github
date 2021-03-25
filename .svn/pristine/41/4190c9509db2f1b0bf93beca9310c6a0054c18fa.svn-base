@@ -1,0 +1,40 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.TasksMapper;
+import com.lovdmx.control.pojo.Tasks;
+import com.lovdmx.control.service.TasksService;
+
+@Service("tasksService")
+public class TasksServiceImpl extends BaseServiceImpl<Tasks> implements TasksService {
+
+	@Autowired
+	private TasksMapper tasksMapper;
+
+	@Override
+	public List<Tasks> findByProjectId(Integer projectId) {
+		return tasksMapper.findByProjectId(projectId);
+	}
+
+	@Override
+	public Integer findCountByProjectId(Integer projectId) {
+		// TODO Auto-generated method stub
+		return tasksMapper.findCountByProjectId(projectId);
+	}
+
+	@Override
+	public Tasks findByProjectIdAndTaskName(Integer projectId,String taskName) {
+		return tasksMapper.findByProjectIdAndTaskName(projectId, taskName);
+	}
+
+	@Override
+	public Tasks findByProjectIdAndTaskMd5(Integer projectId, String taskMd5) {
+		// TODO Auto-generated method stub
+		return tasksMapper.findByProjectIdAndTaskMd5(projectId,taskMd5);
+	}
+
+}

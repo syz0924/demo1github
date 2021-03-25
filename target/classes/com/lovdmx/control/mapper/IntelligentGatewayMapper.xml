@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.lovdmx.control.mapper.IntelligentGatewayMapper">
+	<resultMap id="BaseResultMap"
+		type="com.lovdmx.control.pojo.IntelligentGateway">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="ip" property="ip" jdbcType="CHAR" />
+		<result column="mac" property="mac" jdbcType="CHAR" />
+		<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+		<result column="mode" property="mode" jdbcType="INTEGER" />
+		<result column="task_mode" property="taskMode"
+			jdbcType="INTEGER" />
+		<result column="version" property="version" jdbcType="VARCHAR" />
+		<result column="rack_name" property="rackName"
+			jdbcType="VARCHAR" />
+		<result column="is_online" property="isOnline"
+			jdbcType="INTEGER" />
+		<result column="online_time" property="onlineTime"
+			jdbcType="TIMESTAMP" />
+		<result column="last_time" property="lastTime"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, ip,mode,task_mode, mac, rack_id,version,
+		is_online,online_time,last_time
+	</sql>
+
+	<select id="findAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from ea_intelligent_gateway
+	</select>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from ea_intelligent_gateway
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+	<select id="findByMac" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from ea_intelligent_gateway
+		where mac = #{gatewayMac}
+	</select>
+
+	<select id="findByRackId" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from ea_intelligent_gateway
+		where rack_id = #{rackId}
+	</select>
+
+	<select id="findByRackIdOrMacOrIsOnline"
+		resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.IntelligentGateway">
+		select
+		intg.id,intg.ip,intg.mac,intg.rack_id,intg.mode,intg.task_mode,intg.is_online,intg.online_time,intg.last_time,intg.version,racd.rack_name
+		from ea_intelligent_gateway intg left join
+		dev_rack_device racd on
+		intg.rack_id=racd.rack_id
+		<where>
+			<if test="mac != null and mac != ''">
+				AND intg.mac LIKE CONCAT(CONCAT('%',#{mac},'%'))
+			</if>
+			<if test="isOnline != null">
+				and intg.is_online = #{isOnline}
+			</if>
+			<if test="rackId != null and rackId != ''">
+				and intg.rack_id = #{rackId}
+			</if>
+			<if test="projectId != null and projectId != ''">
+				and racd.project_id = #{projectId}
+			</if>
+		</where>
+		order by racd.rack_index is null,racd.rack_index
+	</select>
+
+	<select id="findRackJoinIntelligentGatewayByProjectId"
+		resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		intg.id,intg.ip,intg.mac,intg.rack_id,intg.mode,intg.task_mode,intg.is_online,intg.online_time,intg.last_time,intg.version,racd.rack_name
+		from
+		dev_rack_device racd inner join ea_intelligent_gateway intg on
+		racd.rack_id=intg.rack_id where project_id=#{projectId}
+	</select>
+
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		delete from
+		ea_intelligent_gateway
+		where id =
+		#{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert"
+		parameterType="com.lovdmx.control.pojo.IntelligentGateway">
+		insert into ea_intelligent_gateway
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="ip != null">
+				ip,
+			</if>
+			<if test="mac != null">
+				mac,
+			</if>
+			<if test="rackId != null">
+				rack_id,
+			</if>
+			<if test="mode != null">
+				mode,
+			</if>
+			<if test="taskMode != null">
+				task_mode,
+			</if>
+			<if test="version != null">
+				version,
+			</if>
+			<if test="isOnline != null">
+				is_online,
+			</if>
+			<if test="onlineTime != null">
+				online_time,
+			</if>
+			<if test="lastTime != null">
+				last_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="ip != null">
+				#{ip,jdbcType=CHAR},
+			</if>
+			<if test="mac != null">
+				#{mac,jdbcType=CHAR},
+			</if>
+			<if test="rackId != null">
+				#{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="mode != null">
+				#{mode,jdbcType=INTEGER},
+			</if>
+			<if test="taskMode != null">
+				#{taskMode,jdbcType=INTEGER},
+			</if>
+			<if test="version != null">
+				#{version,jdbcType=VARCHAR},
+			</if>
+			<if test="isOnline != null">
+				#{isOnline,jdbcType=INTEGER},
+			</if>
+			<if test="onlineTime != null">
+				#{onlineTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastTime != null">
+				#{lastTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateByMac"
+		parameterType="com.lovdmx.control.pojo.IntelligentGateway">
+		update ea_intelligent_gateway
+		<set>
+			<if test="ip != null">
+				ip = #{ip,jdbcType=CHAR},
+			</if>
+			<if test="mac != null">
+				mac = #{mac,jdbcType=CHAR},
+			</if>
+			<if test="rackId != null">
+				rack_id = #{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="mode != null">
+				mode = #{mode,jdbcType=INTEGER},
+			</if>
+			<if test="taskMode != null">
+				task_mode = #{taskMode,jdbcType=INTEGER},
+			</if>
+			<if test="version != null">
+				version = #{version,jdbcType=VARCHAR},
+			</if>
+			<if test="isOnline != null">
+				is_online = #{isOnline,jdbcType=INTEGER},
+			</if>
+			<if test="onlineTime != null">
+				online_time = #{onlineTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastTime != null">
+				last_time = #{lastTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where mac = #{mac,jdbcType=VARCHAR}
+	</update>
+
+	<update id="update"
+		parameterType="com.lovdmx.control.pojo.IntelligentGateway">
+		update ea_intelligent_gateway
+		<set>
+			<if test="ip != null">
+				ip = #{ip,jdbcType=CHAR},
+			</if>
+			<if test="mac != null">
+				mac = #{mac,jdbcType=CHAR},
+			</if>
+			<if test="rackId != null">
+				rack_id = #{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="mode != null">
+				mode = #{mode,jdbcType=INTEGER},
+			</if>
+			<if test="taskMode != null">
+				task_mode = #{taskMode,jdbcType=INTEGER},
+			</if>
+			<if test="version != null">
+				version = #{version,jdbcType=VARCHAR},
+			</if>
+			<if test="isOnline != null">
+				is_online = #{isOnline,jdbcType=INTEGER},
+			</if>
+			<if test="onlineTime != null">
+				online_time = #{onlineTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastTime != null">
+				last_time = #{lastTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

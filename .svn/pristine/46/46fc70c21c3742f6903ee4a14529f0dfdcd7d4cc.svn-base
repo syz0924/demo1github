@@ -1,0 +1,10 @@
+package com.lovdmx.control.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.pojo.SpriteEdlmx;
+import com.lovdmx.control.service.SpriteEdlmxService;
+
+@Service("spriteEdlmxService")
+public class SpriteEdlmxServiceImpl extends BaseServiceImpl<SpriteEdlmx> implements SpriteEdlmxService {
+}

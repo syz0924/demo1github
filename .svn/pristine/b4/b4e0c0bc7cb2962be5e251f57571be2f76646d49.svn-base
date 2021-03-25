@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.AccountMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.Account">
+		<id column="account_id" property="accountId" jdbcType="INTEGER" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="CHAR" />
+		<result column="salt" property="salt" jdbcType="CHAR" />
+		<result column="status" property="status" jdbcType="DECIMAL" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="role_id" property="roleId" jdbcType="INTEGER" />
+		<result column="project_name" property="projectName" jdbcType="VARCHAR" />
+		<result column="is_online" property="isOnline" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		account_id, user_name, nick_name, password, salt, status,
+		project_id, role_id,is_online,
+		create_time,
+		modify_time
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_account
+		where account_id = #{accountId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findByAccountIdORUserName" resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.Account">
+		select
+		account_id, user_name, nick_name, password, salt, status,
+		project_id, role_id,(select project_name from pro_project where
+		project_id=ac.project_id) project_name,is_online,
+		create_time,
+		modify_time
+		from dev_account ac
+		<where>
+			<if test="accountId != null and accountId != ''">
+				and account_id = #{accountId}
+			</if>
+			<if test="userName != null and userName != ''">
+				AND user_name LIKE CONCAT(CONCAT('%',#{userName},'%'))
+			</if>
+		</where>
+		order by account_id desc
+	</select>
+
+	<select id="findByUserName" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_account
+		where user_name = #{userName}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		dev_account
+		where account_id = #{accountId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.Account" useGeneratedKeys="true" keyProperty="accountId">
+		insert into dev_account
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="accountId != null">
+				account_id,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+			<if test="nickName != null">
+				nick_name,
+			</if>
+			<if test="password != null">
+				password,
+			</if>
+			<if test="salt != null">
+				salt,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="roleId != null">
+				role_id,
+			</if>
+			<if test="isOnline != null">
+				is_online,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="modifyTime != null">
+				modify_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="accountId != null">
+				#{accountId,jdbcType=INTEGER},
+			</if>
+			<if test="userName != null">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="nickName != null">
+				#{nickName,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null">
+				#{password,jdbcType=CHAR},
+			</if>
+			<if test="salt != null">
+				#{salt,jdbcType=CHAR},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=DECIMAL},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="roleId != null">
+				#{roleId,jdbcType=INTEGER},
+			</if>
+			<if test="isOnline != null">
+				#{isOnline,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyTime != null">
+				#{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.Account">
+		update dev_account
+		<set>
+			<if test="userName != null">
+				user_name = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="nickName != null">
+				nick_name = #{nickName,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null">
+				password = #{password,jdbcType=CHAR},
+			</if>
+			<if test="salt != null">
+				salt = #{salt,jdbcType=CHAR},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=DECIMAL},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="roleId != null">
+				role_id = #{roleId,jdbcType=INTEGER},
+			</if>
+			<if test="isOnline != null">
+				is_online = #{isOnline,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyTime != null">
+				modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where account_id = #{accountId,jdbcType=INTEGER}
+	</update>
+
+
+	<update id="updateAllOnlineStatus" parameterType="java.lang.Integer">
+		update
+		dev_account set is_online=#{onlineStatus}
+	</update>
+
+</mapper>

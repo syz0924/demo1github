@@ -1,0 +1,17 @@
+package com.lovdmx.test;
+
+import org.junit.Test;
+
+public class Test01 {
+
+	@Test
+	public void demo01() {
+
+		String nums = "";
+
+		int indexOf = nums.indexOf("," + 1);
+
+		System.out.println(nums.split("\\.").length);
+
+	}
+}

@@ -1,0 +1,108 @@
+package com.lovdmx.control.controller.admin;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
+import com.lovdmx.control.controller.BaseController;
+import com.lovdmx.control.pojo.Project;
+import com.lovdmx.control.pojo.RackDevice;
+import com.lovdmx.control.service.ProjectService;
+import com.lovdmx.control.service.RackDeviceService;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: DeviceRackController.java
+ * @Description: 机柜控制器
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年6月20日 下午3:59:23
+ *
+ */
+@Controller
+@RequestMapping("/lovdmx/ht/deviceRack/")
+public class DeviceRackController extends BaseController {
+
+	@Autowired
+	private RackDeviceService rackDeviceService; // 机柜
+
+	@Autowired
+	private ProjectService projectService; // 项目
+
+	/**
+	 * 
+	 * @Function: DeviceRackController.java
+	 * @Description: 设备机柜 展示列表
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年6月22日 上午10:37:34
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年6月22日 Administrator v1.0.0 修改原因
+	 */
+	@RequestMapping(value = "index.do", method = RequestMethod.GET)
+	public String index(RackDevice rackDevice, Integer pageNo, ModelMap map) {
+
+		if (rackDevice.getProjectId() != null && rackDevice.getProjectId() == -1) {
+			rackDevice.setProjectId(null);
+		}
+		// 获取所有项目信息
+		List<Project> projectList = projectService.findAll();
+
+		// 分页
+		PageInfo<RackDevice> pageInfo = rackDeviceService.queryPageListByWhereRackNameOrRackIdOrProjectId(rackDevice,
+				pageNo, rows);
+		// 项目信息
+		Project project = projectService.findById(rackDevice.getProjectId());
+
+		map.put("projectList", projectList);
+		map.put("pageInfo", pageInfo);
+		map.put("project", project);
+
+		return "deviceRack/deviceRack_list";
+	}
+
+	/**
+	 * 
+	 * @Function: DeviceRackController.java
+	 * @Description: 添加设备机柜
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年6月22日 上午10:38:26
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年6月22日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "add.do", method = RequestMethod.GET)
+	public JSONObject add() {
+		JSONObject json = new JSONObject();
+		// 获取所有项目信息
+		List<Project> projectList = projectService.findAll();
+		json.put("projectList", projectList);
+		return json;
+	}
+
+}

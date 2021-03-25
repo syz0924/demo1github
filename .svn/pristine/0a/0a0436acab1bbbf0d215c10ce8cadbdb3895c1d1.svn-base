@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.SpriteDeviceMapper" >
+  <resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.SpriteDevice" >
+    <id column="sprite_id" property="spriteId" jdbcType="INTEGER" />
+    <result column="ip" property="ip" jdbcType="CHAR" />
+    <result column="mac" property="mac" jdbcType="CHAR" />
+    <result column="rack_id" property="rackId" jdbcType="INTEGER" />
+    <result column="sprite_type" property="spriteType" jdbcType="DECIMAL" />
+    <result column="is_online" property="isOnline" jdbcType="DECIMAL" />
+    <result column="sprite_status" property="spriteStatus" jdbcType="DECIMAL" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="breakdown_time" property="breakdownTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    sprite_id, ip, mac, rack_id, sprite_type, is_online, sprite_status, create_time, 
+    modify_time, breakdown_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from dev_sprite_device
+    where sprite_id = #{spriteId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from dev_sprite_device
+    where sprite_id = #{spriteId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.lovdmx.control.pojo.SpriteDevice" >
+    insert into dev_sprite_device (sprite_id, ip, mac, 
+      rack_id, sprite_type, is_online, 
+      sprite_status, create_time, modify_time, 
+      breakdown_time)
+    values (#{spriteId,jdbcType=INTEGER}, #{ip,jdbcType=CHAR}, #{mac,jdbcType=CHAR}, 
+      #{rackId,jdbcType=INTEGER}, #{spriteType,jdbcType=DECIMAL}, #{isOnline,jdbcType=DECIMAL}, 
+      #{spriteStatus,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}, 
+      #{breakdownTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lovdmx.control.pojo.SpriteDevice" >
+    insert into dev_sprite_device
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="spriteId != null" >
+        sprite_id,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="mac != null" >
+        mac,
+      </if>
+      <if test="rackId != null" >
+        rack_id,
+      </if>
+      <if test="spriteType != null" >
+        sprite_type,
+      </if>
+      <if test="isOnline != null" >
+        is_online,
+      </if>
+      <if test="spriteStatus != null" >
+        sprite_status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="modifyTime != null" >
+        modify_time,
+      </if>
+      <if test="breakdownTime != null" >
+        breakdown_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="spriteId != null" >
+        #{spriteId,jdbcType=INTEGER},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=CHAR},
+      </if>
+      <if test="mac != null" >
+        #{mac,jdbcType=CHAR},
+      </if>
+      <if test="rackId != null" >
+        #{rackId,jdbcType=INTEGER},
+      </if>
+      <if test="spriteType != null" >
+        #{spriteType,jdbcType=DECIMAL},
+      </if>
+      <if test="isOnline != null" >
+        #{isOnline,jdbcType=DECIMAL},
+      </if>
+      <if test="spriteStatus != null" >
+        #{spriteStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null" >
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="breakdownTime != null" >
+        #{breakdownTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lovdmx.control.pojo.SpriteDevice" >
+    update dev_sprite_device
+    <set >
+      <if test="ip != null" >
+        ip = #{ip,jdbcType=CHAR},
+      </if>
+      <if test="mac != null" >
+        mac = #{mac,jdbcType=CHAR},
+      </if>
+      <if test="rackId != null" >
+        rack_id = #{rackId,jdbcType=INTEGER},
+      </if>
+      <if test="spriteType != null" >
+        sprite_type = #{spriteType,jdbcType=DECIMAL},
+      </if>
+      <if test="isOnline != null" >
+        is_online = #{isOnline,jdbcType=DECIMAL},
+      </if>
+      <if test="spriteStatus != null" >
+        sprite_status = #{spriteStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyTime != null" >
+        modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="breakdownTime != null" >
+        breakdown_time = #{breakdownTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where sprite_id = #{spriteId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lovdmx.control.pojo.SpriteDevice" >
+    update dev_sprite_device
+    set ip = #{ip,jdbcType=CHAR},
+      mac = #{mac,jdbcType=CHAR},
+      rack_id = #{rackId,jdbcType=INTEGER},
+      sprite_type = #{spriteType,jdbcType=DECIMAL},
+      is_online = #{isOnline,jdbcType=DECIMAL},
+      sprite_status = #{spriteStatus,jdbcType=DECIMAL},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+      breakdown_time = #{breakdownTime,jdbcType=TIMESTAMP}
+    where sprite_id = #{spriteId,jdbcType=INTEGER}
+  </update>
+</mapper>

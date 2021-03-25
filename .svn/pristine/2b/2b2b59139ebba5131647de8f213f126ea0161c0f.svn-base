@@ -1,0 +1,4352 @@
+
+// 保存后端管理员
+$("body")
+		.on(
+				"click",
+				"#lovdmx-submit-manage",
+				function() {
+					// jquery对象
+					var $loginName = $("#lovdmx-popup-window input[name='loginName']");
+					var $password = $("#lovdmx-popup-window input[name='password']");
+					var $nickName = $("#lovdmx-popup-window input[name='nickName']");
+					var $phone = $("#lovdmx-popup-window input[name='phone']");
+					var $email = $("#lovdmx-popup-window input[name='email']");
+
+					// 值
+					var loginName = $loginName.val();
+					var password = $password.val();
+					var nickName = $nickName.val();
+					var phone = $phone.val();
+					var email = $email.val();
+
+					if (loginName == "" || loginName == null
+							|| loginName == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$loginName.addClass("lovdmx-form-danger").focus();
+						return;
+					}
+
+					if (password == "" || password == null
+							|| password == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$password.addClass("lovdmx-form-danger").focus();
+						return;
+					}
+
+					if (nickName == "" || nickName == null
+							|| nickName == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$nickName.addClass("lovdmx-form-danger").focus();
+						return;
+					}
+					
+					
+					var myreg = /^1[34578]\d{9}$/;
+					if (phone != "" && phone != null
+								&& phone != undefined) {
+						 if(!myreg.test(phone)){
+							  layer.msg('请输入有效的手机号码！', {
+									icon : 5
+							  });
+							  
+							  $phone.addClass("lovdmx-form-danger").val("").focus();
+							  return false;
+						 }
+					 }
+					 
+					 varreg = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+					 if (email != "" && email != null
+								&& email != undefined) {
+						 if(!varreg.test(email)){
+							  layer.msg('邮箱格式不正确，请重新输入！', {
+									icon : 5
+							  });
+							  
+							  $email.addClass("lovdmx-form-danger").val("").focus();
+							  return false;
+						 }
+					  }
+					
+
+					$
+							.ajax({
+								type : "POST",
+								url : $("#pageContext").val()
+										+ "/lovdmx/ht/manage/save.do",
+								data : "loginName=" + loginName
+										+ "&password=" + password
+										+ "&nickName=" + nickName
+										+ "&phone=" + phone + "&email="
+										+ email,
+								success : function(json) {
+									if (json.result == "添加失败") {
+										layer.alert(json.result, {
+											icon : 5
+										});
+
+									} else {
+										var obj = json.manage;
+										var addManage = "";
+										// 获取时间
+										var time = formatDateTime(obj.createTime);
+										
+										//项目路径
+										var path=$("#pageContext").val();
+										
+										// 组装
+										addManage += "<tr class='manageId"+obj.manageId+"'>";
+											addManage += "<td class='table-checked lovdmx-unselect'>";
+												addManage += "<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'";
+													addManage += "data-index='"+obj.manageId+"'>";
+													addManage += "<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+												addManage += "</div>";
+											addManage += "</td>";
+											addManage += "<td class='lovdmx-unselect'>";
+												addManage += "<div class='lovdmx-table-cell'>";
+													addManage += "<span class='manageId'>"+obj.manageId+"</span>";
+												addManage += "</div>";
+											addManage += "</td>";
+											addManage += "<td class='lovdmx-unselect'>";
+												addManage += "<div class='lovdmx-table-cell'>";
+													addManage += "<span class='loginName'>"+obj.loginName+"</span>";
+												addManage += "</div>";
+											addManage += "</td>";
+											addManage += "<td class='lovdmx-unselect'>";
+												addManage += "<div class='lovdmx-table-cell'>";
+													addManage += "<span class='nickName'>"+obj.nickName+"</span>";
+												addManage += "</div>";
+											addManage += "</td>";
+											addManage += "<td class='lovdmx-unselect'>";
+												addManage += "<div class='lovdmx-table-cell'>";
+													addManage += "<span class='phone'>"+obj.phone+"</span>";
+												addManage += "</div>";
+											addManage += "</td>";
+											addManage += "<td class='lovdmx-unselect'>";
+												addManage += "<div class='lovdmx-table-cell'>";
+													addManage += "<span class='email'>"+obj.email+"</span>";
+												addManage += "</div>";
+											addManage += "</td>";
+											addManage += "<td class='lovdmx-unselect'>";
+												addManage += "<div class='lovdmx-table-cell'>";
+													addManage += "<span class='createTime'>"+time+"</span>";
+												addManage += "</div>";
+											addManage += "</td>";
+											addManage += "<td class='table-last lovdmx-unselect'>";
+												addManage += "<div class='lovdmx-table-cell'>";
+													addManage += "<a data-manageId='"+obj.manageId+"'";
+														addManage += "class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs manage-edit'>";
+														addManage += "<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑 ";
+													addManage += "</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs'";
+														addManage += "data-link='"+path+"/lovdmx/ht/manage/delelte.do?manageId="+obj.manageId+"'";
+														addManage += "onclick='mydel(this)'> ";
+														addManage += "<i class='icon-shanchu lovdmx-icon iconfont lovdmx-manage-del'></i> 删除";
+													addManage += "</a>";
+												addManage += "</div>";
+											addManage += "</td>";
+										addManage += "</tr>";
+										
+
+										$("tbody").prepend(addManage);
+										layer.alert(json.result, {
+											icon : 6
+										});
+									}
+									//关闭
+									close();
+								}
+							});
+
+				});
+
+// 修改后端管理员信息
+$("body")
+		.on(
+				"click",
+				"#lovdmx-update-manage",
+				function() {
+					// jquery对象
+					var $loginName = $("#lovdmx-popup-window input[name='loginName']");
+					var $nickName = $("#lovdmx-popup-window input[name='nickName']");
+					var $phone = $("#lovdmx-popup-window input[name='phone']");
+					var $email = $("#lovdmx-popup-window input[name='email']");
+					var $manageId = $("#lovdmx-popup-window input[name='manageId']");
+
+					// 值
+					var loginName = $loginName.val();
+					var nickName = $nickName.val();
+					var phone = $phone.val();
+					var email = $email.val();
+					var manageId = $manageId.val();
+
+					if (loginName == "" || loginName == null
+							|| loginName == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$loginName.addClass("lovdmx-form-danger").focus();
+						return;
+					}
+					
+					var myreg = /^1[34578]\d{9}$/;
+					
+					if (phone != "" && phone != null
+								&& phone != undefined) {
+						 if(!myreg.test(phone)){
+							  layer.msg('请输入有效的手机号码！', {
+									icon : 5
+							  });
+							  
+							  $phone.addClass("lovdmx-form-danger").val("").focus();
+							  return false;
+						 }
+					 }
+					 
+					 varreg = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/;
+					 if (email != "" && email != null
+								&& email != undefined) {
+						 if(!varreg.test(email)){
+							  layer.msg('邮箱格式不正确，请重新输入！', {
+									icon : 5
+							  });
+							  
+							  $email.addClass("lovdmx-form-danger").val("").focus();
+							  return false;
+						 }
+					  }
+					 
+					 
+
+					if (nickName == "" || nickName == null
+							|| nickName == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$nickName.addClass("lovdmx-form-danger").focus();
+						return;
+					}
+
+					$.ajax({
+						type : "POST",
+						url : $("#pageContext").val()
+								+ "/lovdmx/ht/manage/updateInfo.do",
+						data : "manageId=" + manageId + "&loginName="
+								+ loginName + "&nickName=" + nickName
+								+ "&phone=" + phone + "&email=" + email,
+						success : function(msg) {
+							if (msg == "修改失败") {
+								layer.alert(msg, {
+									icon : 5
+								});
+							} else {
+								// 更新
+								var $parentManage = $(".manageId"
+										+ manageId);
+								$parentManage.find(".loginName").html(
+										loginName);
+								$parentManage.find(".nickName").html(
+										nickName);
+								$parentManage.find(".phone").html(phone);
+								$parentManage.find(".email").html(email);
+
+								layer.alert(msg, {
+									icon : 6
+								});
+							}
+							close();
+						}
+					});
+
+				});
+
+
+//保存前端管理员
+$("body")
+		.on(
+				"click",
+				"#lovdmx-submit-account",
+				function() {
+					// jquery对象
+					var $userName = $("#lovdmx-popup-window input[name='userName']");
+					var $password = $("#lovdmx-popup-window input[name='password']");
+					var $nickName = $("#lovdmx-popup-window input[name='nickName']");
+					var $role = $("#lovdmx-popup-window input[name='role']");
+					var $project = $("#lovdmx-popup-window input[name='project']");
+					var $status = $("#lovdmx-popup-window input[name='status']");
+
+					// 值
+					var userName = $userName.val();
+					var password = $password.val();
+					var nickName = $nickName.val();
+					var roleName = $role.val();
+					var projectName = $project.val();
+					var roleId = $role.attr("data-value");
+					var projectId = $project.attr("data-value");
+					var status = $status.is(':checked')==true?1:0;
+
+					if (userName == "" || userName == null
+							|| userName == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$userName.addClass("lovdmx-form-danger").focus();
+						return;
+					}
+
+					if (password == "" || password == null
+							|| password == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$password.addClass("lovdmx-form-danger").focus();
+						return;
+					}
+
+					if (nickName == "" || nickName == null
+							|| nickName == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$nickName.addClass("lovdmx-form-danger").focus();
+						return;
+					}
+
+					$
+							.ajax({
+								type : "POST",
+								url : $("#pageContext").val()
+										+ "/lovdmx/ht/account/save.do",
+								data : "userName=" + userName
+										+ "&password=" + password
+										+ "&nickName=" + nickName
+										+ "&roleId=" + roleId + "&projectId="
+										+ projectId+"&status="+status,
+								success : function(json) {
+									if (json.result == "添加失败") {
+										layer.alert(json.result, {
+											icon : 5
+										});
+
+									} else {
+										var obj = json.account;
+										var addManage = "";
+										// 获取时间
+										var time = formatDateTime(obj.createTime);
+										
+										//项目路径
+										var path=$("#pageContext").val();
+										
+										// 组装
+										addAccount += "<tr class='accountId"+obj.accountId+"'>";
+											addAccount += "<td class='table-checked lovdmx-unselect'>";
+												addAccount += "<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'";
+													addAccount += "data-index='"+obj.accountId+"'>";
+													addAccount += "<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+												addAccount += "</div>";
+											addAccount += "</td>";
+											addAccount += "<td class='lovdmx-unselect'>";
+												addAccount += "<div class='lovdmx-table-cell'>";
+													addAccount += "<span class='accountId'>"+obj.accountId+"</span>";
+												addAccount += "</div>";
+											addAccount += "</td>";
+											addAccount += "<td class='lovdmx-unselect'>";
+												addAccount += "<div class='lovdmx-table-cell'>";
+													addAccount += "<span class='userName'>"+obj.userName+"</span>";
+												addAccount += "</div>";
+											addAccount += "</td>";
+											addAccount += "<td class='lovdmx-unselect'>";
+												addAccount += "<div class='lovdmx-table-cell'>";
+													addAccount += "<span class='nickName'>"+obj.nickName+"</span>";
+												addAccount += "</div>";
+											addAccount += "</td>";
+											addAccount += "<td class='lovdmx-unselect'>";
+												addAccount += "<div class='lovdmx-table-cell'>";
+													addAccount += "<span class='roleName'>"+roleName+"</span>";
+												addAccount += "</div>";
+											addAccount += "</td>";
+											addAccount += "<td class='lovdmx-unselect'>";
+												addAccount += "<div class='lovdmx-table-cell'>";
+													addAccount += "<span class='projectName'>"+projectName+"</span>";
+												addAccount += "</div>";
+											addAccount += "</td>";
+											
+											addAccount += "<td class='lovdmx-unselect'>";
+												addAccount += "<div class='lovdmx-table-cell'>";
+													addAccount += "<span class='isOnline'>";
+														addAccount += " <button class='lovdmx-btn lovdmx-btn-xs status lovdmx-btn-gray'>未在线</button>";
+													addAccount += "</span>";
+												addAccount += "</div>";
+											addAccount += "</td>";
+											
+											addAccount += "<td class='lovdmx-unselect  account_status'>";
+												addAccount += "<div class='lovdmx-table-cell'>";
+													addAccount += "<input type='checkbox' class='none' lay-filter='switch'";
+														addAccount += "lay-verify='required' name='status' lay-skin='switch'";
+														addAccount += "lay-text='ON|OFF'"+(obj.status==1?'checked=checked':'')+" />";
+													addAccount += "<div class='status lovdmx-unselect lovdmx-form-switch "+(obj.status==1?'lovdmx-form-onswitch':'')+" '>";
+														addAccount += "<em>"+(obj.status==1?'NO':'OFF')+"</em><i></i>";
+													addAccount += "</div>";
+												addAccount += "</div>";
+											addAccount += "</td>";
+											
+											addAccount += "<td class='lovdmx-unselect'>";
+												addAccount += "<div class='lovdmx-table-cell'>";
+													addAccount += "<span class='createTime'>"+time+"</span>";
+												addAccount += "</div>";
+											addAccount += "</td>";
+											addAccount += "<td class='table-last lovdmx-unselect'>";
+												addAccount += "<div class='lovdmx-table-cell'>";
+													addAccount += "<a data-link='"+path+"/lovdmx/ht/account/edit.do?accountId="+obj.accountId+"' ";
+														addAccount += "class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs account-edit'>";
+														addAccount += "<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑 ";
+													addAccount += "</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs'";
+														addAccount += "data-link='"+path+"/lovdmx/ht/account/delelte.do?accountId="+obj.accountId+"'";
+														addAccount += "onclick='mydel(this)'> ";
+														addAccount += "<i class='icon-shanchu lovdmx-icon iconfont lovdmx-account-del'></i> 删除";
+													addAccount += "</a>";
+												addAccount += "</div>";
+											addAccount += "</td>";
+										addAccount += "</tr>";
+
+										$("tbody").prepend(addAccount);
+										layer.alert(json.result, {
+											icon : 6
+										});
+									}
+									//关闭
+									close();
+								}
+							});
+
+				});
+
+
+
+//修改前端管理员信息
+$("body")
+		.on(
+				"click",
+				"#lovdmx-update-account",
+				function() {
+					// jquery对象
+					var $nickName = $("#lovdmx-popup-window input[name='nickName']");
+					var $role = $("#lovdmx-popup-window input[name='role']");
+					var $project = $("#lovdmx-popup-window input[name='project']");
+					var $status = $("#lovdmx-popup-window input[name='status']");
+					var $accountId = $("#lovdmx-popup-window input[name='accountId']");
+
+					// 值
+					var nickName = $nickName.val();
+					var roleName = $role.val();
+					var projectName = $project.val();
+					var roleId = $role.attr("data-value");
+					var projectId = $project.attr("data-value");
+					var status = $status.is(':checked')==true?1:0;
+					var accountId = $accountId.val();
+
+					if (nickName == "" || nickName == null
+							|| nickName == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$nickName.addClass("lovdmx-form-danger").focus();
+						return;
+					}
+
+					$.ajax({
+						type : "POST",
+						url : $("#pageContext").val()
+								+ "/lovdmx/ht/account/updateInfo.do",
+						data : "accountId=" + accountId+ "&nickName=" + nickName
+								+ "&roleId=" + roleId + "&projectId=" + projectId+ "&status=" + status,
+						success : function(msg) {
+							if (msg == "修改失败") {
+								layer.alert(msg, {
+									icon : 5
+								});
+							} else {
+								// 更新
+								var $parentManage = $(".accountId"
+										+ accountId);
+								$parentManage.find(".nickName").html(
+										nickName);
+								$parentManage.find(".roleId").html(roleName);
+								$parentManage.find(".projectName").html(roleId==1?"所有":projectName);
+								
+								var obj=$parentManage.find(".status");
+								if (status==1) {
+									$(obj).addClass("lovdmx-form-onswitch");
+									$(obj).find("em").html("ON");
+									$(obj).prev("input[type='checkbox']").attr("checked","checked");
+								}else{
+									$(obj).removeClass("lovdmx-form-onswitch");
+									$(obj).find("em").html("OFF");
+									$(obj).prev("input[type='checkbox']").attr("checked",null);
+								}
+								
+								layer.alert(msg, {
+									icon : 6
+								});
+							}
+							close();
+						}
+					});
+
+				});
+
+//添加项目
+$("body")
+		.on(
+				"click",
+				"#submit-project",
+				function() {
+					// jquery对象
+					var $projectName = $("#lovdmx-popup-window input[name='projectName']");
+					// 值
+					var projectName = $projectName.val();
+					if (projectName == "" || projectName == null
+							|| projectName == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$projectName.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}
+					$
+							.ajax({
+								type : "POST",
+								url : $("#pageContext").val()
+										+ "/lovdmx/ht/project/save.do",
+								data : {
+									"projectName" : projectName
+								},
+								success : function(json) {
+									//返回状态
+									if (json.result == "修改失败") {
+										layer.alert(json.result, {
+											icon : 5
+										});
+									} else {
+										var obj = json.project;
+										var addProject = "";
+										
+										// 获取时间
+										var time = formatDateTime(obj.createTime);
+										
+										//项目路径
+										var path=$("#pageContext").val();
+										
+										// 组装
+										addProject += "<tr class='projectId"+obj.projectId+"'>";
+											addProject += "<td class='table-checked lovdmx-unselect'>";
+												addProject += "<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'";
+													addProject += "data-index='"+obj.projectId+"'>";
+													addProject += "<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+												addProject += "</div>";
+											addProject += "</td>";
+											addProject += "<td class='lovdmx-unselect'>";
+												addProject += "<div class='lovdmx-table-cell'>";
+													addProject += "<span class='projectId'>"+obj.projectId+"</span>";
+												addProject += "</div>";
+											addProject += "</td>";
+											addProject += "<td class='lovdmx-unselect'>";
+												addProject += "<div class='lovdmx-table-cell'>";
+													addProject += "<span class='projectName'>"+obj.projectName+"</span>";
+												addProject += "</div>";
+											addProject += "</td>";
+											addProject += "<td class='lovdmx-unselect'>";
+												addProject += "<div class='lovdmx-table-cell'>";
+													addProject += "<span class='createTime'>"+time+"</span>";
+												addProject += "</div>";
+											addProject += "</td>";
+											addProject += "<td class='table-last lovdmx-unselect'>";
+												addProject += "<div class='lovdmx-table-cell'>";
+													addProject += "<a data-link='"+path+"/lovdmx/ht/project/edit.do?projectId="+obj.projectId+"' ";
+														addProject += "class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs project-edit'>";
+														addProject += "<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑 ";
+													addProject += "</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs lovdmx-btn-disabled'> ";
+														addProject += "<i class='icon-shanchu lovdmx-icon iconfont'></i> 删除";
+													addProject += "</a>";
+												addProject += "</div>";
+											addProject += "</td>";
+										addProject += "</tr>";
+
+										$("tbody").prepend(addProject);
+										layer.alert(json.result, {
+											icon : 6
+										});
+									}
+									//关闭
+									close();
+								}
+							});
+				});
+
+
+//修改项目
+$("body").on("click", "#update-project", function() {
+	// jquery对象
+	var $projectName = $("#lovdmx-popup-window input[name='projectName']");
+	var $projectId=$("#lovdmx-popup-window input[name='projectId']");
+
+	// 值
+	var projectName = $projectName.val();
+	var projectId =$projectId.val();
+	if (projectName == "" || projectName == null
+			|| projectName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$projectName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	
+	$
+	.ajax({
+		type : "POST",
+		url : $("#pageContext").val()
+				+ "/lovdmx/ht/project/update.do",
+		data : {
+			"projectId":projectId,
+			"projectName" : projectName
+		},
+		success : function(result) {
+			//返回状态
+			if (result == "修改失败") {
+				layer.alert(result, {
+					icon : 5
+				});
+			} else {
+				// 更新
+				$(".projectId"+projectId).find(".projectName").html(projectName);
+				layer.alert(result, {
+					icon : 6
+				});
+			}
+			close();
+			
+		}
+	});
+	
+});
+
+//添加项目
+$("body")
+		.on(
+				"click",
+				"#submit-deviceRack",
+				function() {
+					// jquery对象
+					var $project = $("#lovdmx-popup-window input[name='project']");
+					var $rackName = $("#lovdmx-popup-window input[name='rackName']");
+					var $rackIndex = $("#lovdmx-popup-window input[name='rackIndex']");
+					var $splitVideoX = $("#lovdmx-popup-window input[name='splitVideoX']");
+					var $splitVideoY = $("#lovdmx-popup-window input[name='splitVideoY']");
+					var $splitVideoWidth = $("#lovdmx-popup-window input[name='splitVideoWidth']");
+					var $splitVideoHeight = $("#lovdmx-popup-window input[name='splitVideoHeight']");
+					var $rackLongitude = $("#lovdmx-popup-window input[name='rackLongitude']");
+					var $rackLatitude = $("#lovdmx-popup-window input[name='rackLatitude']");
+					
+					// 值
+					var projectName = $project.val();
+					var projectId = $project.attr("data-value");
+					var rackName = $rackName.val();
+					var rackIndex = $rackIndex.val();
+					var splitVideoX = $splitVideoX.val();
+					var splitVideoY = $splitVideoY.val();
+					var splitVideoWidth = $splitVideoWidth.val();
+					var splitVideoHeight = $splitVideoHeight.val();
+					var rackLongitude = $rackLongitude.val();
+					var rackLatitude = $rackLatitude.val();
+					
+					if (rackName == "" || rackName == null
+							|| rackName == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$rackName.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}
+					
+					if (rackIndex == "" || rackIndex == null
+							|| rackIndex == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$rackIndex.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}else{
+						//判断是否为整数
+						var bool=false;
+						if(typeof rackIndex=="number"){
+							var uu = Math.floor(rackIndex);
+							if(uu==rackIndex){
+								bool=true;
+							}
+						}
+						if(!bool){
+							layer.msg('格式错误,请输入整数', {
+								icon : 5
+							});
+							
+							$rackIndex.val("");
+							$rackIndex.addClass("lovdmx-form-danger")
+									.focus();
+						}
+					}
+					
+					if (splitVideoX == "" || splitVideoX == null
+							|| splitVideoX == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$splitVideoX.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}else{
+						//判断是否为整数
+						var bool=false;
+						if(typeof splitVideoX=="number"){
+							var uu = Math.floor(splitVideoX);
+							if(uu==splitVideoX){
+								bool=true;
+							}
+						}
+						if(!bool){
+							layer.msg('格式错误,请输入整数', {
+								icon : 5
+							});
+							
+							$splitVideoX.val("");
+							$splitVideoX.addClass("lovdmx-form-danger")
+									.focus();
+						}
+					}
+					
+					if (splitVideoY == "" || splitVideoY == null
+							|| splitVideoY == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$splitVideoY.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}else{
+						//判断是否为整数
+						var bool=false;
+						if(typeof splitVideoY=="number"){
+							var uu = Math.floor(splitVideoY);
+							if(uu==splitVideoY){
+								bool=true;
+							}
+						}
+						if(!bool){
+							layer.msg('格式错误,请输入整数', {
+								icon : 5
+							});
+							
+							$splitVideoY.val("");
+							$splitVideoY.addClass("lovdmx-form-danger")
+									.focus();
+						}
+					}
+					
+					if (splitVideoWidth == "" || splitVideoWidth == null
+							|| splitVideoWidth == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$splitVideoWidth.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}else{
+						//判断是否为整数
+						var bool=false;
+						if(typeof splitVideoWidth=="number"){
+							var uu = Math.floor(splitVideoWidth);
+							if(uu==splitVideoWidth){
+								bool=true;
+							}
+						}
+						if(!bool){
+							layer.msg('格式错误,请输入整数', {
+								icon : 5
+							});
+							
+							$splitVideoWidth.val("");
+							$splitVideoWidth.addClass("lovdmx-form-danger")
+									.focus();
+						}
+					}
+					
+					if (splitVideoHeight == "" || splitVideoHeight == null
+							|| splitVideoHeight == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$splitVideoHeight.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}else{
+						//判断是否为整数
+						var bool=false;
+						if(typeof splitVideoHeight=="number"){
+							var uu = Math.floor(splitVideoHeight);
+							if(uu==splitVideoHeight){
+								bool=true;
+							}
+						}
+						if(!bool){
+							layer.msg('格式错误,请输入整数', {
+								icon : 5
+							});
+							
+							$splitVideoHeight.val("");
+							$splitVideoHeight.addClass("lovdmx-form-danger")
+									.focus();
+						}
+					}
+					
+					if (rackLongitude == "" || rackLongitude == null
+							|| rackLongitude == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$rackLongitude.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}else if(!(typeof rackLongitude=="number")){
+						layer.msg('格式错误,请输入小数', {
+							icon : 5
+						});
+						
+						$rackLongitude.val("");
+						$rackLongitude.addClass("lovdmx-form-danger")
+								.focus();
+					}
+					if (rackLatitude == "" || rackLatitude == null
+							|| rackLatitude == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$rackLatitude.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}else if(!(typeof rackLatitude=="number")){
+						layer.msg('格式错误,请输入小数', {
+							icon : 5
+						});
+						
+						$rackLatitude.val("");
+						$rackLatitude.addClass("lovdmx-form-danger")
+								.focus();
+					}
+					
+					$
+							.ajax({
+								type : "POST",
+								url : $("#pageContext").val()
+										+ "/lovdmx/ht/deviceRack/save.do",
+								data : {
+									"projectId" : projectId,
+									"rackName" : rackName,
+									"splitVideoX" : splitVideoX,
+									"splitVideoY" : splitVideoY,
+									"splitVideoWidth" : splitVideoWidth,
+									"splitVideoHeight" : splitVideoHeight,
+									"rackLongitude" : rackLongitude,
+									"rackLatitude" : rackLatitude,
+								},
+								success : function(json) {
+									//返回状态
+									if (json.result == "修改失败") {
+										layer.alert(json.result, {
+											icon : 5
+										});
+									} else {
+										var obj = json.project;
+										var addProject = "";
+										
+										// 获取时间
+										var time = formatDateTime(obj.createTime);
+										
+										//项目路径
+										var path=$("#pageContext").val();
+										
+										// 组装
+										addProject += "<tr class='projectId"+obj.projectId+"'>";
+											addProject += "<td class='table-checked lovdmx-unselect'>";
+												addProject += "<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'";
+													addProject += "data-index='"+obj.projectId+"'>";
+													addProject += "<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+												addProject += "</div>";
+											addProject += "</td>";
+											addProject += "<td class='lovdmx-unselect'>";
+												addProject += "<div class='lovdmx-table-cell'>";
+													addProject += "<span class='projectId'>"+obj.projectId+"</span>";
+												addProject += "</div>";
+											addProject += "</td>";
+											addProject += "<td class='lovdmx-unselect'>";
+												addProject += "<div class='lovdmx-table-cell'>";
+													addProject += "<span class='projectName'>"+obj.projectName+"</span>";
+												addProject += "</div>";
+											addProject += "</td>";
+											addProject += "<td class='lovdmx-unselect'>";
+												addProject += "<div class='lovdmx-table-cell'>";
+													addProject += "<span class='createTime'>"+time+"</span>";
+												addProject += "</div>";
+											addProject += "</td>";
+											addProject += "<td class='table-last lovdmx-unselect'>";
+												addProject += "<div class='lovdmx-table-cell'>";
+													addProject += "<a data-link='"+path+"/lovdmx/ht/project/edit.do?projectId="+obj.projectId+"' ";
+														addProject += "class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs project-edit'>";
+														addProject += "<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑 ";
+													addProject += "</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs lovdmx-btn-disabled'> ";
+														addProject += "<i class='icon-shanchu lovdmx-icon iconfont'></i> 删除";
+													addProject += "</a>";
+												addProject += "</div>";
+											addProject += "</td>";
+										addProject += "</tr>";
+
+										$("tbody").prepend(addProject);
+										layer.alert(json.result, {
+											icon : 6
+										});
+									}
+									//关闭
+									close();
+								}
+							});
+				});
+
+
+
+
+// 添加父 产品分类
+$("body")
+		.on(
+				"click",
+				"#submit-productCategory",
+				function() {
+					// jquery对象
+					var $categoryName = $("#lovdmx-popup-window input[name='categoryName']");
+
+					// 值
+					var categoryName = $categoryName.val();
+					if (categoryName == "" || categoryName == null
+							|| categoryName == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$categoryName.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}
+
+					$.ajax({
+							type : "POST",
+							url : $("#pageContext").val()
+									+ "/lovdmx/ht/productCategory/save.do",
+							data : {
+								"parentId" : "0",
+								"name" : categoryName
+							},
+							success : function(json) {
+								//返回状态
+								var flag=json.result;
+								if (flag == "添加失败") {
+									layer.alert(flag, {
+										icon : 5
+									});
+								} else {
+									var obj = json.productCategory;
+									var addProductCategory = "";
+									//项目路径
+									var path=$("#pageContext").val();
+									
+									// 添加
+									addProductCategory += "<tr class='productCategory"+obj.id+" lovdmx-table-parent'>";
+									addProductCategory += "<td class='table-checked lovdmx-unselect'>";
+										addProductCategory += "<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'>";
+											addProductCategory += "<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+										addProductCategory += "</div>";
+									addProductCategory += "</td>";
+									addProductCategory += "<td class='lovdmx-unselect'>";
+										addProductCategory += "<div class='lovdmx-table-cell'>";
+											addProductCategory += "<span class='id'>"+obj.id+"</span>";
+										addProductCategory += "</div>";
+									addProductCategory += "</td>";
+									addProductCategory += "<td class='lovdmx-unselect'>";
+										addProductCategory += "<div class='lovdmx-table-cell'>";
+											addProductCategory += "<span class='name'>"+obj.name+"</span>";
+										addProductCategory += "</div>";
+									addProductCategory += "</td>";
+									addProductCategory += "<td class='table-last lovdmx-unselect'>";
+										addProductCategory += "<div class='lovdmx-table-cell'>";
+											addProductCategory += "<a data-link='"+path+"/lovdmx/ht/productCategory/add.do?parentId="+obj.id+"'";
+												addProductCategory += "class='lovdmx-btn lovdmx-btn-add lovdmx-btn-xs category-add'>";
+												addProductCategory += "<i class='icon-tianjia1 lovdmx-icon iconfont'></i>  添加 ";
+											addProductCategory += "</a><a data-link='"+path+"/lovdmx/ht/productCategory/edit.do?id="+obj.id+"'";
+												addProductCategory += "class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs productCategory-edit'>";
+												addProductCategory += "<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑 ";
+											addProductCategory += "</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs'";
+												addProductCategory += "data-id='"+obj.id+"'";
+												addProductCategory += "data-link='"+path+"/lovdmx/ht/productCategory/delete.do?id="+obj.id+"'";
+												addProductCategory += "onclick='mydelProductCategory(this)'> ";
+												addProductCategory += "<i class='icon-shanchu lovdmx-icon iconfont lovdmx-manage-del'></i>";
+												addProductCategory += " 删除 ";
+											addProductCategory += "</a>";
+										addProductCategory += "</div>";
+									addProductCategory += "</td>";
+								addProductCategory += "</tr>";
+									
+									
+									$("tbody").append(
+											addProductCategory);
+									layer.alert(flag, {
+										icon : 6
+									});
+								}
+
+								close();
+							}
+						});
+
+				});
+
+
+
+//添加父 产品分类
+$("body")
+		.on(
+				"click",
+				"#submit-projectCategory",
+				function() {
+					// jquery对象
+					var $name = $("#lovdmx-popup-window input[name='name']");
+
+					// 值
+					var name = $name.val();
+					if (name == "" || name == null
+							|| name == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$name.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}
+
+					$.ajax({
+							type : "POST",
+							url : $("#pageContext").val()
+									+ "/lovdmx/ht/projectCategory/save.do",
+							data : {
+								"name" : name
+							},
+							success : function(json) {
+								//返回状态
+								var flag=json.result;
+								if (flag == "添加失败") {
+									layer.alert(flag, {
+										icon : 5
+									});
+								} else {
+									var projectCategory = json.projectCategory;
+									var addProductCategory = "";
+									//项目路径
+									var path=$("#pageContext").val();
+									
+									// 添加
+									var addProjectCategory = "";
+									//项目路径
+									var path=$("#pageContext").val();
+									
+									// 添加
+									addProjectCategory += "<tr class='projectCategory"+projectCategory.id+"'>";
+										addProjectCategory += "<td class='table-checked lovdmx-unselect'>";
+											addProjectCategory += "<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'>";
+												addProjectCategory += "<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+											addProjectCategory += "</div>";
+										addProjectCategory += "</td>";
+										addProjectCategory += "<td class='lovdmx-unselect'>";
+											addProjectCategory += "<div class='lovdmx-table-cell'>";
+												addProjectCategory += "<span class='id'>"+projectCategory.id+"</span>";
+											addProjectCategory += "</div>";
+										addProjectCategory += "</td>";
+										addProjectCategory += "<td class='lovdmx-unselect'>";
+											addProjectCategory += "<div class='lovdmx-table-cell'>";
+												addProjectCategory += "<span class='name'>"+projectCategory.name+"</span>";
+											addProjectCategory += "</div>";
+										addProjectCategory += "</td>";
+										addProjectCategory += "<td class='table-last lovdmx-unselect'>";
+											addProjectCategory += "<div class='lovdmx-table-cell'>";
+												addProjectCategory += "<a data-link='"+path+"/lovdmx/ht/projectCategory/edit.do?projectCategoryId="+projectCategory.id+"'";
+													addProjectCategory += "class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs projectCategory-edit'>";
+													addProjectCategory += "<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑 ";
+												addProjectCategory += "</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs'";
+													addProjectCategory += "data-link='"+path+"/lovdmx/ht/projectCategory/delete.do?projectCategoryId="+projectCategory.id+"'";
+													addProjectCategory += "onclick='mydel(this)'> ";
+													addProjectCategory += "<i class='icon-shanchu lovdmx-icon iconfont lovdmx-manage-del'></i>";
+													addProjectCategory += " 删除 ";
+												addProjectCategory += "</a>";
+											addProjectCategory += "</div>";
+										addProjectCategory += "</td>";
+									addProjectCategory += "</tr>";
+									
+									
+									$("tbody").append(
+											addProjectCategory);
+									layer.alert(flag, {
+										icon : 6
+									});
+								}
+
+								close();
+							}
+						});
+
+				});
+
+
+// 添加子分类
+$("body")
+		.on(
+				"click",
+				"#submit-category",
+				function() {
+					// jquery对象
+					var $parentId = $("#lovdmx-popup-window .lovdmx_unselect");
+					var $categoryName = $("#lovdmx-popup-window input[name='categoryName']");
+					// 值
+					var categoryName = $categoryName.val();
+					var parentId = parseInt($parentId.attr("data-value"));
+					if (categoryName == "" || categoryName == null
+							|| categoryName == undefined) {
+						layer.msg('必填项不能为空', {
+							icon : 5
+						});
+						$categoryName.addClass("lovdmx-form-danger")
+								.focus();
+						return;
+					}
+					$
+							.ajax({
+								type : "POST",
+								url : $("#pageContext").val()
+										+ "/lovdmx/ht/productCategory/save.do",
+								data : {
+									"parentId" : parentId,
+									"name" : categoryName
+								},
+								success : function(json) {
+									//返回状态
+									var flag=json.result;
+									if (flag == "修改失败") {
+										layer.alert(flag, {
+											icon : 5
+										});
+									} else {
+										var obj = json.productCategory;
+										var addProductCategory = "";
+										// 添加
+										var path=$("#pageContext").val();
+										
+										addProductCategory += "<tr class='parentId"+parentId+" category"+parentId+"'>";
+											addProductCategory += "<td class='table-checked lovdmx-unselect'>";
+												addProductCategory += "<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'>";
+													addProductCategory += "<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+												addProductCategory += "</div>";
+											addProductCategory += "</td>";
+											addProductCategory += "<td class='lovdmx-unselect'>";
+												addProductCategory += "<div class='lovdmx-table-cell'>";
+													addProductCategory += "<span>"+obj.id+"</span>";
+												addProductCategory += "</div>";
+											addProductCategory += "</td>";
+											addProductCategory += "<td class='lovdmx-unselect'>";
+												addProductCategory += "<div class='lovdmx-table-cell '>";
+													addProductCategory += "<span class='pd-lf20 name'>"+obj.name+"</span>";
+												addProductCategory += "</div>";
+											addProductCategory += "</td>";
+											addProductCategory += "<td class='table-last lovdmx-unselect'>";
+												addProductCategory += "<div class='lovdmx-table-cell'>";
+													addProductCategory += "<a data-link='"+path+"/lovdmx/ht/productCategory/categoryEdit.do?id="+obj.id+"&parentId="+parentId+"'";
+														addProductCategory += "class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs category-edit'>";
+														addProductCategory += "<i class='icon-bianji lovdmx-icon iconfont'></i>  编辑 ";
+													addProductCategory += "</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs'";
+														addProductCategory += "data-link='"+path+"/lovdmx/ht/productCategory/categoryDelete.do?id="+obj.id+"'";
+														addProductCategory += "onclick='mydel(this)'> ";
+														addProductCategory += "<i class='icon-shanchu lovdmx-icon iconfont lovdmx-manage-del'></i>";
+														addProductCategory += " 删除 ";
+													addProductCategory += "</a>";
+												addProductCategory += "</div>";
+											addProductCategory += "</td>";
+										addProductCategory += "</tr>";
+										
+										if ($(".parentId" + parentId).length == 0) {
+											$(".productCategory" + parentId)
+													.after(
+															addProductCategory);
+										} else {
+											$(".parentId" + parentId)
+													.last()
+													.after(
+															addProductCategory);
+										}
+
+										layer.alert(flag, {
+											icon : 6
+										});
+									}
+
+									close();
+								}
+							});
+				});
+
+// 修改父 产品分类
+$("body").on("click", "#update-productCategory", function() {
+	// jquery对象
+	var $categoryName = $("#lovdmx-popup-window input[name='categoryName']");
+	var $productCategoryId=$("#lovdmx-popup-window input[name='productCategoryId']");
+
+	// 值
+	var categoryName = $categoryName.val();
+	var productCategoryId =$productCategoryId.val();
+	if (categoryName == "" || categoryName == null
+			|| categoryName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$categoryName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	
+	$
+	.ajax({
+		type : "POST",
+		url : $("#pageContext").val()
+				+ "/lovdmx/ht/productCategory/update.do",
+		data : {
+			"id":productCategoryId,
+			"name" : categoryName
+		},
+		success : function(json) {
+			//返回状态
+			var flag=json.result;
+			if (flag == "修改失败") {
+				layer.alert(flag, {
+					icon : 5
+				});
+			} else {
+				// 更新
+				$(".productCategory"+productCategoryId).find(".name").html(json.productCategory.name);
+				layer.alert(json.result, {
+					icon : 6
+				});
+			}
+			close();
+			
+		}
+	});
+	
+});
+
+
+//修改父 产品分类
+$("body").on("click", "#update-projectCategory", function() {
+	// jquery对象
+	var $name = $("#lovdmx-popup-window input[name='name']");
+	var $projectCategoryId=$("#lovdmx-popup-window input[name='projectCategoryId']");
+
+	// 值
+	var name = $name.val();
+	var projectCategoryId =$projectCategoryId.val();
+	if (name == "" || name == null
+			|| name == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$projectCategoryId.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	$
+	.ajax({
+		type : "POST",
+		url : $("#pageContext").val()
+				+ "/lovdmx/ht/projectCategory/update.do",
+		data : {
+			"id":projectCategoryId,
+			"name" : name
+		},
+		success : function(json) {
+			//返回状态
+			var flag=json.result;
+			if (flag == "修改失败") {
+				layer.alert(flag, {
+					icon : 5
+				});
+			} else {
+				// 更新
+				$(".projectCategory"+projectCategoryId).find(".name").html(json.projectCategory.name);
+
+				layer.alert(json.result, {
+					icon : 6
+				});
+			}
+			close();
+			
+		}
+	});
+	
+});
+
+
+
+
+
+// 修改父 产品分类
+$("body").on("click", "#update-category", function() {
+	
+	// jquery对象
+	var $categoryName = $("#lovdmx-popup-window input[name='categoryName']");
+	var $categoryId=$("#lovdmx-popup-window input[name='categoryId']");
+	var $newparentId = $("#lovdmx-popup-window .lovdmx_unselect");
+	
+	
+	
+
+	// 值
+	var categoryName = $categoryName.val();
+	var categoryId =$categoryId.val();
+	var newparentId =parseInt($newparentId.attr("data-value"));
+	var parentId =$("#lovdmx-popup-window input[name='parentId']").val();
+	if (categoryName == "" || categoryName == null
+			|| categoryName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$categoryName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+
+	$
+	.ajax({
+		type : "POST",
+		url : $("#pageContext").val()
+				+ "/lovdmx/ht/productCategory/update.do",
+		data : {
+			"id":categoryId,
+			"name" : categoryName,
+			"parentId":newparentId,
+		},
+		success : function(json) {
+			//返回状态
+			var flag=json.result;
+			if (flag == "修改失败") {
+				layer.alert(flag, {
+					icon : 5
+				});
+			} else {
+				// 更新
+				var id=json.productCategory.parentId;
+				if(id==parentId){
+					$(".category"+categoryId).find(".name").html(json.productCategory.name);
+				}else{
+					$(".category"+categoryId).remove();
+					
+					
+					var obj = json.productCategory;
+					var addProductCategory = "";
+					//项目路径
+					var path=$("#pageContext").val();
+					// 添加
+					addProductCategory += "<tr class='parentId"+parentId+" category"+parentId+"'>";
+						addProductCategory += "<td class='table-checked lovdmx-unselect'>";
+							addProductCategory += "<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'>";
+								addProductCategory += "<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+							addProductCategory += "</div>";
+						addProductCategory += "</td>";
+						addProductCategory += "<td class='lovdmx-unselect'>";
+							addProductCategory += "<div class='lovdmx-table-cell'>";
+								addProductCategory += "<span>"+obj.id+"</span>";
+							addProductCategory += "</div>";
+						addProductCategory += "</td>";
+						addProductCategory += "<td class='lovdmx-unselect'>";
+							addProductCategory += "<div class='lovdmx-table-cell '>";
+								addProductCategory += "<span class='pd-lf20 name'>"+obj.name+"</span>";
+							addProductCategory += "</div>";
+						addProductCategory += "</td>";
+						addProductCategory += "<td class='table-last lovdmx-unselect'>";
+							addProductCategory += "<div class='lovdmx-table-cell'>";
+								addProductCategory += "<a data-link='"+path+"/lovdmx/ht/productCategory/categoryEdit.do?id="+obj.id+"&parentId="+parentId+"'";
+									addProductCategory += "class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs category-edit'>";
+									addProductCategory += "<i class='icon-bianji lovdmx-icon iconfont'></i>  编辑 ";
+								addProductCategory += "</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs'";
+									addProductCategory += "data-link='"+path+"/lovdmx/ht/productCategory/categoryDelete.do?id="+obj.id+"'";
+									addProductCategory += "onclick='mydel(this)'> ";
+									addProductCategory += "<i class='icon-shanchu lovdmx-icon iconfont lovdmx-manage-del'></i>";
+									addProductCategory += " 删除 ";
+								addProductCategory += "</a>";
+							addProductCategory += "</div>";
+						addProductCategory += "</td>";
+					addProductCategory += "</tr>";
+					
+					if ($(".parentId" + id).length == 0) {
+						$(".parentCategory" + id)
+								.after(
+										addProductCategory);
+					} else {
+						$(".parentId" + id)
+								.last()
+								.after(
+										addProductCategory);
+					}
+					
+					
+				}
+				layer.alert(flag, {
+					icon : 6
+				});
+			}
+			close();
+			
+		}
+	});
+	
+});
+
+
+$("body").on("click","#submit-productParameterType",function(){
+	// jquery对象
+	var $typeName = $("#lovdmx-popup-window input[name='typeName']");
+	
+
+	// 值
+	var typeName = $typeName.val();
+	
+	//项目路径
+	var path=$("#pageContext").val();
+	if (typeName == "" || typeName == null
+			|| typeName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$typeName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	$.ajax({
+		type : "POST",
+		url : path + "/lovdmx/ht/productParameterType/save.do",
+		data : {
+			"name" : typeName
+		},
+		success : function(json) {
+			//返回状态
+			var flag=json.result;
+			if (flag == "保存失败") {
+				layer.alert(flag, {
+					icon : 5
+				});
+			} else {
+				
+				
+				var obj=json.productParameterType;
+				var addProductParameterType="";
+				
+				addProductParameterType += "<tr class='productParameterTypeId"+obj.id+"'>";
+					addProductParameterType += "<td class='table-checked lovdmx-unselect'>";
+						addProductParameterType += "<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'>";
+							addProductParameterType += "<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+						addProductParameterType += "</div>";
+					addProductParameterType += "</td>";
+					addProductParameterType += "<td class='lovdmx-unselect'>";
+						addProductParameterType += "<div class='lovdmx-table-cell'>";
+							addProductParameterType += "<span class='id'>"+obj.id+"</span>";
+						addProductParameterType += "</div>";
+					addProductParameterType += "</td>";
+					addProductParameterType += "<td class='lovdmx-unselect'>";
+						addProductParameterType += "<div class='lovdmx-table-cell'>";
+							addProductParameterType += "<span class='name'>"+obj.name+"</span>";
+						addProductParameterType += "</div>";
+					addProductParameterType += "</td>";
+					addProductParameterType += "<td class='table-last lovdmx-unselect'>";
+						addProductParameterType += "<div class='lovdmx-table-cell'>";
+							addProductParameterType += "<a data-link='"+path+"/lovdmx/ht/productParameterType/edit.do?id="+obj.id+"'";
+								addProductParameterType += "class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs productParameterType-edit'>";
+								addProductParameterType += "<i class='icon-bianji lovdmx-icon iconfont'></i>  编辑 ";
+							addProductParameterType += "</a> <a data-link='"+path+"/lovdmx/ht/productParameterType/delete.do?id="+obj.id+"'";
+							addProductParameterType += "onclick='mydel(this)' class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs '>";
+								addProductParameterType += "<i class='icon-shanchu lovdmx-icon iconfont lovdmx-manage-del'></i>";
+								addProductParameterType += " 删除 ";
+							addProductParameterType += "</a>";
+						addProductParameterType += "</div>";
+					addProductParameterType += "</td>";
+				addProductParameterType += "</tr>";
+				
+				if($("tbody").find("tr").length==0){
+					$("tbody").append(addProductParameterType);
+				}else{
+					$("tbody").find("tr").last().after(addProductParameterType);
+				}
+				
+				layer.alert(flag, {
+					icon : 6
+				});
+			}
+			close();
+		}
+	});
+});
+
+
+
+$("body").on("click","#update-productParameterType",function(){
+	// jquery对象
+	var $typeName = $("#lovdmx-popup-window input[name='typeName']");
+	var $id = $("#lovdmx-popup-window input[name='id']");
+	
+
+	// 值
+	var typeName = $typeName.val();
+	var id = $id.val();
+	//项目路径
+	var path=$("#pageContext").val();
+	if (typeName == "" || typeName == null
+			|| typeName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$typeName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	$.ajax({
+		type : "POST",
+		url : path + "/lovdmx/ht/productParameterType/update.do",
+		data : {
+			"id" : id,
+			"name" : typeName
+		},
+		success : function(json) {
+			//返回状态
+			var flag=json.result;
+			if (flag == "修改失败") {
+				layer.alert(flag, {
+					icon : 5
+				});
+			} else {
+				//项目路径
+				var path=$("#pageContext").val();
+				var obj=json.productParameterType;
+				//更新
+				$(".productParameterTypeId"+id).find(".name").html(obj.name);
+				layer.alert(flag, {
+					icon : 6
+				});
+			}
+			close();
+		}
+	});
+});
+
+
+$("body").on("click","#update-projectParameterType",function(){
+	// jquery对象
+	var $typeName = $("#lovdmx-popup-window input[name='typeName']");
+	var $id = $("#lovdmx-popup-window input[name='id']");
+	
+
+	// 值
+	var typeName = $typeName.val();
+	var id = $id.val();
+	//项目路径
+	var path=$("#pageContext").val();
+	if (typeName == "" || typeName == null
+			|| typeName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$typeName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	$.ajax({
+		type : "POST",
+		url : path + "/lovdmx/ht/projectParameterType/update.do",
+		data : {
+			"id" : id,
+			"name" : typeName
+		},
+		success : function(json) {
+			//返回状态
+			var flag=json.result;
+			if (flag == "修改失败") {
+				layer.alert(flag, {
+					icon : 5
+				});
+			} else {
+				//项目路径
+				var path=$("#pageContext").val();
+				var obj=json.projectParameterType;
+				//更新
+				$(".projectParameterTypeId"+id).find(".name").html(obj.name);
+				layer.alert(flag, {
+					icon : 6
+				});
+			}
+			close();
+		}
+	});
+});
+
+
+$("body").on("click","#submit-productParameter",function(){
+	// jquery对象
+	var $parameterName = $("#lovdmx-popup-window input[name='parameterName']");
+	var $typeId = $("#lovdmx-popup-window .lovdmx_unselect");
+	
+
+	// 值
+	var parameterName = $parameterName.val();
+	var typeId = $typeId.attr("data-value");
+	//项目路径
+	var path=$("#pageContext").val();
+	if (parameterName == "" || parameterName == null
+			|| parameterName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$parameterName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	$.ajax({
+		type : "POST",
+		url : path + "/lovdmx/ht/productParameter/save.do",
+		data : {
+			"typeId" : typeId,
+			"name" : parameterName
+		},
+		success : function(json) {
+			//返回状态
+			var flag=json.result;
+			if (flag == "保存失败") {
+				layer.alert(flag, {
+					icon : 5
+				});
+			} else {
+				var addProductParameter ="";
+				var productParameter=json.productParameter;
+				var productParameterType=json.productParameterType;
+				addProductParameter += "<tr class='productParameterId"+productParameter.id+"'>";
+					addProductParameter += "<td class='table-checked lovdmx-unselect'>";
+						addProductParameter += "<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'>";
+							addProductParameter += "<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+						addProductParameter += "</div>";
+					addProductParameter += "</td>";
+					addProductParameter += "<td class='lovdmx-unselect'>";
+						addProductParameter += "<div class='lovdmx-table-cell'>";
+							addProductParameter += "<span class='id'>"+productParameter.id+"</span>";
+						addProductParameter += "</div>";
+					addProductParameter += "</td>";
+					addProductParameter += "<td class='lovdmx-unselect'>";
+						addProductParameter += "<div class='lovdmx-table-cell'>";
+							addProductParameter += "<span class='name'>"+productParameter.name+"</span>";
+						addProductParameter += "</div>";
+					addProductParameter += "</td>";
+					addProductParameter += "<td class='lovdmx-unselect'>";
+						addProductParameter += "<div class='lovdmx-table-cell'>";
+							addProductParameter += "<span class='typeId'>"+productParameterType.name+"</span>";
+						addProductParameter += "</div>";
+					addProductParameter += "</td>";
+					addProductParameter += "<td class='table-last lovdmx-unselect'>";
+						addProductParameter += "<div class='lovdmx-table-cell'>";
+							addProductParameter += "<a data-link='"+path+"/lovdmx/ht/productParameter/edit.do?id="+productParameter.id+"'";
+								addProductParameter += "class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs productParameter-edit'>";
+								addProductParameter += "<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑 ";
+							addProductParameter += "</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs '";
+								addProductParameter += "onclick='mydel(this)' data-link='"+path+"/lovdmx/ht/productParameter/delete.do?id="+productParameter.id+"'>";
+								addProductParameter += "<i class='icon-shanchu lovdmx-icon iconfont lovdmx-manage-del'></i>";
+								addProductParameter += " 删除 ";
+							addProductParameter += "</a>";
+						addProductParameter += "</div>";
+					addProductParameter += "</td>";
+				addProductParameter += "</tr>";
+				
+				
+				if($("tbody").find("tr").length==0){
+					$("tbody").append(addProductParameter);
+				}else{
+					$("tbody").find("tr").last().after(addProductParameter);
+				}
+				
+				layer.alert(flag, {
+					icon : 6
+				});
+			}
+			close();
+		}
+	});
+	
+	
+});
+
+
+
+$("body").on("click","#submit-projectParameter",function(){
+	// jquery对象
+	var $parameterName = $("#lovdmx-popup-window input[name='parameterName']");
+	var $typeId = $("#lovdmx-popup-window .lovdmx_unselect");
+	
+
+	// 值
+	var parameterName = $parameterName.val();
+	var typeId = $typeId.attr("data-value");
+	//项目路径
+	var path=$("#pageContext").val();
+	if (parameterName == "" || parameterName == null
+			|| parameterName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$parameterName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	$.ajax({
+		type : "POST",
+		url : path + "/lovdmx/ht/projectParameter/save.do",
+		data : {
+			"typeId" : typeId,
+			"name" : parameterName
+		},
+		success : function(json) {
+			//返回状态
+			var flag=json.result;
+			if (flag == "保存失败") {
+				layer.alert(flag, {
+					icon : 5
+				});
+			} else {
+				var addProjectParameter ="";
+				var projectParameter=json.projectParameter;
+				var projectParameterType=json.projectParameterType;
+				addProjectParameter += "<tr class='projectParameterId"+projectParameter.id+"'>";
+					addProjectParameter += "<td class='table-checked lovdmx-unselect'>";
+						addProjectParameter += "<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'>";
+							addProjectParameter += "<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+						addProjectParameter += "</div>";
+					addProjectParameter += "</td>";
+					addProjectParameter += "<td class='lovdmx-unselect'>";
+						addProjectParameter += "<div class='lovdmx-table-cell'>";
+							addProjectParameter += "<span class='id'>"+projectParameter.id+"</span>";
+						addProjectParameter += "</div>";
+					addProjectParameter += "</td>";
+					addProjectParameter += "<td class='lovdmx-unselect'>";
+						addProjectParameter += "<div class='lovdmx-table-cell'>";
+							addProjectParameter += "<span class='name'>"+projectParameter.name+"</span>";
+						addProjectParameter += "</div>";
+					addProjectParameter += "</td>";
+					addProjectParameter += "<td class='lovdmx-unselect'>";
+						addProjectParameter += "<div class='lovdmx-table-cell'>";
+							addProjectParameter += "<span class='typeId'>"+projectParameterType.name+"</span>";
+						addProjectParameter += "</div>";
+					addProjectParameter += "</td>";
+					addProjectParameter += "<td class='table-last lovdmx-unselect'>";
+						addProjectParameter += "<div class='lovdmx-table-cell'>";
+							addProjectParameter += "<a data-link='"+path+"/lovdmx/ht/projectParameter/edit.do?id="+projectParameter.id+"'";
+								addProjectParameter += "class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs projectParameter-edit'>";
+								addProjectParameter += "<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑 ";
+							addProjectParameter += "</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs '";
+								addProjectParameter += "onclick='mydel(this)' data-link='"+path+"/lovdmx/ht/projectParameter/delete.do?id="+projectParameter.id+"'>";
+								addProjectParameter += "<i class='icon-shanchu lovdmx-icon iconfont lovdmx-manage-del'></i>";
+								addProjectParameter += " 删除 ";
+							addProjectParameter += "</a>";
+						addProjectParameter += "</div>";
+					addProjectParameter += "</td>";
+				addProjectParameter += "</tr>";
+				
+				
+				if($("tbody").find("tr").length==0){
+					$("tbody").append(addProjectParameter);
+				}else{
+					$("tbody").find("tr").last().after(addProjectParameter);
+				}
+				
+				layer.alert(flag, {
+					icon : 6
+				});
+			}
+			close();
+		}
+	});
+	
+	
+});
+
+$("body").on("click","#update-productParameter",function(){
+	// jquery对象
+	var $parameterName = $("#lovdmx-popup-window input[name='parameterName']");
+	var $typeId = $("#lovdmx-popup-window .lovdmx_unselect");
+	// 值
+	var parameterName = $parameterName.val();
+	var typeId = $typeId.attr("data-value");
+	var id =$("#lovdmx-popup-window input[name='id']").val();
+	
+	//项目路径
+	var path=$("#pageContext").val();
+	if (parameterName == "" || parameterName == null
+			|| parameterName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$parameterName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	$.ajax({
+		type : "POST",
+		url : path + "/lovdmx/ht/productParameter/update.do",
+		data : {
+			"id" : id,
+			"typeId" : typeId,
+			"name" : parameterName
+		},
+		success : function(json) {
+			//返回状态
+			var flag=json.result;
+			if (flag == "修改失败") {
+				layer.alert(flag, {
+					icon : 5
+				});
+			} else {
+				//更新
+				var productParameter=json.productParameter;
+				var productParameterType=json.productParameterType;
+				var $productParameter= $(".productParameterId"+id);
+				$productParameter.find(".name").html(productParameter.name);
+				$productParameter.find(".typeId").html(productParameterType.name);
+				layer.alert(flag, {
+					icon : 6
+				});
+			}
+			close();
+		}
+	});
+});
+
+
+$("body").on("click","#update-projectParameter",function(){
+	// jquery对象
+	var $parameterName = $("#lovdmx-popup-window input[name='parameterName']");
+	var $typeId = $("#lovdmx-popup-window .lovdmx_unselect");
+	// 值
+	var parameterName = $parameterName.val();
+	var typeId = $typeId.attr("data-value");
+	var id =$("#lovdmx-popup-window input[name='id']").val();
+	
+	//项目路径
+	var path=$("#pageContext").val();
+	if (parameterName == "" || parameterName == null
+			|| parameterName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$parameterName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	$.ajax({
+		type : "POST",
+		url : path + "/lovdmx/ht/projectParameter/update.do",
+		data : {
+			"id" : id,
+			"typeId" : typeId,
+			"name" : parameterName
+		},
+		success : function(json) {
+			//返回状态
+			var flag=json.result;
+			if (flag == "修改失败") {
+				layer.alert(flag, {
+					icon : 5
+				});
+			} else {
+				//更新
+				var projectParameter=json.projectParameter;
+				var projectParameterType=json.projectParameterType;
+				var $projectParameter= $(".projectParameterId"+id);
+				$projectParameter.find(".name").html(projectParameter.name);
+				$projectParameter.find(".typeId").html(projectParameterType.name);
+				layer.alert(flag, {
+					icon : 6
+				});
+			}
+			close();
+		}
+	});
+});
+
+
+//保存产品
+$("body").on("click","#submit-product",function(){
+	var loadT = layer.msg("上传中...", {
+		icon : 16,
+		time : 0,
+		shade : [ 0.3, '#000' ]
+	});
+	var formData = new FormData();//先实例化formdata
+	//项目路径
+	var path=$("#pageContext").val();
+	
+	//获取对象
+	var $parentId =$("#lovdmx-popup-window  input[name='categoryId']");
+	var $productName =$("#lovdmx-popup-window  input[name='productName']");
+	var productImg =$("#lovdmx-popup-window  input[name='productImg']").prop('files');
+	var productImgs =$("#lovdmx-popup-window  input[name='productImgs']");
+	var productVideoImgs =$("#lovdmx-popup-window  input[name='productVideoImgs']");
+	var productVideos =$("#lovdmx-popup-window  input[name='productVideos']");
+	var parameter_list=$("#parameter").find(".lovdmx-input-block .lovdmx-unselect");
+	var publishTime =$("#publish");
+	
+	
+	//获取值
+	var parentId = $parentId.attr("data-value");
+	var productName = $productName.val();
+	var timeStamp = $(publishTime).val();
+	
+	if (productName == "" || productName == null
+			|| productName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$productName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	if(productImg.length ==0){
+		layer.msg('产品图不能为空', {
+			icon : 5
+		});
+		return;
+	}
+	
+	if (timeStamp == "" || timeStamp == null
+			|| timeStamp == undefined) {
+		layer.msg('发布时间不能为空', {
+			icon : 5
+		});
+		$(publishTime).addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	//产品展示图
+	for(var i=0;i<productImgs.length;i++){
+		var productImage = $(productImgs[i]).prop('files');
+		if(productImage.length>0){
+			formData.append("productImages",productImage[0]);
+		}else{
+			layer.msg('产品展示图不能为空!!!', {
+				icon : 5
+			});
+			return;
+		}
+	}
+	//视频图片
+	for(var i=0;i<productVideoImgs.length;i++){
+		var productVideoImg = $(productVideoImgs[i]).prop('files');
+		if(productVideoImg.length>0){
+			formData.append("productVideoImgs",productVideoImg[0]);
+		}else{
+			layer.msg('视频图不能为空!!!', {
+				icon : 5
+			});
+			return;
+		}
+	}
+	
+	//上传视频
+	for(var i=0;i<productVideos.length;i++){
+			
+		var productVideo = $(productVideos[i]).prop('files');
+		if(productVideo.length>0){
+			formData.append("productVideos",productVideo[0]);
+		}else{
+			layer.msg('视频不能为空!!!', {
+				icon : 5
+			});
+			return;
+		}
+		
+	}
+	
+	var parameterIds="";
+	
+	//参数 
+	//图片类型集合
+	var parameterImg_list = new Array();
+	//文件类型集合
+	var parameterFile_list = new Array();
+	//性能特点类型集合
+	var performance_list = new Array();
+	//规格参数类型集合
+	var specification_list = new Array();
+	//产品类型id  集合
+	var typeId_list=new Array();
+	
+	
+	if(parameter_list.length>0){
+		//组装参数ID
+		for(var i=0;i<parameter_list.length;i++){
+			var parameterName = $(parameter_list[i]).find("span").html();
+			var id =$(parameter_list[i]).attr("data-id");
+			parameterIds+=id;
+			if(i<parameter_list.length-1){
+				parameterIds+=",";
+			}
+			var typeId =$(parameter_list[i]).attr("data-typeId");
+			typeId_list.push(typeId);
+			//图片
+			if(typeId==1){
+				
+				var parameterImg = $(".upload-parameter"+id).find(".lovdmx-upload-preview input[type='file']").prop('files');
+				if(parameterImg.length>0){
+					parameterImg_list.push($(".upload-parameter"+id).find(".lovdmx-upload-preview input[type='file']")[0]);
+				}else{
+					selectParameter(id);
+					layer.msg(parameterName+'不能为空!!!', {
+						icon : 5
+					});
+					return;
+				}
+			//性能特点
+			}else if(typeId==2){
+				var performanceList=$(".upload-parameter"+id).find(".table input[name='content']");
+				var content="";
+				for(var g=0;g<performanceList.length;g++){
+					var value = $(performanceList[g]).val();
+					if(value == "" || value == null
+							|| value == undefined){
+					}else{
+						content +=value;
+						if(g<performanceList.length-1){
+							content +="&!&";
+						}
+					}
+				}
+				var annotation=$(".upload-parameter"+id).find(".table tfoot input[name='annotation']").val();
+				content +="#!#"+annotation;
+				//由于spring mvc中的@RequestParam注解 接收集合或者数组，会把使用逗号分割所以,先把逗号替换(!)然后在后台在转为逗号
+				content=content.replaceAll(",","(!)").replaceAll("，","(!)");
+				
+				performance_list.push(content);
+			//规格参数
+			}else if(typeId==3){
+				//获取规格参数 tr
+				var specification_tr = $(".upload-parameter"+id).find(".table-parameter tbody tr");
+				var specificationVal="";
+				for(var j=0;j<specification_tr.length;j++){
+					//获取每行有几个input标签
+					var sp_list = $(specification_tr[j]).find(".lovdmx-input");
+					for(var k=0;k<sp_list.length;k++){
+						specificationVal +=$(sp_list[k]).val();
+						if(k<sp_list.length-1){
+							specificationVal +="&!&";
+						}
+					}
+					specificationVal +="#!#";
+				}
+				specificationVal=specificationVal.replaceAll(",","(!)").replaceAll("，","(!)");
+				specification_list.push(specificationVal);
+			//文件
+			}else if(typeId==4){
+				var parameterFile = $(".upload-parameter"+id).find("input[type='file']").prop('files');
+				if(parameterFile.length>0){
+					parameterFile_list.push($(".upload-parameter"+id).find("input[type='file']")[0]);
+				}else{
+					selectParameter(id);
+					layer.msg(parameterName+'不能为空!!!', {
+						icon : 5
+					});
+					return;
+				}
+			}
+		}
+	}else{
+		layer.alert('请选择参数!!!', {
+			icon : 5
+		});
+		return;
+	}
+	
+	
+	
+	//参数
+	for(var i=0;i<parameterImg_list.length;i++){
+		var parameterImg = $(parameterImg_list[i]).prop('files');
+		formData.append("parameterImgs",parameterImg[0]);
+	}
+	
+	//文件
+	for(var i=0;i<parameterFile_list.length;i++){
+		var parameterFile = $(parameterFile_list[i]).prop('files');
+		formData.append("parameterFiles",parameterFile[0]);
+	}
+	
+	formData.append("categoryId",parentId);
+	formData.append("productName",productName);
+	formData.append("productImage",productImg[0]);
+	
+	formData.append("parameterIds",parameterIds);
+	formData.append("performanceList",performance_list);
+	formData.append("specificationList",specification_list);
+	formData.append("typeIds",typeId_list);
+	
+	formData.append("time",timeStamp);
+	
+	 $.ajax({
+	        type: "POST",
+	        url: path + "/lovdmx/ht/product/save.do",
+	        data: formData,//传过来
+	        cache: false,
+	        processData: false,
+	        contentType: false,
+	        success: function (json) {
+	        	//返回状态
+				var flag=json.result;
+				if (flag == "保存失败") {
+					layer.alert(flag, {
+						icon : 5
+					});
+				} else {
+					
+					//项目路径
+					var path=$("#pageContext").val();
+					var product=json.product;
+					var category=json.category;
+					
+					var addProduct ="";
+					
+					addProduct +="<tr class='productId"+product.productId+"'>";
+						addProduct +="<td class='table-checked lovdmx-unselect'>";
+							addProduct +="<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'>";
+								addProduct +="<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+							addProduct +="</div>";
+						addProduct +="</td>";
+						addProduct +="<td class='lovdmx-unselect'>";
+							addProduct +="<div class='lovdmx-table-cell'>";
+								addProduct +="<span class='id'>"+product.productId+"</span>";
+							addProduct +="</div>";
+						addProduct +="</td>";
+						addProduct +="<td class='lovdmx-unselect'>";
+							addProduct +="<div class='lovdmx-table-cell'>";
+								addProduct +="<span class='productName'>"+product.productName+"</span>";
+							addProduct +="</div>";
+						addProduct +="</td>";
+						addProduct +="<td class='lovdmx-unselect table-show-img'>";
+							addProduct +="<div class='lovdmx-table-cell'>";
+								addProduct +="<span class='productImg'><img class='lovdmx-table-img' src='"+path+"/"+product.productImg+"' /></span>";
+							addProduct +="</div>";
+						addProduct +="</td>";
+						addProduct +="<td class='lovdmx-unselect'>";
+							addProduct +="<div class='lovdmx-table-cell'>";
+							addProduct +="	<span class='publishTime'>"+product.time+"</span>";
+							addProduct +="</div>";
+						addProduct +="</td>";
+						addProduct +="<td class='lovdmx-unselect'>";
+							addProduct +="<div class='lovdmx-table-cell'>";
+								addProduct +="<span class='categoryName'>"+category.name+"</span>";
+							addProduct +="</div>";
+						addProduct +="</td>";
+						addProduct +="<td class='table-last lovdmx-unselect'>";
+							addProduct +="<div class='lovdmx-table-cell'>";
+								addProduct +="<a data-link='"+path+"/lovdmx/ht/product/edit.do?id="+product.productId+"'";
+									addProduct +=" class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs product-edit'>";
+									addProduct +="<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑 ";
+								addProduct +="</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs 'onclick='mydel(this)'";
+									addProduct +="data-link='"+path+"/lovdmx/ht/product/delete.do?id="+product.productId+"'>";
+									addProduct +="<i class='icon-shanchu lovdmx-icon iconfont lovdmx-manage-del'></i>";
+									addProduct +=" 删除 ";
+								addProduct +="</a>";
+							addProduct +="</div>";
+						addProduct +="</td>";
+					addProduct +="</tr>";
+					var tr_arr = $(".lovdmx-table table tbody").find("tr");
+					//展示等于 14个 则，移除最后一个 ,然后在添加新产品
+					if(tr_arr.length==14){
+						$(tr_arr[13]).remove();
+					}
+					$(".lovdmx-table table tbody").prepend(addProduct);
+					
+					var $page_count= $(".lovdmx-table-page .lovdmx-page-count");
+					var count = parseInt($page_count.attr("data-count"))+1;
+					
+					var page_num=$(".lovdmx-table-page .lovdmx-page-num");
+					var size=count/14;
+					
+					if(page_num-1>0){
+						number = (page_num-1)*14+count;
+					}else{
+						number=count;
+					}
+					$(".lovdmx-table-page .lovdmx-page-count").html("共"+number+"条");
+					
+					var page=page_num.length;
+					var categoryId=$("input[name='categoryId']").val();
+					if(page<size){
+						var page_rows = "";
+						page_rows +="<a href='"+path+"/lovdmx/ht/product/index.do?pageNo="+(parseInt(page)+1)+"&categoryId="+categoryId+"'";
+						page_rows +=" class='lovdmx-page-num' data-page='"+(parseInt(page)+1)+"'>"+(parseInt(page)+1)+"</a>";
+						$(page_num[page_num.length-1]).after(page_rows);
+					}
+					
+					layer.alert(flag, {
+						icon : 6
+					});
+				}
+				close();
+	        },error: function (data) { 
+	        	console.log(data);
+	        	layer.alert("错误==>>"+data, {
+					icon : 5
+				});
+	        }     
+	    });
+	
+	 
+	 
+});
+
+
+//修改产品
+$("body").on("click","#update-product",function(){
+	 var loadT = layer.msg("上传中...", {
+		icon : 16,
+		time : 0,
+		shade : [ 0.3, '#000' ]
+	 });
+	 
+	var formData = new FormData();//先实例化formdata
+	//项目路径
+	var path=$("#pageContext").val();
+	
+	//获取对象
+	var $productId =$("#lovdmx-popup-window  input[name='productId']");
+	var $parentId =$("#lovdmx-popup-window  input[name='categoryId']");
+	var $productName =$("#lovdmx-popup-window  input[name='productName']");
+	var productImg =$("#lovdmx-popup-window  input[name='productImg']").prop('files');
+	var productImgs =$("#lovdmx-popup-window  input[name='productImgs']");
+	var productVideoImgs =$("#lovdmx-popup-window  input[name='productVideoImgs']");
+	var productVideos =$("#lovdmx-popup-window  input[name='productVideos']");
+	var parameter_list=$("#parameter").find(".lovdmx-input-block .lovdmx-unselect");
+	var publishTime =$("#publish");
+	
+	/**
+	 * 修改产品的思路
+	 * 
+	 * （产品展示图，图对应视频）这个由于是多张图片，如果修改图片则记录该修改的下标
+	 * 
+	 * （产品参数）参数这个复杂一些，应该每一个参数对应一条数据
+	 * 	思路 : 用新添加的参数用一个集合保存 和 需要修改参数信息的也用一个集合保存 ，参数又划分四个类型(图片，规格参数，性能特点，资料下载)
+	 * 			所有每一种类型用两个集合保存 （区分新添加的和为之前存在的参数 用data-id,因为新添加的id默认设置为-1） 
+	 * 			和保存之前下标的id也用集合保存
+	 * 			还有，之前有的参数然后修改删除了，这个逻辑在后台处理，直接根据id删除信息 即可。
+	 * 
+	 */
+	
+	//获取值
+	var parentId = $parentId.attr("data-value");
+	var productName = $productName.val();
+	var productId =$productId.val();
+	var timeStamp = $(publishTime).val();
+	
+	if (productName == "" || productName == null
+			|| productName == undefined) {
+		layer.msg('必填项不能为空', {
+			icon : 5
+		});
+		$productName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	
+	if(productImg.length >0){
+		formData.append("productImage",productImg[0]);
+	}
+	
+	if (timeStamp == "" || timeStamp == null
+			|| timeStamp == undefined) {
+		layer.msg('发布时间不能为空', {
+			icon : 5
+		});
+		$(publishTime).addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	}
+	//用来保存  修改 图片修改的下标
+	var productImgIndex = new Array();
+	var productVideoImgIndex = new Array();
+	var productVideoIndex = new Array();
+	
+	//产品展示图
+	for(var i=0;i<productImgs.length;i++){
+		var productImage = $(productImgs[i]).prop('files');
+		if(productImage.length>0){
+			formData.append("productImages",productImage[0]);
+			productImgIndex.push(i);
+		}
+	}
+	//视频图片
+	for(var i=0;i<productVideoImgs.length;i++){
+		var productVideoImg = $(productVideoImgs[i]).prop('files');
+		if(productVideoImg.length>0){
+			formData.append("productVideoImgs",productVideoImg[0]);
+			productVideoImgIndex.push(i);
+		}
+	}
+	//上传视频
+	for(var i=0;i<productVideos.length;i++){
+		var productVideo = $(productVideos[i]).prop('files');
+		if(productVideo.length>0){
+			formData.append("productVideos",productVideo[0]);
+			productVideoIndex.push(i);
+		}
+		
+	}
+	
+	//修改过 产品展示图片 & 视频图片 & 视频 的下标
+	formData.append("productIndexs",productImgIndex);
+	formData.append("videoImgIndexs",productVideoImgIndex);
+	formData.append("videoIndexs",productVideoIndex);
+	
+	//参数id 
+	var parameterIds="";
+	//内容id (新添加的保存-1)
+	var contentId_list="";
+	
+	//新添加的 参数
+	//获取参数id
+	var addParameterId_list = new Array();
+	//获取参数排列的下标
+	var addParameterIndex_list = new Array();
+	//获取参数类型
+	var addTypeId_list=new Array()
+	var addParameterImg_list = new Array();
+	var addParameterFile_list = new Array();
+	var addPerformance_list = new Array();
+	var addSpecification_list = new Array();
+	
+	// 修改过的 参数
+	//获取参数类型
+	var beforeTypeId_list=new Array()
+	//获取参数内容id
+	var beforeProductContentId_list = new Array();
+	var beforeParameterImg_list = new Array();
+	var beforeParameterFile_list = new Array();
+	var beforePerformance_list = new Array();
+	var beforeSpecification_list = new Array();
+	//var beforeParameterIndex_list = new Array();
+	
+	
+	
+	
+	//根据参数类型组装
+	if(parameter_list.length>0){
+		//组装参数ID
+		for(var i=0;i<parameter_list.length;i++){
+			//产品名
+			var parameterName=$(parameter_list[i]).find("span").html();
+			//参数ID
+			var id =$(parameter_list[i]).attr("data-id");
+			//产品内容ID(contentId==-1 ,标识新增的参数)
+			var contentId = $(".upload-parameter"+id).attr("data-id");
+			//参数类型
+			var typeId =$(parameter_list[i]).attr("data-typeId");
+			//保存到集合中
+			//追加产品ID
+			parameterIds+=id;
+			contentId_list +=contentId;
+			//	去掉最后一个逗号
+			if(i<parameter_list.length-1){
+				parameterIds+=",";
+				contentId_list+=",";
+			}
+			
+			//新增
+			if(contentId==-1){
+				addParameterId_list.push(id);
+				addParameterIndex_list.push(i);
+				addTypeId_list.push(typeId)
+				//添加
+			}else{
+				beforeProductContentId_list.push(contentId);
+				beforeTypeId_list.push(typeId)
+			}
+			//图片
+			if(typeId==1){
+				var parameterImg = $(".upload-parameter"+id).find(".lovdmx-upload-preview input[type='file']").prop('files');
+				
+				//新增
+				if(contentId==-1){
+					//判断添加了图片
+					if(parameterImg.length>0){
+						addParameterImg_list.push($(".upload-parameter"+id).find(".lovdmx-upload-preview input[type='file']")[0]);
+					}else{
+						layer.msg(parameterName+'不能为空!!!', {
+							icon : 5
+						});
+					}
+					//修改
+				}else{
+					if(parameterImg.length>0){
+						beforeParameterImg_list.push($(".upload-parameter"+id).find(".lovdmx-upload-preview input[type='file']")[0]);
+					}
+				}
+				
+			//性能特点
+			}else if(typeId==2){
+				var performanceList=$(".upload-parameter"+id).find(".table input[name='content']");
+				var content="";
+				for(var g=0;g<performanceList.length;g++){
+					var value = $(performanceList[g]).val();
+					if(value == "" || value == null
+							|| value == undefined){
+					}else{
+						content +=value;
+						if(g<performanceList.length-1){
+							content +="&!&";
+						}
+					}
+				}
+				if(content == "" || content == null
+				|| content == undefined){
+					selectParameter(id);
+					layer.msg(parameterName+'不能为空!!!', {
+						icon : 5
+					});
+					return;
+				}else{
+					//注释
+					var annotation=$(".upload-parameter"+id).find(".table tfoot input[name='annotation']").val();
+					content +="#!#"+annotation;
+					//由于spring mvc中的@RequestParam注解 接收集合或者数组，会把使用逗号分割所以,先把逗号替换(!)然后在后台在转为逗号
+					content=content.replaceAll(",", "(!)").replaceAll("，","(!)");
+					//判断是添加还是修改
+					if(contentId==-1){
+						addPerformance_list.push(content);
+					}else{
+						beforePerformance_list.push(content);
+					}
+				}
+			//规格参数
+			}else if(typeId==3){
+				//获取规格参数 tr
+				var specification_tr = $(".upload-parameter"+id).find(".table-parameter tbody tr");
+				var specificationVal="";
+				for(var j=0;j<specification_tr.length;j++){
+					//获取每行有几个input标签
+					var sp_list = $(specification_tr[j]).find(".lovdmx-input");
+					for(var k=0;k<sp_list.length;k++){
+						specificationVal +=$(sp_list[k]).val();
+						if(k<sp_list.length-1){
+							specificationVal +="&!&";
+						}
+					}
+					specificationVal +="#!#";
+				}
+				specificationVal=specificationVal.replaceAll(",", "(!)").replaceAll("，","(!)");
+				//判断是添加还是修改
+				if(contentId==-1){
+					addSpecification_list.push(specificationVal);
+				}else{
+					beforeSpecification_list.push(specificationVal);
+				}
+				
+			//文件
+			}else if(typeId==4){
+				var parameterFile = $(".upload-parameter"+id).find("input[type='file']").prop('files');
+				//新增
+				if(contentId==-1){
+					//判断添加了图片
+					if(parameterFile.length>0){
+						addParameterFile_list.push($(".upload-parameter"+id).find("input[type='file']")[0]);
+					}else{
+						layer.msg(parameterName+'不能为空!!!', {
+							icon : 5
+						});
+					}
+					//修改
+				}else{
+					if(parameterFile.length>0){
+						beforeParameterFile_list.push($(".upload-parameter"+id).find("input[type='file']")[0]);
+					}
+				}
+				
+			}
+		}
+	}else{
+		layer.alert('请选择参数!!!', {
+			icon : 5
+		});
+		return;
+	}
+	
+	//添加的参数上传图片
+	for(var i=0;i<addParameterImg_list.length;i++){
+		var parameterImg = $(addParameterImg_list[i]).prop('files');
+		formData.append("addParameterImg",parameterImg[0]);
+	}
+	//修改的参数上传图片
+	for(var i=0;i<beforeParameterImg_list.length;i++){
+		var parameterImg = $(beforeParameterImg_list[i]).prop('files');
+		formData.append("beforeParameterImg",parameterImg[0]);
+	}
+	
+	
+	//添加的参数上传文件
+	for(var i=0;i<addParameterFile_list.length;i++){
+		var parameterFile = $(addParameterFile_list[i]).prop('files');
+		formData.append("addParameterFile",parameterFile[0]);
+	}
+	//修改的参数上传文件
+	for(var i=0;i<beforeParameterFile_list.length;i++){
+		var parameterFile = $(beforeParameterFile_list[i]).prop('files');
+		formData.append("beforeParameterFile",parameterFile[0]);
+	}
+	//新增的参数
+	formData.append("addParameterId_list",addParameterId_list);
+	formData.append("addParameterIndex_list",addParameterIndex_list);
+	formData.append("addPerformance_list",addPerformance_list);
+	formData.append("addSpecification_list",addSpecification_list);
+	formData.append("addTypeId_list",addTypeId_list);
+	
+	//修改的参数内容
+	formData.append("beforePerformance_list",beforePerformance_list);
+	formData.append("beforeSpecification_list",beforeSpecification_list);
+	formData.append("beforeTypeId_list",beforeTypeId_list);
+	formData.append("beforeProductContentId_list",beforeProductContentId_list);
+	
+	//product
+	formData.append("productId",productId);
+	formData.append("categoryId",parentId);
+	formData.append("productName",productName);
+	formData.append("contentIds",contentId_list);
+	formData.append("parameterIds",parameterIds);
+	formData.append("time",timeStamp);
+	$.ajax({
+	        type: "POST",
+	        url: path + "/lovdmx/ht/product/update.do",
+	        data: formData,//传过来
+	        cache: false,
+	        processData: false,
+	        contentType: false,
+	        success: function (json) {
+	        	//返回状态
+				var flag=json.result;
+				if (flag == "修改失败") {
+					layer.alert(flag, {
+						icon : 5
+					});
+				} else {
+					
+					var product = json.product;
+					var $tbody =$(".lovdmx-table table tbody .productId"+product.productId);
+					var productImg=product.productImg;
+					//更新
+					$tbody.find(".productName").html(product.productName);
+					if(productImg!=null && productImg!="" && productImg !=undefined){
+						$tbody.find(".productImg img").attr("src",path+"/"+productImg);
+					}
+					$tbody.find(".publishTime").html(product.time);
+					$tbody.find(".categoryName").html(product.categoryName);
+					
+					layer.alert(flag, {
+						icon : 6
+					});
+				}
+				close();
+	        },error: function (data) { 
+	        	layer.alert("错误==>>"+data, {
+					icon : 5
+				});
+	        } 
+	 });
+	 
+	 	
+});
+
+
+
+//添加关于我们
+$("body").on("click","#submit-aboutUs",function(){
+	 var loadT = layer.msg("上传中...", {
+		icon : 16,
+		time : 0,
+		shade : [ 0.3, '#000' ]
+	 });
+	 
+	 var formData = new FormData();//先实例化formdata
+	 //项目路径
+	 var path=$("#pageContext").val();
+	 
+	 var contentList =$("#lovdmx-popup-window  input[name='content']");
+	 var introImage =$("#lovdmx-popup-window  input[name='introImage']").prop('files');
+	 var courseImage =$("#lovdmx-popup-window  input[name='courseImage']").prop('files');
+	 var constructionImage =$("#lovdmx-popup-window  input[name='constructionImage']").prop('files');
+	 var addressImage =$("#lovdmx-popup-window  input[name='addressImage']").prop('files');
+	 
+	 var intro_content="";
+	 for(var i=0;i<contentList.length;i++){
+		 var value=$(contentList[i]).val();
+		 if(value == "" || value == null
+					|| value == undefined){
+		 }else{
+			 intro_content +=value;
+			if(i<contentList.length-1){
+				intro_content +="&!&";
+			}
+		 }
+	 }
+	 
+	 if(intro_content == "" || intro_content == null
+				|| intro_content == undefined){
+		 layer.alert('请输入简介内容!!!', {
+				icon : 5
+			});
+		return;
+	 }else{
+		 formData.append("introContent",intro_content);
+	 }
+	 
+	if(introImage.length ==0){
+		layer.msg('简介图不能为空', {
+			icon : 5
+		});
+		return;
+	}
+	 
+	if(courseImage.length ==0){
+		layer.msg('发展历程图不能为空', {
+			icon : 5
+		});
+		return;
+	}
+	
+	if(constructionImage.length ==0){
+		layer.msg('组织结构图不能为空', {
+			icon : 5
+		});
+		return;
+	}
+	if(addressImage.length ==0){
+		layer.msg('地址图不能为空', {
+			icon : 5
+		});
+		return;
+	}
+	
+	formData.append("introImage",introImage[0]);
+	formData.append("courseImage",courseImage[0]);
+	formData.append("constructionImage",constructionImage[0]);
+	formData.append("addressImage",addressImage[0]);
+	$.ajax({
+	        type: "POST",
+	        url: path + "/lovdmx/ht/aboutUs/save.do",
+	        data: formData,//传过来
+	        cache: false,
+	        processData: false,
+	        contentType: false,
+	        success: function (json) {
+	        	//返回状态
+				var flag=json.result;
+				if (flag == "保存失败") {
+					layer.alert(flag, {
+						icon : 5
+					});
+				} else {
+					
+					//项目路径
+					var path=$("#pageContext").val();
+					var aboutUs=json.aboutUs;
+					
+					var addAboutUs ="";
+					
+					addAboutUs +="<tr>";
+						addAboutUs +="<td class='table-checked lovdmx-unselect'>";
+							addAboutUs +="<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'>";
+								addAboutUs +="<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+							addAboutUs +="</div>";
+						addAboutUs +="</td>";
+						addAboutUs +="<td class='lovdmx-unselect'>";
+							addAboutUs +="<div class='lovdmx-table-cell'>";
+								addAboutUs +="<span class='id'>"+aboutUs.id+"</span>";
+							addAboutUs +="</div>";
+						addAboutUs +="</td>";
+						addAboutUs +="<td class='lovdmx-unselect'>";
+							addAboutUs +="<div class='lovdmx-table-cell'>";
+								addAboutUs +="<span class='introContent'>"+aboutUs.introContent+"</span>";
+							addAboutUs +="</div>";
+						addAboutUs +="</td>";
+						addAboutUs +="<td class='lovdmx-unselect' style='width: 100px;'>";
+							addAboutUs +="<div class='lovdmx-table-cell'>";
+								addAboutUs +="<span class='introImg'><img ";
+									addAboutUs +="class='lovdmx-table-img'";
+									addAboutUs +="src='"+path+"/"+aboutUs.introImg+"' /></span>";
+							addAboutUs +="</div>";
+						addAboutUs +="</td>";
+						addAboutUs +="<td class='lovdmx-unselect' style='width: 100px;'>";
+							addAboutUs +="<div class='lovdmx-table-cell'>";
+								addAboutUs +="<span class='courseImg'><img ";
+									addAboutUs +="class='lovdmx-table-img'";
+									addAboutUs +="src='"+path+"/"+aboutUs.courseImg +"' /></span>";
+							addAboutUs +="</div>";
+						addAboutUs +="</td>";
+						addAboutUs +="<td class='lovdmx-unselect' style='width: 100px;'>";
+							addAboutUs +="<div class='lovdmx-table-cell'>";
+								addAboutUs +="<span class='organizationalChart'><img ";
+									addAboutUs +="class='lovdmx-table-img'";
+									addAboutUs +="src='"+path+"/"+aboutUs.organizationalChart +"' /></span>";
+							addAboutUs +="</div>";
+						addAboutUs +="</td>";
+						addAboutUs +="<td class='lovdmx-unselect' style='width: 100px;'>";
+							addAboutUs +="<div class='lovdmx-table-cell'>";
+								addAboutUs +="<span class='addressImg'><img ";
+									addAboutUs +="class='lovdmx-table-img'";
+									addAboutUs +="src='"+path+"/"+aboutUs.addressImg +"' /></span>";
+							addAboutUs +="</div>";
+						addAboutUs +="</td>";
+						addAboutUs +="<td class='table-last lovdmx-unselect'>";
+							addAboutUs +="<div class='lovdmx-table-cell'>";
+								addAboutUs +="<a class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs aboutUs-edit'>";
+									addAboutUs +="<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑";
+								addAboutUs +="</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs'";
+									addAboutUs +="data-link='"+path+"/lovdmx/ht/aboutUs/delelte.do?id="+aboutUs.id+"'";
+									addAboutUs +="onclick='mydel(this)'> <i ";
+									addAboutUs +="class='icon-shanchu lovdmx-icon iconfont lovdmx-aboutUs-del'></i>";
+									addAboutUs +="删除";
+								addAboutUs +="</a>";
+							addAboutUs +="</div>";
+						addAboutUs +="</td>";
+					addAboutUs +="</tr>";
+					$(".lovdmx-table table tbody").append(addAboutUs);
+					
+					
+					$(".lovdmx-table .table-btn").find("button").remove();
+					layer.alert(flag, {
+						icon : 6
+					});
+				}
+				close();
+	       }
+	});
+	 
+});
+
+$("body").on("click","#update-aboutUs",function(){
+	
+	var loadT = layer.msg("上传中...", {
+		icon : 16,
+		time : 0,
+		shade : [ 0.3, '#000' ]
+	 });
+	 
+	 var formData = new FormData();//先实例化formdata
+	 //项目路径
+	 var path=$("#pageContext").val();
+	 var id =$("#lovdmx-popup-window  input[name='id']").val();
+	 var contentList =$("#lovdmx-popup-window  input[name='content']");
+	 var introImage =$("#lovdmx-popup-window  input[name='introImage']").prop('files');
+	 var courseImage =$("#lovdmx-popup-window  input[name='courseImage']").prop('files');
+	 var constructionImage =$("#lovdmx-popup-window  input[name='constructionImage']").prop('files');
+	 var addressImage =$("#lovdmx-popup-window  input[name='addressImage']").prop('files');
+	 
+	 var intro_content="";
+	 for(var i=0;i<contentList.length;i++){
+		 var value=$(contentList[i]).val();
+		 if(value == "" || value == null
+					|| value == undefined){
+		 }else{
+			 intro_content +=value;
+			if(i<contentList.length-1){
+				intro_content +="&!&";
+			}
+		 }
+	 }
+	 
+	 if(intro_content == "" || intro_content == null
+				|| intro_content == undefined){
+		 layer.alert('请输入简介内容!!!', {
+				icon : 5
+			});
+		return;
+	 }else{
+		 formData.append("introContent",intro_content);
+	 }
+	 
+	 if(introImage.length >0){
+		 formData.append("introImage",introImage[0]);
+	 }
+	 
+	 if(courseImage.length >0){
+		 formData.append("courseImage",courseImage[0]);
+	 }
+	
+	 if(constructionImage.length >0){
+		formData.append("constructionImage",constructionImage[0]);
+	 }
+	 if(addressImage.length >0){
+		formData.append("addressImage",addressImage[0]);
+	 }
+	 formData.append("id",id);
+	 $.ajax({
+	        type: "POST",
+	        url: path + "/lovdmx/ht/aboutUs/update.do",
+	        data: formData,//传过来
+	        cache: false,
+	        processData: false,
+	        contentType: false,
+	        success: function (json) {
+	        	//返回状态
+				var flag=json.result;
+				if (flag == "修改失败") {
+					layer.alert(flag, {
+						icon : 5
+					});
+				} else {
+					var aboutUs=json.aboutUs;
+					//更新
+					$(".lovdmx-table .introContent").html(aboutUs.introContent);
+					if(aboutUs.introImg!="" && aboutUs.introImg!=null &&aboutUs.introImg !=undefined){
+						$(".lovdmx-table .introImg img").attr("src",path+"/"+aboutUs.introImg);
+					}
+					if(aboutUs.courseImg!="" && aboutUs.courseImg!=null &&aboutUs.courseImg !=undefined){		
+						$(".lovdmx-table .courseImg img").attr("src",path+"/"+aboutUs.courseImg);
+					}
+					if(aboutUs.organizationalChart!="" && aboutUs.organizationalChart!=null &&aboutUs.organizationalChart !=undefined){	
+						$(".lovdmx-table .organizationalChart img").attr("src",path+"/"+aboutUs.organizationalChart);
+					}
+					if(aboutUs.addressImg!="" && aboutUs.addressImg!=null &&aboutUs.addressImg !=undefined){	
+						$(".lovdmx-table .addressImg img").attr("src",path+"/"+aboutUs.addressImg);
+					}
+					
+					layer.alert(flag, {
+						icon : 6
+					});
+				}
+				close();
+	        }
+				
+	 });
+	 
+	 
+	 
+	 
+	 
+	 
+});
+$("body").on("click","#submit-footer",function(){
+	
+	 var loadT = layer.msg("上传中...", {
+		icon : 16,
+		time : 0,
+		shade : [ 0.3, '#000' ]
+	 });
+	 
+	 var formData = new FormData();//先实例化formdata
+	 //项目路径
+	 var path=$("#pageContext").val();
+	 var $companyName =$("#lovdmx-popup-window  input[name='companyName']");
+	 var headImg =$("#lovdmx-popup-window  input[name='headImg']").prop('files');
+	 var logoImg =$("#lovdmx-popup-window  input[name='logoImg']").prop('files');
+	 var addressInfo_arr =$("#lovdmx-popup-window  input[name='addressInfo']");
+	 var appImgs =$("#lovdmx-popup-window  input[name='appImg']");
+	 var appPaths =$("#lovdmx-popup-window  input[name='appPath']");
+	 var ewmImgs =$("#lovdmx-popup-window  input[name='ewmImg']");
+	 
+	 //值
+	 var companyName=$companyName.val();
+	 
+	 if (companyName == "" || companyName == null
+				|| companyName == undefined) {
+		 $companyName.addClass("lovdmx-form-danger")
+		 .focus();
+		layer.msg('公司名不能为空', {
+			icon : 5
+		});
+		return;
+	 }else{
+		 formData.append("companyName",companyName); 
+	 }
+	 
+	 
+	//logo图
+	 if(headImg.length>0){
+		 formData.append("headImage",headImg[0]); 
+	 }else{
+		 layer.msg('（手机端）顶部图不能为空', {
+				icon : 5
+			});
+		 return;
+	 }
+	 
+	 //logo图
+	 if(logoImg.length>0){
+		 formData.append("logoImage",logoImg[0]); 
+	 }else{
+		 layer.msg('logo图不能为空', {
+				icon : 5
+			});
+		 return;
+	 }
+	 
+	 var addressInfo="";
+	 
+	 if(addressInfo_arr !=undefined && addressInfo_arr.length>0){
+		 //地址信息
+		 for(var i=0;i<addressInfo_arr.length;i++){
+			 var info = $(addressInfo_arr[i]).val();
+			 if (info == "" || info == null
+						|| info == undefined) {
+				 layer.msg('公司信息描述不能为空', {
+						icon : 5
+					});
+				 return ;
+			 }
+			 addressInfo +=info;
+			 if(i<addressInfo_arr.length-1){
+				 addressInfo +="&!&";
+			 }
+		 }
+		 formData.append("addressInfo",addressInfo);
+	 }else{
+		 layer.msg('公司信息描述不能为空', {
+				icon : 5
+			});
+		 return ;
+	 }
+	 
+	 if(appImgs !=undefined && appImgs.length>0){
+		//app图
+		for(var i=0;i<appImgs.length;i++){
+			var appImg = $(appImgs[i]).prop('files');
+			if(appImg.length>0){
+				formData.append("appImages",appImg[0]);
+			}else{
+				layer.msg('app图不能为空!!!', {
+					icon : 5
+				});
+				return;
+			}
+		}
+	}else{
+		layer.msg('app图不能为空!!!', {
+			icon : 5
+		});
+		return;
+	}
+	
+	if(appPaths !=undefined && appPaths.length>0){
+		var appLinks ="";
+		//app访问地址信息
+		for(var i=0;i<appPaths.length;i++){
+			var appPath = $(appPaths[i]).val();
+			if (appPath == "" || appPath == null
+					|| appPath == undefined) {
+				layer.msg('访问地址不能为空', {
+					icon : 5
+				});
+				return ;
+			}
+			appLinks +=appPath;
+			if(i<appPaths.length-1){
+				appLinks +="&!&";
+			}
+		 }
+		 formData.append("appLinks",appLinks);
+	}else{
+		layer.msg('访问地址不能为空', {
+			icon : 5
+		});
+		return ;
+	}
+	if(ewmImgs !=undefined && ewmImgs.length>0){
+		//二维码图
+		for(var i=0;i<ewmImgs.length;i++){
+			var ewmImg = $(ewmImgs[i]).prop('files');
+			if(ewmImg.length>0){
+				formData.append("ewmImages",ewmImg[0]);
+			}else{
+				layer.msg('二维码展示图不能为空!!!', {
+					icon : 5
+				});
+				return;
+			}
+		}
+	}else{
+		layer.msg('访问地址不能为空', {
+			icon : 5
+		});
+		return ;
+	}
+	$.ajax({
+       type: "POST",
+       url: path + "/lovdmx/ht/footer/save.do",
+       data: formData,//传过来
+       cache: false,
+       processData: false,
+       contentType: false,
+       success: function (json) {
+       	//返回状态
+			var flag=json.result;
+			if (flag == "保存失败") {
+				layer.alert(flag, {
+					icon : 5
+				});
+			} else {
+				var  footer = json.footer;
+				
+				var add_footer="";
+				
+				
+				add_footer +="<tr>";
+					add_footer +="<td class='table-checked lovdmx-unselect'>";
+						add_footer +="<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'>";
+							add_footer +="<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+						add_footer +="</div>";
+					add_footer +="</td>";
+					add_footer +="<td class='lovdmx-unselect'>";
+						add_footer +="<div class='lovdmx-table-cell'>";
+							add_footer +="<span class='id'>"+footer.id+"</span>";
+						add_footer +="</div>";
+					add_footer +="</td>";
+					add_footer +="<td class='lovdmx-unselect table-content'>";
+						add_footer +="<div class='lovdmx-table-cell'>";
+							add_footer +="<span class='companyName'>"+footer.companyName +"</span>";
+						add_footer +="</div>";
+					add_footer +="</td>";
+					
+					add_footer +="<td class='lovdmx-unselect table-show-img'>";
+						add_footer +="<div class='lovdmx-table-cell'>";
+							add_footer +="<span class='headImg'> <img ";
+								add_footer +=" class='lovdmx-table-img' src='"+path+"/"+footer.headImg+"' />";
+							add_footer +="</span>";
+						add_footer +="</div>";
+					add_footer +="</td>";
+					
+					add_footer +="<td class='lovdmx-unselect table-show-img'>";
+						add_footer +="<div class='lovdmx-table-cell'>";
+							add_footer +="<span class='logoImg'> <img ";
+								add_footer +=" class='lovdmx-table-img' src='"+path+"/"+footer.logoImg+"' />";
+							add_footer +="</span>";
+						add_footer +="</div>";
+					add_footer +="</td>";
+					
+					add_footer +="<td class='lovdmx-unselect table-content'>";
+						add_footer +="<div class='lovdmx-table-cell'>";
+							add_footer +="<span class='addressInfo'>"+footer.addressInfo+"</span>";
+						add_footer +="</div>";
+					add_footer +="</td>";
+					add_footer +="<td class='lovdmx-unselect table-show-img'>";
+						add_footer +="<div class='lovdmx-table-cell'>";
+							add_footer +="<span class='ewmImgPaths'> ";
+								var ewmImg_list=footer.ewmImg_list;
+								for(var i=0;i<ewmImg_list.length;i++){
+									add_footer +="<img class='lovdmx-table-img' src='"+path+"/"+ewmImg_list[i]+"' />";
+								}
+							add_footer +="</span>";
+						add_footer +="</div>";
+					add_footer +="</td>";
+					
+					add_footer +="<td class='lovdmx-unselect table-show-img'>";
+						add_footer +="<div class='lovdmx-table-cell'>";
+							add_footer +="<span class='appImgPaths'>";
+								var appImg_list=footer.appImg_list;
+								for(var i=0;i<appImg_list.length;i++){
+									add_footer +="<img class='lovdmx-table-img' src='"+path+"/"+appImg_list[i]+"' />";
+								}
+							add_footer +="</span>";
+						add_footer +="</div>";
+					add_footer +="</td>";
+					
+					add_footer +="<td class='table-last lovdmx-unselect'>";
+						add_footer +="<div class='lovdmx-table-cell'>";
+							add_footer +="<a data-link='${path }/lovdmx/ht/footer/edit.do?id="+footer.id+"'";
+								add_footer +=" class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs footer-edit'>";
+								add_footer +="<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑 ";
+							add_footer +="</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs'";
+								add_footer +=" data-link='${path}/lovdmx/ht/footer/delete.do?id="+footer.id+"'";
+								add_footer +="onclick='footerdel(this)'> <i ";
+								add_footer +="class='icon-shanchu lovdmx-icon iconfont lovdmx-footer-del'></i>";
+								add_footer +=" 删除";
+							add_footer +="</a>";
+						add_footer +="</div>";
+					add_footer +="</td>";
+				add_footer +="</tr>";
+				
+				$(".lovdmx-table tbody").append(add_footer);
+			
+				
+				$(".lovdmx-table .table-btn").find("button").remove();
+				layer.alert(flag, {
+					icon : 6
+				});
+				
+				
+			}
+			close();
+       }
+	 
+	});
+	 
+});
+
+
+$("body").on("click","#update-footer",function(){
+	 
+	 var loadT = layer.msg("上传中...", {
+		icon : 16,
+		time : 0,
+		shade : [ 0.3, '#000' ]
+	 });
+	 
+	 var formData = new FormData();//先实例化formdata
+	 //项目路径
+	 var path=$("#pageContext").val();
+	 var $companyName =$("#lovdmx-popup-window  input[name='companyName']");
+	 var headImg =$("#lovdmx-popup-window  input[name='headImg']").prop('files');
+	 var logoImg =$("#lovdmx-popup-window  input[name='logoImg']").prop('files');
+	 var addressInfo_arr =$("#lovdmx-popup-window  input[name='addressInfo']");
+	 var appImgs =$("#lovdmx-popup-window  input[name='appImg']");
+	 var appPaths =$("#lovdmx-popup-window  input[name='appPath']");
+	 var ewmImgs =$("#lovdmx-popup-window  input[name='ewmImg']");
+	 var $footerId = $("#lovdmx-popup-window  input[name='footerId']");
+	 
+	 //值
+	 var companyName=$companyName.val();
+	 var footerId =$footerId.val();
+	 
+	 if (companyName == "" || companyName == null
+				|| companyName == undefined) {
+		layer.msg('公司名不能为空', {
+			icon : 5
+		});
+		$companyName.addClass("lovdmx-form-danger")
+				.focus();
+		return;
+	 }else{
+		 formData.append("companyName",companyName); 
+	 }
+	 
+	 //logo图
+	 if(headImg.length>0){
+		 formData.append("headImage",headImg[0]); 
+	 }
+	 
+	 //logo图
+	 if(logoImg.length>0){
+		 formData.append("logoImage",logoImg[0]); 
+	 }
+	 
+	 var addressInfo="";
+	 //地址信息
+	 for(var i=0;i<addressInfo_arr.length;i++){
+		 var info = $(addressInfo_arr[i]).val();
+		 if (info == "" || info == null
+					|| info == undefined) {
+			 layer.msg('公司信息描述不能为空', {
+					icon : 5
+				});
+			 return ;
+		 }
+		 addressInfo +=info;
+		 if(i<addressInfo_arr.length-1){
+			 addressInfo +="&!&";
+		 }
+	 }
+	 formData.append("addressInfo",addressInfo);
+	 
+	 var upd_appIndex = new Array();
+	 var before_appIndex = new Array();
+	 
+	 if(appImgs !=undefined && appImgs.length>0){
+		//app图
+		for(var i=0;i<appImgs.length;i++){
+			var type =$(appImgs[i]).attr("data-type");
+			var appImg = $(appImgs[i]).prop('files');
+			if(type==0){
+				if(appImg.length>0){
+					//新增
+					formData.append("add_appImages",appImg[0]);
+				}else{
+					layer.msg('app图不能为空!!!', {
+						icon : 5
+					});
+					return;
+				}
+			}else if(type==1){
+				var index = $(appImgs[i]).attr("data-index");
+				before_appIndex.push(index);
+				if(appImg.length>0){
+					upd_appIndex.push(index);
+					//修改
+					formData.append("upd_appImages",appImg[0]);
+				}
+			}
+		}
+	 }else{
+		 layer.msg('app图不能为空!!!', {
+				icon : 5
+			});
+			return;
+	 }
+	 formData.append("upd_appIndex",upd_appIndex);
+	 formData.append("before_appIndex",before_appIndex);
+	var appLinks ="";
+	
+	//地址信息
+	for(var i=0;i<appPaths.length;i++){
+		var appPath = $(appPaths[i]).val();
+		if (appPath == "" || appPath == null
+				|| appPath == undefined) {
+			layer.msg('访问地址不能为空', {
+				icon : 5
+			});
+			return ;
+		}
+		appLinks +=appPath;
+		if(i<appPaths.length-1){
+			appLinks +="&!&";
+		}
+	}
+	formData.append("appLinks",appLinks);
+	 
+	var add_ewmIndex = new Array();
+	var upd_ewmIndex = new Array();
+	var before_ewmIndex = new Array();
+	
+	if(ewmImgs !=undefined && ewmImgs.length>0){
+		//app图
+		for(var i=0;i<ewmImgs.length;i++){
+			var type =$(ewmImgs[i]).attr("data-type");
+			var ewmImg = $(ewmImgs[i]).prop('files');
+			if(type==0){
+				if(ewmImg.length>0){
+					add_ewmIndex.push(i);
+					formData.append("add_ewmImages",ewmImg[0]);
+				}else{
+					layer.msg('二维码图不能为空!!!', {
+						icon : 5
+					});
+					return;
+				}
+			}else if(type==1){
+				var index = $(ewmImgs[i]).attr("data-index");
+				before_ewmIndex.push(index);
+				if(ewmImg.length>0){
+					upd_ewmIndex.push(index);
+					formData.append("upd_ewmImages",ewmImg[0]);
+				}
+			}
+		}
+	 }else{
+		 layer.msg('二维码图不能为空!!!', {
+				icon : 5
+			});
+			return;
+	 }
+	
+	 formData.append("upd_ewmIndex",upd_ewmIndex);
+	 formData.append("before_ewmIndex",before_ewmIndex);
+	 
+	 formData.append("id",footerId);
+	 
+	 $.ajax({
+	        type: "POST",
+	        url: path + "/lovdmx/ht/footer/update.do",
+	        data: formData,//传过来
+	        cache: false,
+	        processData: false,
+	        contentType: false,
+	        success: function (json) {
+	        	//返回状态
+				var flag=json.result;
+				if (flag == "修改失败") {
+					layer.alert(flag, {
+						icon : 5
+					});
+				} else {
+					var footer = json.footer;
+					var add_ewm="";
+					var add_app="";
+					var ewmImg_list=footer.ewmImg_list;
+					var appImg_list=footer.appImg_list;
+					//更新
+					$(".lovdmx-table .companyName").html(footer.companyName);
+					$(".lovdmx-table .headImg").find("img").attr("src",path+"/"+footer.headImg);
+					$(".lovdmx-table .logoImg").find("img").attr("src",path+"/"+footer.logoImg);
+					$(".lovdmx-table .addressInfo").html(footer.addressInfo);
+					
+					for(var i=0;i<ewmImg_list.length;i++){
+						add_ewm +="<img class='lovdmx-table-img' src='"+path+"/"+ewmImg_list[i]+"' />";
+					}
+					
+					for(var i=0;i<appImg_list.length;i++){
+						add_app +="<img class='lovdmx-table-img' src='"+path+"/"+appImg_list[i]+"' />";
+					}
+					$(".lovdmx-table .ewmImgPaths").empty().append(add_ewm);
+					$(".lovdmx-table .appImgPaths").empty().append(add_app);
+					
+					layer.alert(flag, {
+						icon : 6
+					});
+				}
+				close();
+	        }
+		 
+		});
+	 
+	 
+});
+
+
+$("body").on("click","#submit-slideshow",function(){
+	 var loadT = layer.msg("上传中...", {
+			icon : 16,
+			time : 0,
+			shade : [ 0.3, '#000' ]
+	 });
+	 
+	 var formData = new FormData();//先实例化formdata
+	 //项目路径
+	 var path=$("#pageContext").val();
+	 var image =$("#lovdmx-popup-window  input[name='image']").prop('files');
+	 var $url =$("#lovdmx-popup-window  input[name='url']");
+	 var $istop =$("#lovdmx-popup-window  input[name='istop']");
+	 var $publishTime =$("#lovdmx-popup-window  input[name='publishTime']");
+	
+	 //获取值
+	 var url = $url.val();
+	 var timeStamp = $publishTime.val();
+	
+	 
+
+	 if(image.length ==0){
+		 layer.msg('轮播图不能为空', {
+			 icon : 5
+		 });
+		 return;
+	 }
+	 
+	 if (url == "" || url == null
+			 || url == undefined) {
+		 layer.msg('访问地址不能为空', {
+			 icon : 5
+		 });
+		 $url.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }
+	 if (timeStamp == "" || timeStamp == null
+			 || timeStamp == undefined) {
+		 layer.msg('发布时间不能为空', {
+			 icon : 5
+		 });
+		 $publishTime.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }
+	 formData.append("image",image[0]);
+	 formData.append("url",url);
+	 formData.append("istop",$istop.is(':checked')==true?1:0);
+	 formData.append("timeStamp",timeStamp);
+	 $.ajax({
+	        type: "POST",
+	        url: path + "/lovdmx/ht/slideshow/save.do",
+	        data: formData,//传过来
+	        cache: false,
+	        processData: false,
+	        contentType: false,
+	        success: function (json) {
+	        	//返回状态
+				var flag=json.result;
+				if (flag == "保存失败") {
+					layer.alert(flag, {
+						icon : 5
+					});
+				} else {
+					//项目路径
+					var path=$("#pageContext").val();
+					var addslideshow="";
+					var slideshow=json.slideshow;
+					
+					addslideshow +="<tr class='slideshowId"+slideshow.id+"'>";
+						addslideshow +="<td class='table-checked lovdmx-unselect'>";
+							addslideshow +="<div class='lovdmx-table-cell lovdmxtable-cell-checkbox'";
+								addslideshow +="data-index='"+slideshow.id+"'>";
+								addslideshow +="<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+							addslideshow +="</div>";
+						addslideshow +="</td>";
+						addslideshow +="<td class='lovdmx-unselect'>";
+							addslideshow +="<div class='lovdmx-table-cell'>";
+								addslideshow +="<span class='id'>"+slideshow.id+"</span>";
+							addslideshow +="</div>";
+						addslideshow +="</td>";
+						addslideshow +="<td class='lovdmx-unselect'>";
+							addslideshow +="<div class='lovdmx-table-cell'>";
+								addslideshow +="<span class='img'><img src='"+path+"/"+slideshow.img+"' class='lovdmx-table-img'></span>";
+							addslideshow +="</div>";
+						addslideshow +="</td>";
+						addslideshow +="<td class='lovdmx-unselect'>";
+							addslideshow +="<div class='lovdmx-table-cell'>";
+								addslideshow +="<span class='url'>"+slideshow.url+"</span>";
+							addslideshow +="</div>";
+						addslideshow +="</td>";
+						addslideshow +="<td class='lovdmx-unselect'>";
+							addslideshow +="<div class='lovdmx-table-cell'>";
+								addslideshow +="<span class='publishTime'>"+slideshow.timeStamp+"</span>";
+							addslideshow +="</div>";
+						addslideshow +="</td>";
+						
+						
+						addslideshow +="<td class='lovdmx-unselect'>";
+							addslideshow +="<div class='lovdmx-table-cell center'>";
+							if(slideshow.istop==1){
+								addslideshow+="<button class='istop lovdmx-btn lovdmx-btn-xs'>置顶</button>";
+							}else{
+								addslideshow+="<button class='istop lovdmx-btn lovdmx-btn-primary lovdmx-btn-xs'>正常显示</button>";
+							}
+							addslideshow +="</div>";
+						addslideshow +="</td>";
+						
+						
+						addslideshow +="<td class='table-last lovdmx-unselect'>";
+							addslideshow +="<div class='lovdmx-table-cell'>";
+								addslideshow +="<a data-link='${path }/lovdmx/ht/slideshow/edit.do?id="+slideshow.id+"'";
+									addslideshow +=" class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs slideshow-edit'>";
+									addslideshow +="<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑 ";
+								addslideshow +=" </a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs'";
+									addslideshow +=" data-link='${path}/lovdmx/ht/slideshow/delete.do?id="+slideshow.id+"'";
+									addslideshow +=" onclick='mydel(this)'> <i";
+									addslideshow +=" class='icon-shanchu lovdmx-icon iconfont lovdmx-slideshow-del'></i>";
+									addslideshow +=" 删除 ";
+								addslideshow +="</a>";
+							addslideshow +="</div>";
+						addslideshow +="</td>";
+					addslideshow +="</tr>";
+					
+					$(".lovdmx-table tbody").append(addslideshow);
+					
+					layer.alert(flag, {
+						icon : 6
+					});
+					
+					
+				}
+				close();
+	        }
+	 });
+	
+});
+
+
+$("body").on("click","#update-slideshow",function(){
+	 var loadT = layer.msg("上传中...", {
+			icon : 16,
+			time : 0,
+			shade : [ 0.3, '#000' ]
+	 });
+	 
+	 var formData = new FormData();//先实例化formdata
+	 //项目路径
+	 var path=$("#pageContext").val();
+	 var $id =$("#lovdmx-popup-window  input[name='id']");
+	 var image =$("#lovdmx-popup-window  input[name='image']").prop('files');
+	 var $url =$("#lovdmx-popup-window  input[name='url']");
+	 var $istop =$("#lovdmx-popup-window  input[name='istop']");
+	 var $publishTime =$("#lovdmx-popup-window  input[name='publishTime']");
+	
+
+	 //获取值
+	 var id = $id.val();
+	 var url = $url.val();
+	 var timeStamp = $publishTime.val();
+	
+	 formData.append("id",id);
+
+	 if(image.length > 0){
+		 formData.append("image",image[0]);
+	 }
+	 
+	 if (url == "" || url == null
+			 || url == undefined) {
+		 layer.msg('访问地址不能为空', {
+			 icon : 5
+		 });
+		 $url.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }else{
+		 formData.append("url",url);
+	 }
+	 if (timeStamp == "" || timeStamp == null
+			 || timeStamp == undefined) {
+		 layer.msg('发布时间不能为空', {
+			 icon : 5
+		 });
+		 $publishTime.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }else{
+		 formData.append("timeStamp",timeStamp);
+	 }
+	 formData.append("istop",$istop.is(':checked')==true?1:0);
+	 $.ajax({
+	        type: "POST",
+	        url: path + "/lovdmx/ht/slideshow/update.do",
+	        data: formData,//传过来
+	        cache: false,
+	        processData: false,
+	        contentType: false,
+	        success: function (json) {
+	        	//返回状态
+				var flag=json.result;
+				if (flag == "修改失败") {
+					layer.alert(flag, {
+						icon : 5
+					});
+				} else {
+					//项目路径
+					var path=$("#pageContext").val();
+					var slideshow=json.slideshow;
+					
+					// 更新
+					var $parentslideshow = $(".slideshowId"
+							+ slideshow.id);
+					
+					
+					if(slideshow.img!=null && slideshow.img !="" && slideshow.img!= undefined){
+						$parentslideshow.find("img").attr("src",path+"/"+slideshow.img);
+					}
+					
+					if(slideshow.url!=null && slideshow.url !="" && slideshow.url!= undefined){
+						$parentslideshow.find(".url").html(url);
+					}
+					
+					if(slideshow.publishTime!=null && slideshow.publishTime !="" && slideshow.publishTime!= undefined){
+						$parentslideshow.find(".publishTime").html(slideshow.timeStamp);
+					}
+					
+					if(slideshow.istop==1){
+						$parentslideshow.find("button.istop").removeClass("lovdmx-btn-primary").html("置顶");
+					}else{
+						$parentslideshow.find("button.istop").addClass("lovdmx-btn-primary").text("正常显示");
+					}
+					
+					layer.alert(flag, {
+						icon : 6
+					});
+					
+				}
+				close();
+	        }
+	 });
+	
+});
+
+$("body").on("click","#submit-news",function(){
+	var loadT = layer.msg("上传中...", {
+		icon : 16,
+		time : 0,
+		shade : [ 0.3, '#000' ]
+	});
+ 
+	var formData = new FormData();//先实例化formdata
+	//项目路径
+	var path=$("#pageContext").val();
+	
+	// jquery对象
+	var $title =$("#lovdmx-popup-window  input[name='title']");
+	var word =$("#lovdmx-popup-window  input[name='word']");
+	var content =$("#lovdmx-popup-window  input[name='content']");
+	var newsBgImage =$("#lovdmx-popup-window  input[name='newsBgImage']").prop('files');
+	var newsImage =$("#lovdmx-popup-window  input[name='newsImage']").prop('files');
+	var $link =$("#lovdmx-popup-window  input[name='link']");
+	var $runTime =$("#lovdmx-popup-window  input[name='runTime']");
+	var $istop =$("#lovdmx-popup-window  input[name='istop']");
+	
+	//值
+	var title =$title.val();
+	var link =$link.val();
+	var runTime =$runTime.val();
+	var istop =$istop.val();
+	//新闻标题
+	if (title == "" || title == null
+			 || title == undefined) {
+		 layer.msg('新闻标题不能为空', {
+			 icon : 5
+		 });
+		 $title.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }else{
+		 formData.append("title",title);
+	 }
+	//新闻(引导)词
+	 var temp_word="";
+	 for(var i=0;i<word.length;i++){
+		 var value = $(word[i]).val();
+		 if(value!="" && value !=null && value !=undefined){
+			 temp_word +=value;
+			 if(word.length-1>i){
+				 temp_word+="&!&";
+			 }
+		 }
+	 }
+	 
+	 if(temp_word!="" && temp_word !=null && temp_word !=undefined){
+		 formData.append("word",temp_word);
+	 }else{
+		 layer.msg('新闻(引导)词不能为空', {
+			 icon : 5
+		 });
+		 $word.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }
+	 //新闻内容
+	 var temp_content="";
+	 for(var i=0;i<content.length;i++){
+		 var value = $(content[i]).val();
+		 if(value!="" && value !=null && value !=undefined){
+			 temp_content +=value;
+			 if(content.length-1>i){
+				 temp_content+="&!&";
+			 }
+		 }
+	 }
+	 if(temp_content!="" && temp_content !=null && temp_content !=undefined){
+		 formData.append("content",temp_content);
+	 }else{
+		 layer.msg('新闻内容不能为空', {
+			 icon : 5
+		 });
+		 $content.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }
+	 
+	 //新闻背景图片
+	 if(newsBgImage.length > 0){
+		 formData.append("newsBgImage",newsBgImage[0]);
+	 }else{
+		 layer.msg('新闻背景图片不能为空', {
+			 icon : 5
+		 });
+		 return;
+	 }
+	 
+	//新闻图片
+	 if(newsImage.length > 0){
+		 formData.append("newsImage",newsImage[0]);
+	 }else{
+		 layer.msg('新闻图片不能为空', {
+			 icon : 5
+		 });
+		 return;
+	 }
+	 
+	
+	//(公众号)地址
+	if (link == "" || link == null
+			 || link == undefined) {
+		 layer.msg('(公众号)地址不能为空', {
+			 icon : 5
+		 });
+		 $link.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }else{
+		 formData.append("link",link);
+	 }
+	
+	 //运行时间
+	 if (runTime == "" || runTime == null
+			 || runTime == undefined) {
+		 layer.msg('运行时间不能为空', {
+			 icon : 5
+		 });
+		 $runTime.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	  }else{
+		 formData.append("time",runTime);
+	  }
+	 
+	  formData.append("istop",$istop.is(':checked')==true?1:0);
+	  $.ajax({
+	        type: "POST",
+	        url: path + "/lovdmx/ht/news/save.do",
+	        data: formData,//传过来
+	        cache: false,
+	        processData: false,
+	        contentType: false,
+	        success: function (json) {
+	        	//返回状态
+				var flag=json.result;
+				if (flag == "保存失败") {
+					layer.alert(flag, {
+						icon : 5
+					});
+				} else {
+					//项目路径
+					var path=$("#pageContext").val();
+					var _news=json.news;
+					
+					var add_news="";
+					add_news +="<tr class='newsId"+_news.newsId+"'>";
+						add_news +="<td class='table-checked lovdmx-unselect'>";
+							add_news +="<div class='lovdmx-table-cell lovdmxtable-cell-checkbox' ";
+								add_news +="data-index='"+_news.newsId+"'>";
+								add_news +="<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+							add_news +="</div>";
+						add_news +="</td>";
+						add_news +="<td class='lovdmx-unselect'>";
+							add_news +="<div class='lovdmx-table-cell'>";
+								add_news +="<span class='newsId'>"+_news.newsId+"</span>";
+							add_news +="</div>";
+						add_news +="</td>";
+						add_news +="<td class='lovdmx-unselect'>";
+							add_news +="<div class='lovdmx-table-cell'>";
+								add_news +="<span class='title'>"+_news.title+"</span>";
+							add_news +="</div>";
+						add_news +="</td>";
+						add_news +="<td class='lovdmx-unselect table-content'>";
+							add_news +="<div class='lovdmx-table-cell'>";
+								add_news +="<span class='word'>"+_news.word+"</span>";
+							add_news +="</div>";
+						add_news +="</td>";
+						add_news +="<td class='lovdmx-unselect table-content'>";
+							add_news +="<div class='lovdmx-table-cell'>";
+								add_news +="<span class='content'>"+_news.content+"</span>";
+							add_news +="</div>";
+						add_news +="</td>";
+						add_news +="<td class='lovdmx-unselect'>";
+							add_news +="<div class='lovdmx-table-cell'>";
+								add_news +="<span class='img'><img class='lovdmx-table-img'";
+								add_news +=" src='"+path+"/"+_news.img+"'></span>";
+							add_news +="</div>";
+						add_news +="</td>";
+						add_news +="<td class='lovdmx-unselect'>";
+							add_news +="<div class='lovdmx-table-cell'>";
+								add_news +="<span class='bgImg'><img class='lovdmx-table-img'";
+									add_news +=" src='"+path+"/"+_news.bgImg+"'></span>";
+							add_news +="</div>";
+						add_news +="</td>";
+						add_news +="<td class='lovdmx-unselect'>";
+							add_news +="<div class='lovdmx-table-cell'>";
+								add_news +="<span class='runTime'>"+_news.time+"</span>";
+							add_news +="</div>";
+						add_news +="</td>";
+						add_news +="<td class='lovdmx-unselect'>";
+							add_news +="<div class='lovdmx-table-cell'>";
+								add_news +="<span class='link'>"+_news.link+"</span>";
+							add_news +="</div>";
+						add_news +="</td>";
+						add_news +="<td class='lovdmx-unselect'>";
+							add_news +="<div class='lovdmx-table-cell center'>";
+								add_news +="<span class='istop'>";
+								if(_news.istop==1){
+									add_news +="<button class='istop lovdmx-btn lovdmx-btn-xs'>置顶</button>";
+								}else{
+									add_news +="<button class='istop lovdmx-btn lovdmx-btn-primary lovdmx-btn-xs'>正常显示</button>";
+								}
+							add_news +="</span></div>";
+						add_news +="</td>";
+						add_news +="<td class='table-last lovdmx-unselect'>";
+							add_news +="<div class='lovdmx-table-cell'>";
+								add_news +="<a data-link='"+path+"/lovdmx/ht/news/edit.do?newsId="+_news.newsId+"'";
+									add_news +=" class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs news-edit'>";
+									add_news +=" <i class='icon-bianji lovdmx-icon iconfont'></i> 编辑";
+								add_news +="</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs'";
+									add_news +=" data-link='"+path+"/lovdmx/ht/news/delete.do?newsId="+_news.newsId+"'";
+									add_news +=" onclick='mydel(this)'> <i class='icon-shanchu lovdmx-icon iconfont lovdmx-news-del'></i>";
+									add_news +=" 删除";
+								add_news +="</a>";
+							add_news +="</div>";
+						add_news +="</td>";
+					add_news +="</tr>";
+					
+					$(".lovdmx-table tbody").prepend(add_news);
+	
+					layer.alert(flag, {
+						icon : 6
+					});
+					
+				}
+				close();
+	        }
+	  });
+	  
+	  
+	  
+});
+$("body").on("click","#update-news",function(){
+	var loadT = layer.msg("上传中...", {
+		icon : 16,
+		time : 0,
+		shade : [ 0.3, '#000' ]
+	});
+ 
+	var formData = new FormData();//先实例化formdata
+	//项目路径
+	var path=$("#pageContext").val();
+	
+	// jquery对象
+	var $newsId =$("#lovdmx-popup-window  input[name='newsId']");
+	var $title =$("#lovdmx-popup-window  input[name='title']");
+	var word =$("#lovdmx-popup-window  input[name='word']");
+	var content =$("#lovdmx-popup-window  input[name='content']");
+	var newsBgImage =$("#lovdmx-popup-window  input[name='newsBgImage']").prop('files');
+	var newsImage =$("#lovdmx-popup-window  input[name='newsImage']").prop('files');
+	var $link =$("#lovdmx-popup-window  input[name='link']");
+	var $runTime =$("#lovdmx-popup-window  input[name='runTime']");
+	var $istop =$("#lovdmx-popup-window  input[name='istop']");
+	
+	//值
+	var newsId = $newsId.val();
+	var title =$title.val();
+	var link =$link.val();
+	var runTime =$runTime.val();
+	var istop =$istop.val();
+	
+	formData.append("newsId",newsId);
+	
+	//新闻标题
+	if (title == "" || title == null
+			 || title == undefined) {
+		 layer.msg('新闻标题不能为空', {
+			 icon : 5
+		 });
+		 $title.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }else{
+		 formData.append("title",title);
+	 }
+	//新闻(引导)词
+	 var temp_word="";
+	 for(var i=0;i<word.length;i++){
+		 var value = $(word[i]).val();
+		 if(value!="" && value !=null && value !=undefined){
+			 temp_word +=value;
+			 if(word.length-1>i){
+				 temp_word+="&!&";
+			 }
+		 }
+	 }
+	 
+	 if(temp_word!="" && temp_word !=null && temp_word !=undefined){
+		 formData.append("word",temp_word);
+	 }else{
+		 layer.msg('新闻(引导)词不能为空', {
+			 icon : 5
+		 });
+		 $word.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }
+	 //新闻内容
+	 var temp_content="";
+	 for(var i=0;i<content.length;i++){
+		 var value = $(content[i]).val();
+		 if(value!="" && value !=null && value !=undefined){
+			 temp_content +=value;
+			 if(content.length-1>i){
+				 temp_content+="&!&";
+			 }
+		 }
+	 }
+	 if(temp_content!="" && temp_content !=null && temp_content !=undefined){
+		 formData.append("content",temp_content);
+	 }else{
+		 layer.msg('新闻内容不能为空', {
+			 icon : 5
+		 });
+		 $content.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }
+	 
+	 //新闻背景图片
+	 if(newsBgImage.length > 0){
+		 formData.append("newsBgImage",newsBgImage[0]);
+	 }
+	 
+	//新闻图片
+	 if(newsImage.length > 0){
+		 formData.append("newsImage",newsImage[0]);
+	 }
+	 
+	
+	//(公众号)地址
+	if (link == "" || link == null
+			 || link == undefined) {
+		 layer.msg('(公众号)地址不能为空', {
+			 icon : 5
+		 });
+		 $link.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }else{
+		 formData.append("link",link);
+	 }
+	
+	 //运行时间
+	 if (runTime == "" || runTime == null
+			 || runTime == undefined) {
+		 layer.msg('运行时间不能为空', {
+			 icon : 5
+		 });
+		 $runTime.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	  }else{
+		 formData.append("time",runTime);
+	  }
+	 
+	  formData.append("istop",$istop.is(':checked')==true?1:0);
+	  $.ajax({
+	        type: "POST",
+	        url: path + "/lovdmx/ht/news/update.do",
+	        data: formData,//传过来
+	        cache: false,
+	        processData: false,
+	        contentType: false,
+	        success: function (json) {
+	        	//返回状态
+				var flag=json.result;
+				if (flag == "修改失败") {
+					layer.alert(flag, {
+						icon : 5
+					});
+				} else {
+					//项目路径
+					var path=$("#pageContext").val();
+					var _news=json.news;
+					
+					//更新
+					var $parent_news=$(".newsId"+_news.newsId);
+					
+					$parent_news.find(".title").html(_news.title);
+					$parent_news.find(".word").html(_news.word);
+					$parent_news.find(".content").html(_news.content);
+					
+					if(_news.img!=null && _news.img!="" && _news.img !=undefined){
+						$parent_news.find(".img img").attr("src",path+"/"+_news.img);
+					}
+					if(_news.bgImg!=null && _news.bgImg!="" && _news.bgImg !=undefined){
+						$parent_news.find(".bgImg img").attr("src",path+"/"+_news.bgImg);
+					}
+					
+					$parent_news.find(".runTime").html(_news.time);
+					$parent_news.find(".link").html(_news.link);
+					
+					if(_news.istop==1){
+						$parent_news.find("button.istop").removeClass("lovdmx-btn-primary").html("置顶");
+					}else{
+						$parent_news.find("button.istop").addClass("lovdmx-btn-primary").text("正常显示");
+					}
+					
+					layer.alert(flag, {
+						icon : 6
+					});
+					
+				}
+				close();
+	        }
+	  });
+});
+
+$("body").on("click","#submit-dynamicNews",function(){
+	var loadT = layer.msg("上传中...", {
+		icon : 16,
+		time : 0,
+		shade : [ 0.3, '#000' ]
+	});
+ 
+	var formData = new FormData();//先实例化formdata
+	//项目路径
+	var path=$("#pageContext").val();
+	
+	// jquery对象
+	var content =$("#lovdmx-popup-window  input[name='content']");
+	var $type =$("#lovdmx-popup-window button.active");
+	var imgs =$("#lovdmx-popup-window  input[name='imgs']");
+	var video =$("#lovdmx-popup-window  input[name='video']").prop('files');
+	var $publishTime =$("#lovdmx-popup-window  input[name='publishTime']");
+	
+	
+	//值
+	var typeId=$type.attr("data-type");
+	var publishTime = $publishTime.val();
+	
+	//新闻动态内容
+	 var temp_content="";
+	 for(var i=0;i<content.length;i++){
+		 var value = $(content[i]).val();
+		 if(value!="" && value !=null && value !=undefined){
+			 temp_content +=value;
+			 if(content.length-1>i){
+				 temp_content+="&!&";
+			 }
+		 }
+	 }
+	 if(temp_content!="" && temp_content !=null && temp_content !=undefined){
+		 formData.append("content",temp_content);
+	 }else{
+		 layer.msg('新闻内容不能为空', {
+			 icon : 5
+		 });
+		 $content.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }
+	 //类型
+	 if(typeId ==1){
+		//上传图片
+		for(var i=0;i<imgs.length;i++){
+			var img = $(imgs[i]).prop('files');
+			if(img.length>0){
+				formData.append("newsImages",img[0]);
+			}else{
+				layer.msg('类型选择为上传视频,图片不能为空', {
+					 icon : 5
+				 });
+				 return ;
+			}
+		}
+	 }else{
+		 //视频
+		 if(video.length > 0){
+			 formData.append("newsVideo",video[0]);
+		 }else{
+			 layer.msg('类型选择为上传视频,视频不能为空', {
+				 icon : 5
+			 });
+			 return ;
+		 }
+	 }
+	 formData.append("typeId",typeId);
+	 
+	 //发布时间
+	 if(publishTime!=null && publishTime!="" && publishTime!=undefined){
+		 formData.append("time",publishTime);
+	 }else{
+		 layer.msg('发布时间不能为空', {
+			 icon : 5
+		 });
+		 return ;
+	 }
+	 
+	 $.ajax({
+	        type: "POST",
+	        url: path + "/lovdmx/ht/dynamicNews/save.do",
+	        data: formData,//传过来
+	        cache: false,
+	        processData: false,
+	        contentType: false,
+	        success: function (json) {
+	        	//返回状态
+				var flag=json.result;
+				if (flag == "保存失败") {
+					layer.alert(flag, {
+						icon : 5
+					});
+				} else {
+					//项目路径
+					var path=$("#pageContext").val();
+					var _dynamicNews=json.dynamicNews;
+					var add_dynamicNews="";
+					
+					add_dynamicNews +="<tr class='dynamicNewsId"+_dynamicNews.newsId+"'>";
+						add_dynamicNews +="<td class='table-checked lovdmx-unselect'>";
+							add_dynamicNews +="<div class='lovdmx-table-cell lovdmxtable-cell-checkbox' data-index='"+_dynamicNews.newsId+"'>";
+								add_dynamicNews +="<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+							add_dynamicNews +="</div>";
+						add_dynamicNews +="</td>";
+						add_dynamicNews +="<td class='lovdmx-unselect'>";
+							add_dynamicNews +="<div class='lovdmx-table-cell'>";
+								add_dynamicNews +="<span class='newsId'>"+_dynamicNews.newsId+"</span>";
+							add_dynamicNews +="</div>";
+						add_dynamicNews +="</td>";
+						add_dynamicNews +="<td class='lovdmx-unselect table-content'>";
+							add_dynamicNews +="<div class='lovdmx-table-cell'>";
+								add_dynamicNews +="<span class='content'>"+_dynamicNews.content+"</span>";
+							add_dynamicNews +="</div>";
+						add_dynamicNews +="</td>";
+						add_dynamicNews +="<td class='lovdmx-unselect'>";
+							add_dynamicNews +="<div class='lovdmx-table-cell imgs'>";
+								var imgList = _dynamicNews.imgList;
+								if(imgList!=null && imgList!="" && imgList!=undefined){
+									for(var i=0;i<imgList.length;i++){
+										add_dynamicNews +="<img class='lovdmx-table-img' src='"+path+"/"+imgList[i]+"'> ";
+									}
+								}
+							add_dynamicNews +="</div>";
+						add_dynamicNews +="</td>";
+						add_dynamicNews +="<td class='lovdmx-unselect video'>";
+							add_dynamicNews +="<div class='lovdmx-table-cell'>";
+								if(_dynamicNews.typeId==2){
+									add_dynamicNews +="<button class='preview-video' data-path='"+path+"/"+_dynamicNews.video+"'>预览视频</button>";
+								}
+							add_dynamicNews +="</div>";
+						add_dynamicNews +="</td>";
+						add_dynamicNews +="<td class='lovdmx-unselect'>";
+							add_dynamicNews +="<div class='lovdmx-table-cell'>";
+								add_dynamicNews +="<span class='publishTime'>"+_dynamicNews.time+"</span>";
+							add_dynamicNews +="</div>";
+						add_dynamicNews +="</td>";
+						add_dynamicNews +="<td class='table-last lovdmx-unselect'>";
+							add_dynamicNews +="<div class='lovdmx-table-cell'>";
+								add_dynamicNews +="<a data-link='"+path+"/lovdmx/ht/dynamicNews/edit.do?newsId="+_dynamicNews.newsId+"' ";
+									add_dynamicNews +=" class='lovdmx-btn lovdmx-btn-edit lovdmx-btn-xs dynamicNews-edit'> ";
+									add_dynamicNews +="<i class='icon-bianji lovdmx-icon iconfont'></i> 编辑";
+								add_dynamicNews +="</a> <a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs'";
+									add_dynamicNews +=" data-link='"+path+"/lovdmx/ht/dynamicNews/delete.do?newsId="+_dynamicNews.newsId+"' ";
+									add_dynamicNews +=" onclick='mydel(this)'> <i ";
+									add_dynamicNews +=" class='icon-shanchu lovdmx-icon iconfont lovdmx-news-del'></i>";
+									add_dynamicNews +=" 删除";
+								add_dynamicNews +="</a>";
+							add_dynamicNews +="</div>";
+						add_dynamicNews +="</td>";
+					add_dynamicNews +="</tr>";
+					
+					$(".lovdmx-table tbody").prepend(add_dynamicNews);
+					
+					layer.alert(flag, {
+						icon : 6
+					});
+				}
+				close();
+	        }
+	  });
+});
+$("body").on("click","#update-dynamicNews",function(){
+	var loadT = layer.msg("上传中...", {
+		icon : 16,
+		time : 0,
+		shade : [ 0.3, '#000' ]
+	});
+ 
+	var formData = new FormData();//先实例化formdata
+	//项目路径
+	var path=$("#pageContext").val();
+	
+	// jquery对象
+	var $newsId =$("#lovdmx-popup-window  input[name='newsId']");
+	var content =$("#lovdmx-popup-window  input[name='content']");
+	var $type =$("#lovdmx-popup-window button.active");
+	var imgs =$("#lovdmx-popup-window  input[name='imgs']");
+	var video =$("#lovdmx-popup-window  input[name='video']").prop('files');
+	var $publishTime =$("#lovdmx-popup-window  input[name='publishTime']");
+	
+	
+	//值
+	var newsId = $newsId.val();
+	var typeId=$type.attr("data-type");
+	var publishTime = $publishTime.val();
+	
+	
+	
+	 formData.append("newsId",newsId);
+	//新闻动态内容
+	 var temp_content="";
+	 for(var i=0;i<content.length;i++){
+		 var value = $(content[i]).val();
+		 if(value!="" && value !=null && value !=undefined){
+			 temp_content +=value;
+			 if(content.length-1>i){
+				 temp_content+="&!&";
+			 }
+		 }
+	 }
+	 if(temp_content!="" && temp_content !=null && temp_content !=undefined){
+		 formData.append("content",temp_content);
+	 }else{
+		 layer.msg('新闻内容不能为空', {
+			 icon : 5
+		 });
+		 $content.addClass("lovdmx-form-danger")
+					.focus();
+		 return;
+	 }
+	 
+	 var upd_imgIndex = new Array();
+	 var now_imgIndex = new Array();
+	 
+	//类型
+	if(typeId ==1){
+		if(imgs.length>0){
+			//上传图片
+			for(var i=0;i<imgs.length;i++){
+				var type=$(imgs[i]).attr("data-type");
+				var img = $(imgs[i]).prop('files');
+				if(type==0){
+					if(img.length>0){
+						//新增
+						formData.append("addImages",img[0]);
+					}else{
+						layer.msg('类型选择为上传视频,图片不能为空', {
+							 icon : 5
+						});
+						return ;
+					}
+				}else if(type==1){
+					var index=$(imgs[i]).attr("data-index");
+					now_imgIndex.push(index);
+					if(img.length>0){
+						upd_imgIndex.push(index);
+						//修改
+						formData.append("updImages",img[0]);
+					}
+				}
+			}
+		}else{
+			layer.msg('请添加新闻动态图,新闻动态图不能为空', {
+				 icon : 5
+			});
+			return ;
+		}
+	}else{
+		 //视频
+		 if(video.length > 0){
+			 formData.append("newsVideo",video[0]);
+		 }
+	}
+	formData.append("typeId",typeId);
+	formData.append("upd_imgIndex",upd_imgIndex);
+	formData.append("now_imgIndex",now_imgIndex);
+	 //发布时间
+	 if(publishTime!=null && publishTime!="" && publishTime!=undefined){
+		 formData.append("time",publishTime);
+	 }else{
+		 layer.msg('发布时间不能为空', {
+			 icon : 5
+		 });
+		 return ;
+	 }
+	 
+	 $.ajax({
+	        type: "POST",
+	        url: path + "/lovdmx/ht/dynamicNews/update.do",
+	        data: formData,//传过来
+	        cache: false,
+	        processData: false,
+	        contentType: false,
+	        success: function (json) {
+	        	//返回状态
+				var flag=json.result;
+				if (flag == "修改失败") {
+					layer.alert(flag, {
+						icon : 5
+					});
+				} else {
+					//项目路径
+					var path=$("#pageContext").val();
+					var _dynamicNews=json.dynamicNews;
+					//更新
+					var content=_dynamicNews.content;
+					var img_list=_dynamicNews.imgList;
+					var video = _dynamicNews.video;
+					var publish_time=_dynamicNews.publishTime;
+					var parent_dynamicNews = $("table .dynamicNewsId"+_dynamicNews.newsId);
+					
+					if(content!=null && content!="" && content!=undefined){
+						$(parent_dynamicNews).find(".content").html(content);
+					}
+					
+					if(img_list!=null && img_list!="" && img_list!=undefined){
+						var img_value="";
+						for(var i=0;i<img_list.length;i++){
+							img_value +="<img class='lovdmx-table-img' src='"+path+"/"+img_list[i]+"'>";
+						}
+						$(parent_dynamicNews).find(".imgs").empty().append(img_value);
+						$(parent_dynamicNews).find(".video").empty();
+					}
+					
+					if(video!=null && video!="" && video!=undefined){
+						var video_value="<button class='preview-video' data-path='"+path+"/"+video+"'>预览视频</button>";
+						$(parent_dynamicNews).find(".video").empty().append(video_value);
+						$(parent_dynamicNews).find(".imgs").empty();
+					}
+					
+					if(publish_time!=null && publish_time!="" && publish_time!=undefined){
+						$(parent_dynamicNews).find(".publishTime").html(publish_time);
+					}
+					
+					layer.alert(flag, {
+						icon : 6
+					});
+				}
+				close();
+	        }
+	  });
+	
+});
+
+
+// 时间戳转yyyy-MM-dd HH-mm-ss
+function formatDateTime(inputTime) {
+	var date = new Date(inputTime);
+	var y = date.getFullYear();
+	var m = date.getMonth() + 1;
+	m = m < 10 ? ('0' + m) : m;
+	var d = date.getDate();
+	d = d < 10 ? ('0' + d) : d;
+	var h = date.getHours();
+	h = h < 10 ? ('0' + h) : h;
+	var minute = date.getMinutes();
+	var second = date.getSeconds();
+	minute = minute < 10 ? ('0' + minute) : minute;
+	second = second < 10 ? ('0' + second) : second;
+	return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+};
+
+// 指定参数 为空的元素
+function selectParameter(paramterId){
+	
+	$("#lovdmx-popup-window .lovdmx-form-item .lovdmx-form-checkbox").removeClass("lovdmxtable-cell-checked");
+	$("#lovdmx-popup-window .lovdmx-form-item .parameter"+paramterId).addClass("lovdmxtable-cell-checked");
+	
+	$("#lovdmx-popup-window .new-parameter").addClass("none");
+	$("#lovdmx-popup-window .upload-parameter"+paramterId).removeClass("none");
+	
+	
+}

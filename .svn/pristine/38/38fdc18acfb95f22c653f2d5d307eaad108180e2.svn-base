@@ -1,0 +1,50 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.pojo 
+ * @author: syz  
+ * @date: 2019年3月23日 下午4:47:26 
+ */
+package com.lovdmx.control.pojo;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: EnumDeviceType.java
+ * @Description: 枚举 设备类型
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月23日 下午4:47:26
+ *
+ */
+public enum EnumDeviceType {
+
+	RTR(0, "RTR服务器"), DMX512(1, "控制盒"), Sprite(2, "录放精灵");
+
+	private Integer key;
+
+	private String value;
+
+	EnumDeviceType(Integer key, String value) {
+		this.key = key;
+		this.value = value;
+	}
+
+	public Integer getKey() {
+		return key;
+	}
+
+	public void setKey(Integer key) {
+		this.key = key;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+}

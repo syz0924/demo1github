@@ -1,0 +1,122 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.thread 
+ * @author: syz  
+ * @date: 2019年3月4日 下午4:18:15 
+ */
+package com.lovdmx.control.common.thread;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.socket.SpriteAnalysisServiceUtils;
+import com.lovdmx.control.common.socket.SpriteServerSocketThread;
+import com.lovdmx.control.common.socket.WebSocket;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: SpriteAnalysisOpCodeThread.java
+ * @Description: 该类的功能描述
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月4日 下午4:18:15
+ *
+ */
+public class SpriteAnalysisOpCodeThread implements Runnable {
+
+	// 启动线程
+	private boolean isOK = true;
+	// web客户端 传入数据
+	private Map<String, JSONObject> webClientDataMap = Collections.synchronizedMap(new HashMap<String, JSONObject>());
+	// 录放精灵客户端 然后数据
+	private List<JSONObject> spriteClientDataList = Collections.synchronizedList(new ArrayList<JSONObject>());
+
+	@Override
+	public void run() {
+		List<JSONObject> dataList = Collections.synchronizedList(new ArrayList<JSONObject>());
+		while (isOK) {
+			synchronized (this) {
+				dataList = spriteClientDataList;
+			}
+			if (dataList.size() > 0) {
+				JSONObject json = dataList.get(0);
+				// opCode
+				Integer opCode = (Integer) json.get("opCode");
+				String uuid = null;
+				try {
+					if (opCode == 0x1022) {
+						// 组装 文件上传状态
+						String dataJson = SpriteAnalysisServiceUtils.getAssembleDeviceInfo(json);
+						json.put("dataJson", dataJson);
+						// 赋值最新的文件信息
+						SpriteServerSocketThread.setDirectoryListData(dataJson);
+					} else {
+						// 获取key 标识 UUID
+						uuid = (String) json.get("uuid");
+						// 根据uuid获取 客户端传入的数据
+						JSONObject webClientData = webClientDataMap.get(uuid);
+						if (opCode == 0x1026) {
+							Integer status = (Integer) json.get("status");
+							// 判断是否成功
+							if (status == 1) {
+								// 上传成功添加 记录
+								SpriteAnalysisServiceUtils.addUploadVideoOrEdlmxFile(json, webClientData);
+								webClientData.put("operationMode", "add");
+								webClientData.put("projectId", json.get("projectId"));
+								// 添加操作日志
+								SpriteAnalysisServiceUtils.addLogInfo(webClientData);
+
+								// 目录列表添加json中
+								json.put("dataJson", SpriteServerSocketThread.getDirectoryListData());
+								// 更新 目录文件列表
+								String dataJson = SpriteAnalysisServiceUtils.getAssembleDeviceInfo(json);
+								json.put("dataJson", dataJson);
+								// 赋值最新的文件信息
+								SpriteServerSocketThread.setDirectoryListData(dataJson);
+							}
+						}
+					}
+					// 广播给所有客户端
+					WebSocket.sendDataInfo(json.toJSONString());
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				} finally {
+					// 移除
+					spriteClientDataList.remove(0);
+					webClientDataMap.remove(uuid);
+				}
+			} else {
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public void setOK(boolean isOK) {
+		this.isOK = isOK;
+	}
+
+	public void addJSONObject(JSONObject jsonObject) {
+		this.spriteClientDataList.add(jsonObject);
+	}
+
+	public void addMapInfo(String uuid, JSONObject jsonObject) {
+		webClientDataMap.put(uuid, jsonObject);
+	}
+
+	public JSONObject getMapInfo(String uuid) {
+		return webClientDataMap.get("uuid");
+	}
+
+}

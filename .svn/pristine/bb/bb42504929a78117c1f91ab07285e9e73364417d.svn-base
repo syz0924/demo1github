@@ -1,0 +1,50 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.lovdmx.control.mapper.RtrDeviceMapper;
+import com.lovdmx.control.pojo.RtrDevice;
+import com.lovdmx.control.service.RtrDeviceService;
+
+@Service("rtrDeviceService")
+public class RtrDeviceServiceImpl extends BaseServiceImpl<RtrDevice> implements RtrDeviceService {
+
+	@Autowired
+	private RtrDeviceMapper rtrDeviceMapper;
+
+	@Override
+	public List<RtrDevice> findByParentId(Integer parentId) {
+		return rtrDeviceMapper.findByParentId(parentId);
+	}
+
+	@Override
+	public Integer batchInsert(List<RtrDevice> list) {
+		// TODO Auto-generated method stub
+		return rtrDeviceMapper.batchInsert(list);
+	}
+
+	@Override
+	public List<RtrDevice> findByRackId(Integer rackId) {
+		// TODO Auto-generated method stub
+		return rtrDeviceMapper.findByRackId(rackId);
+	}
+
+	@Override
+	public PageInfo<RtrDevice> queryPageListByWhereDeviceMacOrModeIdOrIsOnlineOrRackId(RtrDevice rtrDevice, Integer pageNo,
+			Integer rows) {
+		// 设置分页参数
+		if (pageNo == null || "".equals(pageNo)) {
+			pageNo = 1;
+		}
+		PageHelper.startPage(pageNo, rows);
+		List<RtrDevice> list = this.rtrDeviceMapper.findByDeviceMacOrModeIdOrIsOnlineOrRackId(rtrDevice);
+
+		PageInfo<RtrDevice> pageInfo = new PageInfo<RtrDevice>(list);
+		return pageInfo;
+	}
+}

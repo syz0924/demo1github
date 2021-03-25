@@ -1,0 +1,159 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.utils 
+ * @author: syz  
+ * @date: 2019年3月1日 上午11:26:07 
+ */
+package com.lovdmx.control.common.utils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.socket.SocketUtils;
+import com.lovdmx.control.httpVo.Catalogue;
+import com.lovdmx.control.httpVo.LightFile;
+import com.lovdmx.control.httpVo.VideoFile;
+import com.lovdmx.control.pojo.UploadEdlmx;
+import com.lovdmx.control.pojo.UploadVideos;
+
+import net.sf.json.JSONArray;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: SpriteAnalysisServiceUtils.java
+ * @Description: socket业务判断
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月1日 上午11:26:07
+ *
+ */
+public class SpriteAnalysisServiceUtils extends SocketUtils {
+
+	/**
+	 * 
+	 * @Function: SpriteAnalysisServiceUtils.java
+	 * @Description: 组装设备信息
+	 *
+	 * @param:jsonObject JSON对象
+	 * @return：String
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月1日 下午3:23:01
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月1日 Administrator v1.0.0 修改原因
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
+	public static String getAssembleDeviceInfo(JSONObject jsonObject) {
+		// 項目ID
+		Integer projectId = (Integer) jsonObject.get("projectId");
+		// 1、使用JSONArray
+		JSONArray json = JSONArray.fromObject(jsonObject.get("dataJson"));// userStr是json字符串
+		// 2、 添加子类型的class
+		Map classMap = new HashMap();
+		classMap.put("lightFileList", LightFile.class);
+		classMap.put("videoFileList", VideoFile.class);
+		// 3、JOSN数据转 对象
+		List<Catalogue> catalogueList = (List<Catalogue>) JSONArray.toList(json, Catalogue.class, classMap);
+		// 获取已上传的视频信息
+		List<UploadVideos> uploadVideosList = uploadVideosService.findByProjectId(projectId);
+		// 获取已上传的灯光文件信息
+		List<UploadEdlmx> uploadEdlmxList = uploadEdlmxService.findByProjectId(projectId);
+		// 4、遍历 组装上传状态
+		for (Catalogue catalogue : catalogueList) {
+			for (LightFile lightFile : catalogue.getLightFileList()) {
+				for (UploadEdlmx uploadEdlmx : uploadEdlmxList) {
+					// 判断是否上传
+					if (uploadEdlmx.getMd5().equals(lightFile.getMd5())) {
+						// 判断是否分发
+						if (uploadEdlmx.getRtrLoaded() == 1) {
+							lightFile.setStatus(2);
+						} else {
+							lightFile.setStatus(1);
+						}
+					}
+				}
+			}
+			for (VideoFile videoFile : catalogue.getVideoFileList()) {
+				for (UploadVideos uploadVideo : uploadVideosList) {
+					// 判断是否上传
+					if (uploadVideo.getMd5().equals(videoFile.getMd5())) {
+						// 判断是否分发
+						if (uploadVideo.getRtrLoaded() == 1) {
+							videoFile.setStatus(2);
+						} else {
+							videoFile.setStatus(1);
+						}
+					}
+				}
+			}
+		}
+		return JsonUtils.objectToJson(catalogueList);
+	}
+
+	/**
+	 * @Function: SpriteAnalysisServiceUtils.java
+	 * @Description: 添加视频或灯光文件
+	 *
+	 * @param:dataJson 上传成功添加
+	 *                     数据
+	 * @return：返回结果描述
+	 * @throws：Exception
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月1日 下午2:56:52
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月1日 Administrator v1.0.0 修改原因
+	 */
+	public static void addUploadVideoOrEdlmxFile(JSONObject dataJson) throws Exception {
+		Integer typeId = (Integer) dataJson.get("fileType");
+		Integer num = 0;
+		// 灯光
+		if (typeId == 0) {
+			// JOSN对象转 类对象
+			UploadEdlmx uploadEdlmx = JSON.toJavaObject(dataJson, UploadEdlmx.class);
+			// 获取主录放精灵上传的最后一条信息
+			UploadEdlmx lastUploadEdlmx = uploadEdlmxService
+					.findWebUploadLastInfoByProjectIdAndUploadRole(uploadEdlmx.getProjectId(), 1);
+			int index = 1;
+			if (lastUploadEdlmx != null) {
+				// 下标加一
+				index += lastUploadEdlmx.getFileIndex();
+			}
+			uploadEdlmx.setFileIndex(index);
+			uploadEdlmx.setUploadRole(1);
+			num = uploadEdlmxService.save(uploadEdlmx);
+		} else {
+			// JOSN对象转 类对象
+			UploadVideos uploadVideo = JSON.toJavaObject(dataJson, UploadVideos.class);
+			// 获取主录放精灵上传的最后一条信息
+			UploadVideos lastUploadVideo = uploadVideosService
+					.findWebUploadLastInfoByProjectIdAndUploadRole(uploadVideo.getProjectId(), 1);
+			int index = 1;
+			if (lastUploadVideo == null) {
+				index = 101;
+			} else {
+				// 下标加一
+				index += lastUploadVideo.getFileIndex();
+			}
+			uploadVideo.setFileIndex(index);
+			uploadVideo.setUploadRole(1);
+			num = uploadVideosService.save(uploadVideo);
+		}
+		dataJson.put("result", num == 0 ? true : false);
+	}
+
+}

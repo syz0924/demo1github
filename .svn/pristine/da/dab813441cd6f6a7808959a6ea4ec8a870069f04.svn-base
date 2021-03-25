@@ -1,0 +1,24 @@
+package com.lovdmx.control.service;
+
+import com.lovdmx.control.pojo.EdlmxSplit;
+
+public interface EdlmxSplitService extends BaseService<EdlmxSplit> {
+	/**
+	 * 
+	 * @Function: EdlmxSplitService.java
+	 * @Description: 根据md5, 获取切割的数量
+	 *
+	 * @param:md5 文件MD5值
+	 * @return：Integer
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月19日 下午2:35:37
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月19日 Administrator v1.0.0 修改原因
+	 */
+	Integer findCountByMainMd5(String md5);
+}

@@ -1,0 +1,220 @@
+/**
+ * 
+ */
+package com.lovdmx.control.controller.admin;
+
+import java.util.Date;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.utils.JsonUtils;
+import com.lovdmx.control.common.utils.ResponseUtils;
+import com.lovdmx.control.common.utils.SecurityUtil;
+import com.lovdmx.control.pojo.Manage;
+import com.lovdmx.control.service.ManageService;
+
+/**
+ * 管理员控制器
+ * 
+ * @author syz
+ * @Date 2018年11月22日
+ * @version 2.0
+ */
+@Controller
+@RequestMapping("/lovdmx/ht/manage/")
+public class ManageController extends BaseController {
+
+	@Resource
+	private ManageService manageService;
+
+	/**
+	 * 编辑
+	 * 
+	 * @param manageId
+	 *            管理员ID
+	 * @param response
+	 */
+	@RequestMapping(value = "edit.do", method = RequestMethod.GET)
+	public void edit(HttpServletResponse response, Integer manageId) {
+		Manage manage = manageService.findById(manageId);
+		String json = JsonUtils.objectToJson(manage);
+		ResponseUtils.renderJson(response, json);
+	}
+
+	/**
+	 * 
+	 * 保存管理员
+	 * 
+	 * 注意： 随机产生 加密码盐值 status默认值为0，表示禁用 1： 启用
+	 * 
+	 */
+	@RequestMapping(value = "save.do", method = RequestMethod.POST)
+	public void save(Manage manage, HttpServletResponse response) {
+
+		JSONObject jSONObject = new JSONObject();
+
+		// 加密码盐值
+		String salt = SecurityUtil.md5Encode(manage.getPassword());
+		manage.setSalt(salt);
+		String pwd = manage.getPassword();
+		// 密码
+		String pwdSalt = SecurityUtil.md5Encode(pwd + manage.getSalt());
+		manage.setPassword(pwdSalt);
+		// 创建时间
+		manage.setCreateTime(new Date());
+		// 状态
+		manage.setStatus((short) 1);
+		// 反馈
+		String result = "";
+		// 添加
+		Integer num = manageService.save(manage);
+
+		System.out.println(JsonUtils.objectToJson(manage));
+
+		result = num == 0 ? "添加失败" : "添加成功";
+		jSONObject.put("result", result);
+		jSONObject.put("manage", manage);
+		String json = jSONObject.toJSONString();
+		ResponseUtils.renderJson(response, json);
+	}
+
+	/**
+	 * 修改管理员信息
+	 * 
+	 * @param manage
+	 */
+	@RequestMapping("updateInfo.do")
+	public void updateInfo(Manage manage, HttpServletResponse response) {
+		// 反馈
+		String result = "";
+		// 修改
+		Integer num = manageService.update(manage);
+		result = num == 0 ? "修改失败" : "修改成功";
+		ResponseUtils.renderText(response, result);
+	}
+
+	/**
+	 * 启用或禁用(要求用ajax)
+	 * 
+	 * @param manageId
+	 *            管理員ID
+	 * @param status
+	 *            状态
+	 * @param response
+	 */
+	@RequestMapping(value = "updateStatus.do", method = RequestMethod.GET)
+	public void updateStatus(Integer manageId, Short status, HttpServletResponse response) {
+		JSONObject json = new JSONObject(); // 对象
+
+		Manage manage = manageService.findById(manageId);
+		manage.setStatus(status);
+		Integer num = manageService.update(manage);
+		if (num == 1) {
+			json.put("result", true);
+		} else {
+			json.put("result", false);
+		}
+		String value = json.toJSONString();
+		ResponseUtils.renderJson(response, value);
+
+	}
+
+	/**
+	 * 删除管理员
+	 * 
+	 * @param manageId
+	 *            管理員ID
+	 * 
+	 * @param response
+	 */
+	@RequestMapping(value = "delete.do", method = RequestMethod.GET)
+	public void delete(Integer manageId, HttpServletResponse response) {
+		String result = "";
+		Integer num = manageService.deleteById(manageId);
+		result = num == 0 ? "删除失败" : "删除成功";
+		ResponseUtils.renderText(response, result);
+	}
+
+	/**
+	 * 判断登录账号是否存在
+	 * 
+	 * @param loginName
+	 *            登录名
+	 * @param response
+	 */
+	@RequestMapping(value = "findByLoginName.do", method = RequestMethod.GET)
+	public void findByLoginName(String loginName, HttpServletResponse response) {
+		String result = "";
+		Manage manage = manageService.getSaltByName(loginName);
+		result = manage == null ? "true" : "false";
+
+		ResponseUtils.renderText(response, result);
+	}
+
+	/**
+	 * 账号信息
+	 * 
+	 * @param manage
+	 * @return
+	 */
+	@RequestMapping(value = "info.do", method = RequestMethod.GET)
+	public String info(Integer manageId, ModelMap map) {
+		Manage manageInfo = manageService.findById(manageId);
+		map.put("manageInfo", manageInfo);
+		return "manage/manage_info";
+	}
+
+	/**
+	 * 
+	 * 跳转密码界面
+	 */
+	@RequestMapping(value = "upadtePwd.do", method = RequestMethod.GET)
+	public String upadtePwd() {
+		return "manage/manage_upd_password";
+	}
+
+	/**
+	 * 判断密码是否正确
+	 * 
+	 * @param manageId
+	 *            账号ID
+	 * @param password
+	 *            密码
+	 * @param response
+	 */
+	@RequestMapping(value = "findByPassword.do", method = RequestMethod.POST)
+	public void findByPassword(Manage manage, HttpServletResponse response) {
+		boolean bool = manageService.findByPassword(manage.getManageId(), manage.getPassword());
+		ResponseUtils.renderText(response, bool + "");
+	}
+
+	/**
+	 * 修改密码
+	 * 
+	 * @param manage
+	 * @param response
+	 */
+	@RequestMapping(value = "updatePwd.do", method = RequestMethod.POST)
+	public void updatePwd(Manage manage, HttpServletResponse response) {
+
+		String result = "";
+		// 加密码盐值
+		String salt = SecurityUtil.md5Encode(manage.getPassword());
+		manage.setSalt(salt);
+		String pwd = manage.getPassword();
+		// 密码
+		String pwdSalt = SecurityUtil.md5Encode(pwd + manage.getSalt());
+		manage.setPassword(pwdSalt);
+		Integer num = manageService.update(manage);
+		result = num == 0 ? "false" : "true";
+		ResponseUtils.renderText(response, result);
+	}
+
+}

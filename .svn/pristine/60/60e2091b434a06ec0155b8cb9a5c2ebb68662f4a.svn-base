@@ -1,0 +1,151 @@
+package com.lovdmx.control.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.lovdmx.control.pojo.RackDevice;
+
+public interface RackDeviceMapper extends BaseMapper<RackDevice> {
+	/**
+	 * 
+	 * @Function: RackDeviceMapper.java
+	 * @Description: 根据父类ID获取所有机架信息
+	 *
+	 * @param:parentId 父类ID
+	 * @return：List<RackDevice>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月21日 下午4:44:47
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月21日 Administrator v1.0.0 修改原因
+	 */
+	List<RackDevice> findByParentId(@Param("parentId") Integer parentId);
+
+	/**
+	 * @Function: RackDeviceMapper.java
+	 * @Description: 根据项目ID获取机架中所有设备信息
+	 *
+	 * @param: projectId
+	 *             项目ID
+	 * @return：List<RackDevice>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月25日 下午1:53:54
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月25日 Administrator v1.0.0 修改原因
+	 */
+	List<RackDevice> findRackDeviceAllInfoByProjectId(@Param("projectId") Integer projectId);
+
+	/**
+	 * 
+	 * @Function: RackDeviceMapper.java
+	 * @Description: 批量插入
+	 *
+	 * @param: list
+	 *             集合
+	 * @return：Integer
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月28日 下午2:16:25
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月28日 Administrator v1.0.0 修改原因
+	 */
+	Integer batchInsert(@Param("list") List<RackDevice> list);
+
+	/**
+	 * 
+	 * @Function: RackDeviceMapper.java
+	 * @Description: 根据md5值和项目id ，获取RTR设备中视频丢失机架id（,）逗号隔开
+	 *
+	 * @param:projectId 项目ID
+	 * @param: md5
+	 *             文件md5值
+	 * @return：String
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月7日 下午4:37:53
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月7日 Administrator v1.0.0 修改原因
+	 */
+	String findRTRNotExistVideoGroupCounatRackIdByParentIdAndMd5(@Param("projectId") Integer projectId,
+			@Param("md5") String md5);
+
+	/**
+	 * 
+	 * @Function: RackDeviceMapper.java
+	 * @Description: 根据md5值和项目id ，获取录放精灵设备中视频丢失机架id（,）逗号隔开
+	 *
+	 * @param:projectId 项目ID
+	 * @param: md5
+	 *             文件md5值
+	 * @return：String
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月7日 下午4:37:53
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月7日 Administrator v1.0.0 修改原因
+	 */
+	String findSpriteNotExistVideoGroupCounatRackIdByParentIdAndMd5(@Param("projectId") Integer projectId,
+			@Param("md5") String md5);
+
+	/**
+	 * 
+	 * @Function: RackDeviceMapper.java
+	 * @Description: 统计机架数量
+	 *
+	 * @param: projectId
+	 *             项目ID
+	 * @return：Integer
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月13日 上午10:38:13
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月13日 Administrator v1.0.0 修改原因
+	 */
+	Integer countByProjectId(@Param("projectId") Integer projectId);
+
+	/**
+	 * 
+	 * @Function: RackDeviceMapper.java
+	 * @Description: 根据项目id，获取所有机架id（,）逗号隔开
+	 *
+	 * @param: projectId
+	 *             项目ID
+	 * @return：String
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月19日 下午3:14:18
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月19日 Administrator v1.0.0 修改原因
+	 */
+	String findGroupCounatRackIdByParojectId(@Param("projectId") Integer projectId);
+}

@@ -1,0 +1,75 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.utils 
+ * @author: syz  
+ * @date: 2019年3月6日 下午4:12:47 
+ */
+package com.lovdmx.control.common.utils;
+
+import com.lovdmx.control.common.socket.RTRServerSocketThread;
+import com.lovdmx.control.common.socket.SpriteServerSocketThread;
+import com.lovdmx.control.httpVo.RTRDeviceInfoVo;
+import com.lovdmx.control.httpVo.SpriteDeviceInfoVo;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: OnLineClientUtils.java
+ * @Description: 客户端在线状态
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月6日 下午4:12:47
+ *
+ */
+public class OnLineClientUtils {
+
+	/**
+	 * 
+	 * @Function: OnLineClientUtils.java
+	 * @Description: 根据MAC地址获取 RTR设备信息
+	 *
+	 * @param: mac
+	 *             MAC地址
+	 * @return：RTRDeviceInfoVo
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月6日 下午4:21:49
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月6日 Administrator v1.0.0 修改原因
+	 */
+	public static RTRDeviceInfoVo getRTRClientInfo(String mac) {
+		// 根据MAC地址获取设备信息
+		return RTRServerSocketThread.rtrDeviceMap.get(mac);
+	}
+
+	/**
+	 * 
+	 * @Function: OnLineClientUtils.java
+	 * @Description: 根据MAC地址获取 录放精灵设备信息
+	 *
+	 * @param: mac
+	 *             MAC地址
+	 * @return：SpriteAnalysisAndRealTimeDataVo
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月6日 下午4:21:24
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月6日 Administrator v1.0.0 修改原因
+	 */
+	public static SpriteDeviceInfoVo getSpriteClientInfo(String mac) {
+		// 根据MAC地址获取设备信息
+		return SpriteServerSocketThread.spriteDeviceMap.get(mac);
+	}
+
+}

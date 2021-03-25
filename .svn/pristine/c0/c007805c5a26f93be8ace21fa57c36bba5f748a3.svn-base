@@ -1,0 +1,54 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.pojo 
+ * @author: syz  
+ * @date: 2019年3月23日 下午4:56:56 
+ */
+package com.lovdmx.control.pojo;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: EnumErrRank.java
+ * @Description: 枚举 错误级别
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月23日 下午4:56:56
+ *
+ */
+public enum EnumErrRank {
+
+	General(0, "一般"), Grave(1, "严重");
+
+	private Integer key;
+
+	private String value;
+
+	EnumErrRank(Integer key, String value) {
+		this.key = key;
+		this.value = value;
+	}
+
+	public Integer getKey() {
+		return key;
+	}
+
+	public void setKey(Integer key) {
+		this.key = key;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public static void main(String[] args) {
+		System.out.println(EnumErrRank.Grave.name());
+	}
+}

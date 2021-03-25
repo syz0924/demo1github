@@ -1,0 +1,6 @@
+package com.lovdmx.control.service;
+
+import com.lovdmx.control.pojo.Dmx512Device;
+
+public interface Dmx512DeviceService extends BaseService<Dmx512Device> {
+}

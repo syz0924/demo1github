@@ -1,0 +1,81 @@
+package com.lovdmx.control.pojo;
+
+import java.io.Serializable;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: EdlmxSplit.java
+ * @Description: 灯光文件分割表
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月15日 上午10:29:45
+ *
+ */
+public class EdlmxSplit implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 1836781922308833847L;
+	// 编号
+	private Integer splitId;
+	// 灯光文件MD5值
+	private String mainMd5;
+	// 灯光文件分割成的小文件的MD5值
+	private String lmxName;
+	// 项目ID
+	private Integer projectId;
+	// Sprite MAC地址
+	private String mac;
+	// 机架ID
+	private String rackId;
+
+	public Integer getSplitId() {
+		return splitId;
+	}
+
+	public void setSplitId(Integer splitId) {
+		this.splitId = splitId;
+	}
+
+	public String getMainMd5() {
+		return mainMd5;
+	}
+
+	public void setMainMd5(String mainMd5) {
+		this.mainMd5 = mainMd5 == null ? null : mainMd5.trim();
+	}
+
+	public String getLmxName() {
+		return lmxName;
+	}
+
+	public void setLmxName(String lmxName) {
+		this.lmxName = lmxName;
+	}
+
+	public String getRackId() {
+		return rackId;
+	}
+
+	public void setRackId(String rackId) {
+		this.rackId = rackId;
+	}
+
+	public Integer getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
+	}
+
+	public String getMac() {
+		return mac;
+	}
+
+	public void setMac(String mac) {
+		this.mac = mac;
+	}
+
+}

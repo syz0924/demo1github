@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.ErrMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.Err">
+		<id column="err_id" property="errId" jdbcType="INTEGER" />
+		<result column="device_mac" property="deviceMac" jdbcType="CHAR" />
+		<result column="ip" property="ip" jdbcType="CHAR" />
+		<result column="device_type" property="deviceType" jdbcType="CHAR" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+		<result column="rack_name" property="rackName" jdbcType="VARCHAR" />
+		<result column="err_type" property="errType" jdbcType="CHAR" />
+		<result column="err_rank" property="errRank" jdbcType="CHAR" />
+		<result column="task_name" property="taskName" jdbcType="VARCHAR" />
+		<result column="type_md5" property="typeMd5" jdbcType="VARCHAR" />
+		<result column="err_describe" property="errDescribe" jdbcType="VARCHAR" />
+		<result column="number" property="number" jdbcType="INTEGER" />
+		<result column="alarm_number" property="alarmNumber" jdbcType="INTEGER" />
+		<result column="resolution_state" property="resolutionState"
+			jdbcType="INTEGER" />
+		<result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+		<result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+		<result column="alarm_date" property="alarmDate" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<resultMap id="BaseResultErrTypteFileAlarmDataInfoMap" type="com.lovdmx.control.httpVo.SolveAlarmData">
+		<result column="err_id" property="errId" jdbcType="INTEGER" />
+		<result column="rack_name" property="rackName" jdbcType="VARCHAR" />
+		<result column="task_count" property="taskCount" jdbcType="INTEGER" />
+		<result column="video_count" property="videoCount" jdbcType="INTEGER" />
+		<result column="edlmx_count" property="edlmxCount" jdbcType="INTEGER" />
+		<result column="task_offline_alarm_status" property="taskOfflineAlarmStatus"
+			jdbcType="INTEGER" />
+		<result column="video_offline_alarm_status" property="videoOfflineAlarmStatus"
+			jdbcType="INTEGER" />
+		<result column="edlmx_offline_alarm_status" property="edlmxOfflineAlarmStatus"
+			jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap id="BaseResultAlarmDeviceInfoMap" type="com.lovdmx.control.httpVo.AlarmDeviceInfoVo">
+		<id column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+		<result column="err_id" property="errId" jdbcType="INTEGER" />
+		<result column="rack_name" property="rackName" jdbcType="VARCHAR" />
+		<result column="rtr_is_online" property="rtrIsOnline" jdbcType="DECIMAL" />
+		<result column="sprite_is_online" property="spriteIsOnline"
+			jdbcType="DECIMAL" />
+		<result column="sprite_offline_alarm_status" property="spriteOfflineAlarmStatus"
+			jdbcType="INTEGER" />
+		<result column="rtr_offline_alarm_status" property="rtrOfflineAlarmStatus"
+			jdbcType="INTEGER" />
+		<result column="dmx_offline_alarm_status" property="dmxOfflineAlarmStatus"
+			jdbcType="INTEGER" />
+		<result column="dmx_before_alarm_number" property="dmxBeforeAlarmNumber"
+			jdbcType="INTEGER" />
+		<result column="dmx_now_alarm_number" property="dmxNowAlarmNumber"
+			jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		err_id, device_mac, ip, device_type, project_id,rack_id,
+		err_type,err_rank,number,task_name,
+		type_md5,resolution_state,err_describe,start_time,end_time,alarm_date
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from t_err
+		where err_id = #{errId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findAlarmDateNumber" resultMap="BaseResultMap">
+		select
+		alarm_date,count(1) alarm_number from t_err where
+		project_id=#{projectId}
+		<if test="deviceType !=null and deviceType !=''">
+			and device_type=#{deviceType}
+		</if>
+		<if test="resolutionState !=null">
+			and resolution_state=#{resolutionState}
+		</if>
+		<if test="startTime !=null and startTime !=''">
+			and UNIX_TIMESTAMP(date_format(start_time,'%Y/%m/%d')) <![CDATA[>=]]>
+			#{startTime}
+		</if>
+		<if test="endTime !=null and endTime !=''">
+			and UNIX_TIMESTAMP(date_format(start_time,'%Y/%m/%d')) <![CDATA[<=]]>
+			#{endTime}
+		</if>
+		group by alarm_date;
+	</select>
+
+	<select id="findLoseGroupCounatRackIdByTypeMd5AndErrType"
+		resultType="java.lang.String">
+		select
+		GROUP_CONCAT(rack_id separator ',') from t_err where
+		project_id=#{projectId} and
+		type_md5=#{fileMd5} and err_type=#{errType}
+		and
+		resolution_state=0
+	</select>
+
+	<select id="findLoseGroupCounatRackIdByTaskNameAndErrType"
+		resultType="java.lang.String">
+		select
+		GROUP_CONCAT(rack_id separator ',') from t_err where
+		project_id=#{projectId} and
+		task_name=#{taskName} and
+		err_type=#{errType}
+		and
+		resolution_state=0
+	</select>
+
+	<select id="findByProjectId" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		err.err_id err_id,err.device_mac device_mac,err.ip
+		ip,err.device_type device_type,err.project_id project_id,err.rack_id
+		rack_id,err.type_md5 type_md5,err.task_name task_name,
+		racd.rack_name
+		rack_name,err.err_type err_type,err.err_rank
+		err_rank,err.err_describe
+		err_describe,err.number
+		number,err.resolution_state resolution_state,
+		err.start_time
+		start_time,err.end_time end_time
+		from dev_rack_device
+		racd,t_err err
+		where racd.project_id=racd.project_id and
+		err.rack_id=racd.rack_id and
+		err.project_id = #{projectId} and
+		resolution_state=0
+		GROUP BY
+		err.err_id order by err.start_time desc
+	</select>
+
+	<select id="findAlarmDataByDeviceType" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_err
+		where device_type = #{deviceType,jdbcType=VARCHAR} where
+		resolution_state=0
+	</select>
+
+	<select id="findConditionQueryAlarmData" resultMap="BaseResultMap">
+		select err.err_id, err.device_mac, err.ip, err.device_type,
+		err.project_id,err.rack_id,
+		err.err_type,err_rank,number,task_name,
+		err.type_md5,err.resolution_state,err.err_describe,err.start_time,err.end_time,racd.rack_name
+		from pro_project prop,t_err err,dev_rack_device racd where
+		prop.project_id=err.project_id and racd.project_id=prop.project_id and
+		err.rack_id=racd.rack_id and prop.project_id=#{projectId}
+		<if test="deviceType !=null and deviceType !=''">
+			and err.device_type=#{deviceType}
+		</if>
+		<if test="resolutionState !=null">
+			and err.resolution_state=#{resolutionState}
+		</if>
+		<if test="startTime !=null and startTime !=''">
+			and UNIX_TIMESTAMP(date_format(err.start_time,'%Y/%m/%d')) <![CDATA[>=]]>
+			#{startTime}
+		</if>
+		<if test="endTime !=null and endTime !=''">
+			and UNIX_TIMESTAMP(date_format(err.start_time,'%Y/%m/%d')) <![CDATA[<=]]>
+			#{endTime}
+		</if>
+	</select>
+
+
+	<select id="findErrTypteOffLineAlarmInfoByProjectId" resultMap="BaseResultAlarmDeviceInfoMap"
+		parameterType="java.lang.Integer">
+		select prop.project_id,err.rack_id,err.err_id,
+		(select
+		rack_name from dev_rack_device where rack_id=err.rack_id) rack_name,
+		(SELECT
+		is_online from dev_sprite_device where mac=device_mac and
+		err.device_type='Sprite' ) sprite_is_online,
+		(SELECT is_online from
+		dev_rtr_device where mac=device_mac and err.device_type='RTR' )
+		rtr_is_online,
+		(SELECT 1 from dev_rtr_device where mac=device_mac and
+		err.device_type='RTR' ) rtr_offline_alarm_status,
+		(SELECT 1 from
+		dev_sprite_device where mac=device_mac and
+		err.device_type='Sprite' )
+		sprite_offline_alarm_status,
+		(SELECT count(1) from
+		dev_dmx512_device
+		where rtr_mac=device_mac and
+		err.device_type='DMX512' and is_online=0 )
+		dmx_now_alarm_number,
+		(SELECT 1 from dev_dmx512_device where
+		rtr_mac=device_mac and
+		err.device_type='DMX512' )
+		dmx_offline_alarm_status
+		from pro_project
+		prop,
+		t_err err where
+		prop.project_id=err.project_id and
+		prop.project_id=#{projectId} and
+		err_type='OffLine' and
+		resolution_state=0
+	</select>
+
+	<select id="findErrTypteFileAlarmInfoByProjectId" resultMap="BaseResultErrTypteFileAlarmDataInfoMap"
+		parameterType="java.lang.Integer">
+		select er.err_id err_id,
+		(select rack_name from
+		dev_rack_device where er.rack_id=rack_id)
+		rack_name,
+		(select 1 from dev_sprite_tasks
+		sprt,dev_tasks task where
+		sprt.task_id=task.task_id and
+		sprt.sprite_mac=er.device_mac and
+		er.err_type='Task' and
+		er.resolution_state=0 and
+		task.task_name=er.task_name) task_count ,
+		(select 1 from dev_rtr_video
+		rtrv where rtrv.rtr_mac=er.device_mac and
+		er.err_type='Video' and
+		er.resolution_state=0 and
+		rtrv.orgvideo_md5=er.type_md5 group by
+		rtrv.rtr_mac) video_count,
+		(select 1 from
+		dev_sprite_edlmx spre where
+		spre.sprite_mac=er.device_mac and
+		er.err_type='Lmx' and
+		er.resolution_state=0 and
+		spre.orglmx_md5=er.type_md5 group by
+		spre.sprite_mac) edlmx_count,
+		(select 1 from
+		dev_sprite_device where
+		mac=er.device_mac and
+		er.err_type='Task')task_offline_alarm_status,
+		(select 1 from
+		dev_sprite_device where mac=er.device_mac and
+		er.err_type='Video')
+		video_offline_alarm_status,
+		(select 1 from
+		dev_sprite_device where
+		mac=er.device_mac and er.err_type='Lmx')
+		edlmx_offline_alarm_status
+		from pro_project prop,t_err er
+		where
+		prop.project_id=er.project_id and
+		prop.project_id=#{projectId}
+		and
+		er.resolution_state=0 and er.err_type
+		in('Lmx','Task','Video')
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from t_err
+		where err_id = #{errId,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="errId"
+		parameterType="java.util.List">
+		insert into t_err
+		(device_mac,ip,device_type,project_id,rack_id,err_type,err_rank,task_name,type_md5,err_describe,resolution_state,number,start_time,alarm_date)
+		values
+		<if test="list !=null">
+			<foreach collection="list" item="item" separator="," close=";">
+				(#{item.deviceMac},#{item.ip},#{item.deviceType},#{item.projectId},#{item.rackId},#{item.errType},#{item.errRank},#{item.taskName},#{item.typeMd5},#{item.errDescribe},#{item.resolutionState},#{item.number},#{item.startTime},#{item.alarmDate})
+			</foreach>
+		</if>
+	</insert>
+
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.Err">
+		insert into t_err
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="errId != null">
+				err_id,
+			</if>
+			<if test="deviceMac != null">
+				device_mac,
+			</if>
+			<if test="ip != null">
+				ip,
+			</if>
+			<if test="deviceType != null">
+				device_type,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="rackId != null">
+				rack_id,
+			</if>
+			<if test="errType != null">
+				err_type,
+			</if>
+			<if test="errRank != null">
+				err_rank,
+			</if>
+			<if test="taskName != null">
+				task_name,
+			</if>
+			<if test="typeMd5 != null">
+				type_md5,
+			</if>
+			<if test="errDescribe != null">
+				err_describe,
+			</if>
+			<if test="resolutionState != null">
+				resolution_state,
+			</if>
+			<if test="number != null">
+				number,
+			</if>
+			<if test="startTime != null">
+				start_time,
+			</if>
+			<if test="endTime != null">
+				end_time,
+			</if>
+			<if test="alarmDate != null">
+				alarm_date,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="errId != null">
+				#{errId,jdbcType=INTEGER},
+			</if>
+			<if test="deviceMac != null">
+				#{deviceMac,jdbcType=CHAR},
+			</if>
+			<if test="ip != null">
+				#{ip,jdbcType=CHAR},
+			</if>
+			<if test="deviceType != null">
+				#{deviceType,jdbcType=CHAR},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="rackId != null">
+				#{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="errType != null">
+				#{errType,jdbcType=CHAR},
+			</if>
+			<if test="errRank != null">
+				#{errRank,jdbcType=CHAR},
+			</if>
+			<if test="taskName != null">
+				#{taskName,jdbcType=VARCHAR},
+			</if>
+			<if test="typeMd5 != null">
+				#{typeMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="errDescribe != null">
+				#{errDescribe,jdbcType=VARCHAR},
+			</if>
+			<if test="resolutionState != null">
+				#{resolutionState,jdbcType=INTEGER},
+			</if>
+			<if test="number != null">
+				#{number,jdbcType=INTEGER},
+			</if>
+			<if test="startTime != null">
+				#{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				#{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="alarmDate != null">
+				#{alarmDate,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="batchUpdate" parameterType="java.util.List"
+		useGeneratedKeys="true" keyProperty="errId">
+		update t_err
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="number = " suffix="end,">
+				<foreach collection="list" item="item" separator=" "
+					open="case err_id">
+					when
+					#{item.errId} then #{item.number}
+				</foreach>
+			</trim>
+			<trim prefix="err_describe = " suffix="end,">
+				<foreach collection="list" item="item" separator=" "
+					open="case err_id">
+					when
+					#{item.errId} then #{item.errDescribe}
+				</foreach>
+			</trim>
+		</trim>
+		where err_id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item.errId}
+		</foreach>
+	</update>
+
+	<update id="batchUpdateResoutionState" parameterType="java.util.List"
+		useGeneratedKeys="true" keyProperty="errId">
+		update t_err
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="resolution_state = " suffix="end,">
+				<foreach collection="list" item="item" separator=" "
+					open="case err_id">
+					when
+					#{item.errId} then #{item.resolutionState}
+				</foreach>
+			</trim>
+			<trim prefix="type_md5 = " suffix="end,">
+				<foreach collection="list" item="item" separator=" "
+					open="case err_id">
+					when
+					#{item.errId} then #{item.typeMd5}
+				</foreach>
+			</trim>
+			<trim prefix="end_time = " suffix="end,">
+				<foreach collection="list" item="item" separator=" "
+					open="case err_id">
+					when
+					#{item.errId} then #{item.endTime}
+				</foreach>
+			</trim>
+		</trim>
+		where err_id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item.errId}
+		</foreach>
+	</update>
+	<update id="update" parameterType="com.lovdmx.control.pojo.Err">
+		update t_err
+		<set>
+			<if test="deviceMac != null">
+				device_mac = #{deviceMac,jdbcType=CHAR},
+			</if>
+			<if test="ip != null">
+				ip = #{ip,jdbcType=CHAR},
+			</if>
+			<if test="deviceType != null">
+				device_type = #{deviceType,jdbcType=CHAR},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="rackId != null">
+				rack_id = #{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="errType != null">
+				err_type = #{errType,jdbcType=CHAR},
+			</if>
+			<if test="errRank != null">
+				err_rank = #{errRank,jdbcType=CHAR},
+			</if>
+			<if test="taskName != null">
+				task_name = #{taskName,jdbcType=VARCHAR},
+			</if>
+			<if test="typeMd5 != null">
+				type_md5 = #{typeMd5,jdbcType=VARCHAR},
+			</if>
+			<if test="errDescribe != null">
+				err_describe = #{errDescribe,jdbcType=VARCHAR},
+			</if>
+			<if test="resolutionState != null">
+				resolution_state = #{resolutionState,jdbcType=INTEGER},
+			</if>
+			<if test="number != null">
+				number = #{resolutionState,jdbcType=INTEGER},
+			</if>
+			<if test="startTime != null">
+				start_time = #{startTime,jdbcType=INTEGER},
+			</if>
+			<if test="endTime != null">
+				end_time = #{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="alarmDate != null">
+				alarm_date = #{alarmDate,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where err_id = #{errId,jdbcType=TIMESTAMP}
+	</update>
+</mapper>

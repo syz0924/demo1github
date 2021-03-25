@@ -1,0 +1,50 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.pojo 
+ * @author: syz  
+ * @date: 2019年3月23日 下午4:54:23 
+ */
+package com.lovdmx.control.pojo;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: EnumErrType.java
+ * @Description: 枚举 错误类型
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月23日 下午4:54:23
+ *
+ */
+public enum EnumErrType {
+
+	OffLine(0, "离线"), Task(1, "任务"), Lmx(2, "灯光文件"), Video(2, "视频文件");
+
+	private Integer key;
+
+	private String value;
+
+	EnumErrType(Integer key, String value) {
+		this.key = key;
+		this.value = value;
+	}
+
+	public Integer getKey() {
+		return key;
+	}
+
+	public void setKey(Integer key) {
+		this.key = key;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+}

@@ -1,0 +1,27 @@
+package com.lovdmx.control.service;
+
+import java.util.List;
+
+import com.lovdmx.control.pojo.IntelligentGateway;
+
+public interface IntelligentGatewayService extends BaseService<IntelligentGateway> {
+
+	/**
+	 * 
+	 * @Function: IntelligentGatewayService.java
+	 * @Description: 机架内连接智能网关 然后根据项目ID 获取网关信息
+	 *
+	 * @param:projectId 项目ID
+	 * @return：List<IntelligentGateway>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月14日 上午10:37:46
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年5月14日 Administrator v1.0.0 修改原因
+	 */
+	List<IntelligentGateway> findRackJoinIntelligentGatewayByProjectId(Integer projectId);
+}

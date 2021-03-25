@@ -1,0 +1,10 @@
+package com.lovdmx.control.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.pojo.Dmx512Device;
+import com.lovdmx.control.service.Dmx512DeviceService;
+
+@Service("dmx512DeviceService")
+public class Dmx512DeviceServiceImpl extends BaseServiceImpl<Dmx512Device> implements Dmx512DeviceService {
+}

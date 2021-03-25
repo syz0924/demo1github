@@ -1,0 +1,161 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.thread 
+ * @author: syz  
+ * @date: 2019年3月19日 上午10:32:52 
+ */
+package com.lovdmx.control.common.thread;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.socket.TextMessage;
+
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.socket.ServerSocketThread;
+import com.lovdmx.control.common.utils.OpCodeAnalysisServiceUtils;
+import com.lovdmx.control.common.utils.SocketUtils;
+import com.lovdmx.control.common.websocket.SpringWebSocketHandler;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: ProjectAnalysisOpCodeThread.java
+ * @Description: 根据OpCode解析业务
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年3月19日 上午10:32:52
+ *
+ */
+public class ProjectAnalysisOpCodeThread extends SocketUtils implements Runnable {
+
+	// 启动线程
+	private boolean isOK = true;
+	// web客户端 传入数据
+	private Map<String, JSONObject> webClientDataMap = Collections.synchronizedMap(new HashMap<String, JSONObject>());
+	// 录放精灵客户端 然后数据
+	private List<JSONObject> socketClientDataList = Collections.synchronizedList(new ArrayList<JSONObject>());
+
+	private Integer projectId;
+
+	@Override
+	public void run() {
+		List<JSONObject> dataList = Collections.synchronizedList(new ArrayList<JSONObject>());
+		while (isOK) {
+			synchronized (this) {
+				dataList = socketClientDataList;
+			}
+			if (dataList.size() > 0) {
+				// 客户端反馈JSON
+				JSONObject socketClientData = dataList.get(0);
+				// opCode
+				Integer opCode = (Integer) socketClientData.get("opCode");
+				String uuid = null;
+				try {
+					if (opCode == 0x1022) {
+						// 组装 文件上传状态
+						String dataJson = OpCodeAnalysisServiceUtils.getAssembleDeviceInfo(socketClientData);
+						socketClientData.put("dataJson", dataJson);
+						// 赋值最新的文件信息
+						ServerSocketThread.setDirectoryListData(dataJson);
+						continue;
+					} else {
+						if (socketClientData.containsKey("uuid")) {
+							// 获取key 标识 UUID
+							uuid = (String) socketClientData.get("uuid");
+						} else if (socketClientData.containsKey("OrgFileMd5")) {
+							// 获取key 标识 UUID
+							uuid = (String) socketClientData.get("OrgFileMd5");
+						}
+						// 根据uuid获取 客户端传入的数据
+						JSONObject webClientData = webClientDataMap.get(uuid);
+						if (opCode == 0x1026) {
+							OpCodeAnalysisServiceUtils.addUploadVideoOrLmxInfo(socketClientData, webClientData, projectId);
+						} else if (opCode == 0x1015) {
+							// 视频切割策略的反馈
+							OpCodeAnalysisServiceUtils.updateUpdateVideoSplitStatus(socketClientData, webClientData, uuid,
+									webClientDataMap);
+						} else if (opCode == 0x1016) {
+							// 灯光文件切割策略的反馈
+							OpCodeAnalysisServiceUtils.updateUpdateLightingSplitStatus(socketClientData, webClientData, uuid,
+									webClientDataMap);
+						} else if (opCode == 0x1008) {
+							// 任务策略的反馈
+							OpCodeAnalysisServiceUtils.addTask(socketClientData, webClientData,uuid,webClientDataMap);
+						} else if (opCode == 0x1009) {
+							// 暂停任务策略
+							OpCodeAnalysisServiceUtils.addPauseTaskInfo(socketClientData, webClientData);
+						} else if (opCode == 0x1010) {
+							// 恢复任务策略
+							OpCodeAnalysisServiceUtils.addRestoreTaskInfo(socketClientData, webClientData);
+						} else if (opCode == 0x1012) {
+							// 反馈任务信息
+							OpCodeAnalysisServiceUtils.feedbackTaskInfo(socketClientData, webClientData, projectId);
+						} else if (opCode == 0x1013) {
+							// 反馈暂停任务信息
+							OpCodeAnalysisServiceUtils.feedbackPauseTaskInfo(socketClientData, webClientData, projectId);
+						} else if (opCode == 0x1014) {
+							// 反馈恢复任务信息
+							OpCodeAnalysisServiceUtils.feedbackRestoreTaskInfo(socketClientData, webClientData, projectId);
+						} else if (opCode == 0x1006) {
+							// 反馈添加RTR 视频信息
+							OpCodeAnalysisServiceUtils.feedbackRtrVideoInfo(socketClientData, webClientData, projectId);
+						} else if (opCode == 0x1007) {
+							// 反馈添加Sprite 灯光信息
+							OpCodeAnalysisServiceUtils.feedbackSpriteLmxInfo(socketClientData, webClientData, projectId);
+						}
+					}
+					// 广播给所有客户端
+					SpringWebSocketHandler.sendMessageToUsers(projectId, new TextMessage(socketClientData.toJSONString()));
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				} finally {
+					// 移除
+					socketClientDataList.remove(0);
+					if (opCode != 0x1007 && opCode != 0x1006) {
+						webClientDataMap.remove(uuid);
+					}
+				}
+			} else {
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		webClientDataMap.clear();
+		socketClientDataList.clear();
+	}
+
+	public void setOK(boolean isOK) {
+		this.isOK = isOK;
+	}
+
+	public void addJSONObject(JSONObject jsonObject) {
+		this.socketClientDataList.add(jsonObject);
+	}
+
+	public void addMapInfo(String uuid, JSONObject jsonObject) {
+		webClientDataMap.put(uuid, jsonObject);
+	}
+
+	public JSONObject getMapInfo(String uuid) {
+		return webClientDataMap.get("uuid");
+	}
+
+	public ProjectAnalysisOpCodeThread() {
+	}
+
+	public ProjectAnalysisOpCodeThread(Integer projectId) {
+		super();
+		this.projectId = projectId;
+	}
+
+}

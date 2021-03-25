@@ -1,0 +1,39 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.vo 
+ * @author: syz  
+ * @date: 2019年2月28日 下午3:49:14 
+ */
+package com.lovdmx.control.vo;
+
+import java.io.Serializable;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: VoltageVo.java
+ * @Description: 电压对象
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月28日 下午3:49:14
+ *
+ */
+public class VoltageVo implements Serializable {
+
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 1L;
+	// 电压值
+	private Integer current;
+
+	public Integer getCurrent() {
+		return current;
+	}
+
+	public void setCurrent(Integer current) {
+		this.current = current;
+	}
+
+}

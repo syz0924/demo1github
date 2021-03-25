@@ -1,0 +1,101 @@
+package com.lovdmx.control.pojo;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RackDevice.java
+ * @Description: 小型服务器机架表
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月15日 上午10:39:30
+ *
+ */
+public class RackDevice implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 3299563032155639859L;
+	// 编号
+	private Integer rackId;
+	// 机架编号
+	private Integer rackIndex;
+	// 机架名称
+	private String rackName;
+	// 项目ID
+	private Integer projectId;
+	// 实时电流
+	private Integer current;
+	// 实时电压
+	private Integer voltage;
+	// 创建时间
+	private Date createTime;
+	// 更新时间
+	private Date modifyTime;
+
+	public Integer getRackId() {
+		return rackId;
+	}
+
+	public void setRackId(Integer rackId) {
+		this.rackId = rackId;
+	}
+
+	public Integer getRackIndex() {
+		return rackIndex;
+	}
+
+	public void setRackIndex(Integer rackIndex) {
+		this.rackIndex = rackIndex;
+	}
+
+	public String getRackName() {
+		return rackName;
+	}
+
+	public void setRackName(String rackName) {
+		this.rackName = rackName == null ? null : rackName.trim();
+	}
+
+	public Integer getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
+	}
+
+	public Integer getCurrent() {
+		return current;
+	}
+
+	public void setCurrent(Integer current) {
+		this.current = current;
+	}
+
+	public Integer getVoltage() {
+		return voltage;
+	}
+
+	public void setVoltage(Integer voltage) {
+		this.voltage = voltage;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public Date getModifyTime() {
+		return modifyTime;
+	}
+
+	public void setModifyTime(Date modifyTime) {
+		this.modifyTime = modifyTime;
+	}
+}

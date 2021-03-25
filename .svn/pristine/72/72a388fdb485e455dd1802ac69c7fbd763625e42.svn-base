@@ -1,0 +1,6 @@
+package com.lovdmx.control.mapper;
+
+import com.lovdmx.control.pojo.Tasks;
+
+public interface TasksMapper extends BaseMapper<Tasks> {
+}

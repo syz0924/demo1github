@@ -1,0 +1,102 @@
+package com.lovdmx.control.pojo;
+
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: Relay.java
+ * @Description: 继电器 实体类
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年5月14日 上午10:17:22
+ *
+ */
+public class Relay implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 8236106822846079683L;
+	// 标识
+	private Integer id;
+	// 网关MAC
+	private String gatewayMac;
+	// 当前rs485toNet的IP地址s
+	private String rs485toNetIp;
+	// 从站地址
+	private Integer slaveAddr;
+	// 继电器个数
+	private Integer number;
+	// 继电器回路状态为“开
+	private String electricRelayLoopON;
+	// 继电器回路状态为“关”
+	private String electricRelayLoopOFF;
+	// 根据rs485toNetIp分组 获取继电器
+	private List<Relay> relayList;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getGatewayMac() {
+		return gatewayMac;
+	}
+
+	public void setGatewayMac(String gatewayMac) {
+		this.gatewayMac = gatewayMac == null ? null : gatewayMac.trim();
+	}
+
+	public String getRs485toNetIp() {
+		return rs485toNetIp;
+	}
+
+	public void setRs485toNetIp(String rs485toNetIp) {
+		this.rs485toNetIp = rs485toNetIp == null ? null : rs485toNetIp.trim();
+	}
+
+	public Integer getNumber() {
+		return number;
+	}
+
+	public void setNumber(Integer number) {
+		this.number = number;
+	}
+
+	public String getElectricRelayLoopON() {
+		return electricRelayLoopON;
+	}
+
+	public void setElectricRelayLoopON(String electricRelayLoopON) {
+		this.electricRelayLoopON = electricRelayLoopON;
+	}
+
+	public String getElectricRelayLoopOFF() {
+		return electricRelayLoopOFF;
+	}
+
+	public void setElectricRelayLoopOFF(String electricRelayLoopOFF) {
+		this.electricRelayLoopOFF = electricRelayLoopOFF;
+	}
+
+	public Integer getSlaveAddr() {
+		return slaveAddr;
+	}
+
+	public void setSlaveAddr(Integer slaveAddr) {
+		this.slaveAddr = slaveAddr;
+	}
+
+	public List<Relay> getRelayList() {
+		return relayList;
+	}
+
+	public void setRelayList(List<Relay> relayList) {
+		this.relayList = relayList;
+	}
+
+}

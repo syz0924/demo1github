@@ -1,0 +1,23 @@
+package com.lovdmx.control.controller.admin;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.PlatformTransactionManager;
+
+@Controller
+public class BaseController {
+
+	// 每页的数量
+	public static Integer rows = 14;
+	
+	// 日志
+	protected static Log logger = LogFactory.getLog(BaseController.class);
+
+	// 事务
+	@Resource(name = "transactionManager")
+	public PlatformTransactionManager platformTransactionManager;
+
+}

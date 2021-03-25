@@ -1,0 +1,10 @@
+package com.lovdmx.control.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.pojo.RtrVideo;
+import com.lovdmx.control.service.RtrVideoService;
+
+@Service("rtrVideoService")
+public class RtrVideoServiceImpl extends BaseServiceImpl<RtrVideo> implements RtrVideoService {
+}

@@ -1,0 +1,73 @@
+package com.lovdmx.control.controller.admin;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.github.pagehelper.PageInfo;
+import com.lovdmx.control.controller.BaseController;
+import com.lovdmx.control.pojo.EnumCurMode;
+import com.lovdmx.control.pojo.RackDevice;
+import com.lovdmx.control.pojo.RtrDevice;
+import com.lovdmx.control.service.RackDeviceService;
+import com.lovdmx.control.service.RtrDeviceService;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RtrDeviceController.java
+ * @Description: RTR设备 控制器
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年7月1日 上午11:03:27
+ *
+ */
+@Controller
+@RequestMapping("/lovdmx/ht/rtrDevice/")
+public class RtrDeviceController extends BaseController {
+
+	@Autowired
+	private RackDeviceService rackDeviceService; // 机柜
+
+	@Autowired
+	private RtrDeviceService rtrDeviceService; // RTR
+
+	/**
+	 * 
+	 * @Function: RtrDeviceController.java
+	 * @Description: 该函数的功能描述
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年7月3日 上午11:08:14
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年7月3日 Administrator v1.0.0 修改原因
+	 */
+	@RequestMapping("index.do")
+	public String index(RtrDevice rtrDevice, Integer pageNo, ModelMap map) {
+
+		// 获取所有机柜信息
+		List<RackDevice> rackDeviceList = rackDeviceService.findAll();
+		// 模糊查询 分页
+		PageInfo<RtrDevice> pageInfo = rtrDeviceService
+				.queryPageListByWhereDeviceMacOrModeIdOrIsOnlineOrRackId(rtrDevice, pageNo, rows);
+		map.put("rtrDevice", rtrDevice);
+		map.put("pageInfo", pageInfo);
+		map.put("rackDeviceList", rackDeviceList);
+		map.put("curModeList", EnumCurMode.values());
+
+		return "device/rtrDevice/rtrDevice_list";
+	}
+
+}

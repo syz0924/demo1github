@@ -1,0 +1,112 @@
+package com.lovdmx.control.service;
+
+import java.util.List;
+
+import com.lovdmx.control.pojo.RackDevice;
+import com.lovdmx.control.vo.RackAndEdlmxVo;
+import com.lovdmx.control.vo.RackAndVideoVo;
+
+public interface RackDeviceService extends BaseService<RackDevice> {
+
+	/**
+	 * 
+	 * @Function: RackDeviceService.java
+	 * @Description: 根据父类ID获取所有机架信息
+	 *
+	 * @param:parentId 父类ID
+	 * @return：List<RackDevice>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月21日 下午4:52:37
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月21日 Administrator v1.0.0 修改原因
+	 */
+	List<RackDevice> findByParentId(Integer parentId);
+
+	/**
+	 * 
+	 * @Function: RackDeviceService.java
+	 * @Description: 批量插入
+	 *
+	 * @param: list
+	 *             集合
+	 * @return：Integer
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月28日 下午2:16:25
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月28日 Administrator v1.0.0 修改原因
+	 */
+	Integer batchInsert(List<RackDevice> list);
+
+	/**
+	 * 
+	 * @Function: RackDeviceService.java
+	 * @Description: 查询不存在该视频的机架信息
+	 *
+	 * @param:projectId 项目ID
+	 * @param: md5
+	 *             文件md5值
+	 * @return：List<RackAndVideoVo>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月7日 下午4:37:53
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月7日 Administrator v1.0.0 修改原因
+	 */
+	List<RackAndVideoVo> findRackRTRNotExistVideoInfo(Integer projectId, String md5);
+
+	/**
+	 * 
+	 * @Function: RackDeviceService.java
+	 * @Description: 查询不存在该灯光文件的机架信息
+	 *
+	 * @param:projectId 项目ID
+	 * @param: md5
+	 *             文件md5值
+	 * @return：List<RackAndEdlmxVo>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月7日 下午4:37:53
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月7日 Administrator v1.0.0 修改原因
+	 */
+	List<RackAndEdlmxVo> findRackSpriteNotExistEdlmxInfo(Integer projectId, String md5);
+
+	/**
+	 * 
+	 * @Function: RackDeviceService.java
+	 * @Description: 统计机架数量
+	 *
+	 * @param: projectId
+	 *             项目ID
+	 * @return：Integer
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月13日 上午10:38:13
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月13日 Administrator v1.0.0 修改原因
+	 */
+	Integer countByProjectId(Integer projectId);
+
+}

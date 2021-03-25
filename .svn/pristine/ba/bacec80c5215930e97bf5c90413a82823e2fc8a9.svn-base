@@ -1,0 +1,51 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.pojo 
+ * @author: Administrator   
+ * @date: 2019年2月21日 下午2:53:36 
+ */
+package com.lovdmx.control.pojo;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: InternationalEnumUtil.java
+ * @Description: 该类的功能描述
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月21日 下午2:53:36
+ *
+ */
+public enum EnumSexType {
+	ALL(0, "全部"), YES(1, "是"), NO(2, "否");
+	private int v;
+	private String name;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getV() {
+		return v;
+	}
+
+	public void setV(int v) {
+		this.v = v;
+	}
+
+	private EnumSexType(int v, String name) {
+		this.v = v;
+		this.name = name;
+	}
+
+	public static boolean isEquals(String enumName, int code) {
+		return EnumSexType.valueOf(enumName).getV() == code;
+	}
+}

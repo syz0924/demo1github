@@ -1,0 +1,113 @@
+package com.lovdmx.control.pojo;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RelayTasks.java
+ * @Description: 继电器任务 实体类
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年5月14日 上午10:19:49
+ *
+ */
+public class RelayTasks implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 6096186422762737633L;
+	// 标识
+	private Integer taskId;
+	// 星期ID
+	private Integer weekId;
+	// 继电器ID
+	private Integer relayId;
+	// 延时时间(毫秒为单位)
+	private Integer delayTime;
+	// 回路操作列表
+	private String loopNums;
+	// 开始时间
+	private Date startTime;
+	// 结束时间
+	private Date endTime;
+
+	public RelayTasks() {
+		super();
+	}
+
+	public RelayTasks(Integer weekId, Integer relayId, Integer delayTime, String loopNums, Date startTime,
+			Date endTime) {
+		super();
+		this.weekId = weekId;
+		this.relayId = relayId;
+		this.delayTime = delayTime;
+		this.startTime = startTime;
+		this.loopNums=loopNums;
+		this.endTime = endTime;
+	}
+
+	public Integer getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(Integer taskId) {
+		this.taskId = taskId;
+	}
+
+	public Integer getWeekId() {
+		return weekId;
+	}
+
+	public void setWeekId(Integer weekId) {
+		this.weekId = weekId;
+	}
+
+	public Integer getRelayId() {
+		return relayId;
+	}
+
+	public void setRelayId(Integer relayId) {
+		this.relayId = relayId;
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+
+	public Integer getDelayTime() {
+		return delayTime;
+	}
+
+	public void setDelayTime(Integer delayTime) {
+		this.delayTime = delayTime;
+	}
+
+	public String getLoopNums() {
+		return loopNums;
+	}
+
+	public void setLoopNums(String loopNums) {
+		this.loopNums = loopNums;
+	}
+
+	@Override
+	public String toString() {
+		return "RelayTasks [taskId=" + taskId + ", weekId=" + weekId + ", relayId=" + relayId + ", delayTime="
+				+ delayTime + ", loopNums=" + loopNums + ", startTime=" + startTime + ", endTime=" + endTime + "]";
+	}
+
+}

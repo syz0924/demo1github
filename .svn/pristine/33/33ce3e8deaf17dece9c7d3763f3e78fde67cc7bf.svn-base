@@ -1,0 +1,191 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.thread 
+ * @author: Administrator   
+ * @date: 2019年1月18日 下午3:15:06 
+ */
+package com.lovdmx.control.common.socket;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.lovdmx.control.common.thread.ControlAnalysisSocketThread;
+import com.lovdmx.control.common.thread.ProjectAnalysisOpCodeThread;
+import com.lovdmx.control.common.utils.SocketUtils;
+import com.lovdmx.control.httpVo.ControlClientInfoVo;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: ControlServerSocketThread.java
+ * @Description: 中控服务端
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年1月18日 下午3:15:06
+ *
+ */
+public class ControlServerSocketThread extends SocketUtils implements Runnable {
+
+	// 获取 客户端套接字socket
+	public static Socket socket = null;
+
+	// 服务端socket
+	private ServerSocket serverScoket = null;
+
+	// 端口号
+	private static final int ServerPort = 9009;
+
+	// Map中Integer 代表发送端的标识
+	// 根据key 来开启线程，所有的线程都保存到map键值对中
+	public static Map<String, ControlClientInfoVo> controlClientMap = Collections
+			.synchronizedMap(new HashMap<String, ControlClientInfoVo>());
+
+	/**
+	 * @see java.lang.Runnable#run()
+	 * @Function: ControlServerSocketThread.java
+	 * @Description: 监听中控客户端线程
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年1月18日 下午3:32:45
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年1月18日 Administrator v1.0.0 修改原因
+	 */
+	@Override
+	public void run() {
+
+		try {
+			serverScoket = new ServerSocket();
+
+			serverScoket.bind(new InetSocketAddress(ServerIP, ServerPort));
+			// 端口复用
+			serverScoket.setReuseAddress(true);
+			log.error("socket start");
+
+			while (FLAG) {
+				try {
+					// 侦听并接受到此套接字的连接。
+					socket = serverScoket.accept();
+					// 打印连接地址
+					log.error(socket.getInetAddress().getHostAddress());
+					socket.setKeepAlive(true);// 开启保持活动状态的套接字
+					// 指定超时时间
+					socket.setSoTimeout(1000 * 10);
+
+					ControlAnalysisSocketThread controlAnalysisSocketThread = new ControlAnalysisSocketThread(socket,
+							1);
+					boolean running = controlAnalysisSocketThread.isRunning();
+					if (running) {
+						// MAC 地址
+						String mac = controlAnalysisSocketThread.getMac();
+						if (!controlClientMap.containsKey(mac)) {
+
+							if (controlClientMap.size() > 0) {
+								for (Map.Entry<String, ControlClientInfoVo> entry : controlClientMap.entrySet()) {
+									// 移除
+									ControlAnalysisSocketThread controlAnalysisSocketThread2 = entry.getValue()
+											.getControlAnalysisSocketThread();
+									removeMap(entry.getKey(), controlAnalysisSocketThread2.getSocket(),
+											controlAnalysisSocketThread2.getDis(),
+											controlAnalysisSocketThread2.getDos());
+								}
+							}
+
+							// 开启心跳包线程
+							Thread t = new Thread(controlAnalysisSocketThread);
+							threadPoolTaskExecutor.execute(t);
+							// 获取 解析OpCode 业务
+							ProjectAnalysisOpCodeThread projectAnalysisOpCodeThread = projectThreadMap.get(key + "1")
+									.getProjectAnalysisOpCodeThread();
+							controlAnalysisSocketThread.setProjectAnalysisOpCodeThread(projectAnalysisOpCodeThread);
+
+							ControlClientInfoVo controlClientInfoVo = new ControlClientInfoVo(
+									controlAnalysisSocketThread);
+							// 保存客户端信息到集合中
+							controlClientMap.put(mac, controlClientInfoVo);
+						} else {
+							log.error("======>>macExits");
+							try {
+								ControlClientInfoVo controlClientInfoVo = controlClientMap.get(mac);
+								ControlAnalysisSocketThread controlAnalysisSocketThread2 = controlClientInfoVo
+										.getControlAnalysisSocketThread();
+								// 发送 紧急数据包
+								ControlAnalysisSocketThread.transmit(controlAnalysisSocketThread2, urgentDataByte);
+							} catch (Exception e) {
+								e.printStackTrace();
+							} finally {
+								// 关闭socket
+								SocketUtils.close(socket, null, null);
+							}
+						}
+
+					} else {
+						// 关闭socket
+						SocketUtils.close(socket, null, null);
+						log.error("格式错误!!!!!!!!!");
+					}
+				} catch (IOException e) {
+					log.error("ioe", e);
+				} catch (Exception e) {
+					e.printStackTrace();
+					log.error("Exc", e);
+				}
+
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @Function: SocketThread.java
+	 * @Description: 删除线程
+	 *
+	 * @param: uid
+	 *             设备UID
+	 * @return: void
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年1月16日 下午5:28:56
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年1月16日 Administrator v1.0.0 修改原因
+	 */
+	public static void removeMap(String mac, Socket socket, DataInputStream dis, DataOutputStream dos) {
+		// 判断当前编号是否存在
+		ControlClientInfoVo controlClientInfoVo = controlClientMap.get(mac);
+		if (controlClientInfoVo != null) {
+
+			// 中断线程。
+			controlClientInfoVo.getControlAnalysisSocketThread().setOK(false);
+
+			// 关闭流
+			SocketUtils.close(socket, dis, dos);
+			// 移除
+			controlClientMap.remove(mac);
+			log.error("remove succeed mac===>>>" + mac);
+		}
+	}
+
+}

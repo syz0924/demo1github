@@ -1,0 +1,27 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.ErrMapper;
+import com.lovdmx.control.pojo.Err;
+import com.lovdmx.control.service.ErrService;
+
+@Service("errService")
+public class ErrServiceImpl extends BaseServiceImpl<Err> implements ErrService {
+
+	@Autowired
+	private ErrMapper errMapper;
+
+	@Override
+	public Integer batchInsert(List<Err> list) {
+		return errMapper.batchInsert(list);
+	}
+
+	@Override
+	public List<Err> findAlarmDataByDeviceType(String deviceType) {
+		return errMapper.findAlarmDataByDeviceType(deviceType);
+	}
+}

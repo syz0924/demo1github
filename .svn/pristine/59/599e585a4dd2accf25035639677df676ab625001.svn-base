@@ -1,0 +1,200 @@
+package com.lovdmx.control.common.utils;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import com.lovdmx.control.httpVo.ProjectThreadVo;
+import com.lovdmx.control.service.ErrService;
+import com.lovdmx.control.service.LogService;
+import com.lovdmx.control.service.ProjectService;
+import com.lovdmx.control.service.RackDeviceService;
+import com.lovdmx.control.service.TasksService;
+import com.lovdmx.control.service.UploadEdlmxService;
+import com.lovdmx.control.service.UploadVideosService;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: UtilThread.java
+ * @Description: Socket 公共类
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年1月18日 下午5:21:35
+ *
+ */
+public class SocketUtils {
+	// 日志
+	public static Log log = LogFactory.getLog(SocketUtils.class);
+	// 包头
+	public static byte[] headByte = new byte[9];
+	// 包尾
+	public static byte[] endByte = new byte[2];
+	// 紧急数据包
+	public static byte[] urgentDataByte = new byte[1];
+	// 线程池
+	public static ThreadPoolTaskExecutor threadPoolTaskExecutor;
+	// 项目业务层
+	public static ProjectService projectService;
+	// 已上传视频业务层
+	public static UploadVideosService uploadVideosService;
+	// 已上传灯光业务层
+	public static UploadEdlmxService uploadEdlmxService;
+	// 上传的定时任务 业务层
+	public static TasksService tasksService;
+	// 异常报警 业务层
+	public static ErrService errService;
+	// 机架 业务层
+	public static RackDeviceService rackDeviceService;
+	// 日志 业务层
+	public static LogService logService;
+	// 项目key
+	public static final String key = "LOVDMX";
+
+	// 根据key获取 项目中的公共线程
+	public static Map<String, ProjectThreadVo> projectThreadMap = Collections
+			.synchronizedMap(new HashMap<String, ProjectThreadVo>());
+
+	// IP
+	public static final String ServerIP = "192.168.100.100";
+
+	// 端口号
+	public static final int ServerPort = 9009;
+
+	// 状态
+	public static final boolean FLAG = true;
+
+	public SocketUtils() {
+	}
+
+	// 初始化 包头包尾
+	static {
+		// 包头
+		headByte[0] = 'C';
+		headByte[1] = 'C';
+		headByte[2] = 'S';
+		// OpCode
+		headByte[3] = 0x00;
+		headByte[4] = 0x00;
+		// 内容长度
+		headByte[5] = 0x00;
+		headByte[6] = 0x00;
+		// 校验码
+		headByte[7] = 0x00;
+		headByte[8] = 0x00;
+
+		// 包尾
+		endByte[0] = 0x0D; // /r回车
+		endByte[1] = 0x0A; // /n换行
+
+		// 紧急数据包
+		urgentDataByte[0] = 0x00;
+	}
+
+	// 初始化业务层 对象
+	public static void setInitServiceObject(ThreadPoolTaskExecutor threadPoolTaskExecutor,
+			ProjectService projectService, UploadVideosService uploadVideosService,
+			UploadEdlmxService uploadEdlmxService, LogService logService, ErrService errService,
+			RackDeviceService rackDeviceService, TasksService tasksService) {
+		SocketUtils.threadPoolTaskExecutor = threadPoolTaskExecutor;
+		SocketUtils.projectService = projectService;
+		SocketUtils.uploadVideosService = uploadVideosService;
+		SocketUtils.uploadEdlmxService = uploadEdlmxService;
+		SocketUtils.logService = logService;
+		SocketUtils.errService = errService;
+		SocketUtils.rackDeviceService = rackDeviceService;
+		SocketUtils.tasksService = tasksService;
+	}
+
+	/**
+	 * 
+	 * @Function: ClientServiceUtils.java
+	 * @Description: 关闭流
+	 *
+	 * @param: socket
+	 *             socket对象
+	 * @param: dis
+	 *             输入流
+	 * @param: dos
+	 *             输出流
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年1月17日 下午2:42:58
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年1月17日 Administrator v1.0.0 修改原因
+	 */
+	public static void close(Socket socket, DataInputStream dis, DataOutputStream dos) {
+		try {
+			if (socket != null) {
+				// 关闭输入输出流
+				socket.shutdownInput();
+				socket.shutdownOutput();
+				socket.close();
+				socket = null;
+			}
+			if (dis != null) {
+				dis.close();
+				dis = null;
+			}
+			if (dos != null) {
+				dos.flush();
+				dos.close();
+				dos = null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("关闭流异常======>>" + e);
+		}
+	}
+
+	/**
+	 * 
+	 * @Function: ClientServiceUtils.java
+	 * @Description: 关闭流
+	 *
+	 * @param: socket
+	 *             socket对象
+	 * @param: dis
+	 *             输入流
+	 * @param: dos
+	 *             输出流
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年1月17日 下午2:42:58
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年1月17日 Administrator v1.0.0 修改原因
+	 */
+	public static void close(Socket socket) {
+		try {
+			if (socket != null) {
+				// 关闭输入输出流
+				socket.shutdownInput();
+				socket.shutdownOutput();
+				socket.close();
+				socket = null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("关闭流异常======>>" + e);
+		}
+	}
+
+}

@@ -1,0 +1,7 @@
+package com.lovdmx.control.service;
+
+import com.lovdmx.control.pojo.IntelligentGateway;
+
+public interface IntelligentGatewayService extends BaseService<IntelligentGateway> {
+
+}

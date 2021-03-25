@@ -1,0 +1,10 @@
+package com.lovdmx.control.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.pojo.UploadVideos;
+import com.lovdmx.control.service.UploadVideosService;
+
+@Service("uploadVideosService")
+public class UploadVideosServiceImpl extends BaseServiceImpl<UploadVideos> implements UploadVideosService {
+}

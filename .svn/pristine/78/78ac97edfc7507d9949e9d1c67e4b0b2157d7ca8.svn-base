@@ -1,0 +1,59 @@
+package com.lovdmx.control.vo;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: GatewayCtrVo.java
+ * @Description: 继电器控制
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年5月15日 上午10:59:15
+ *
+ */
+public class RelayCtrVo {
+
+	// 从站地址，表示哪个继电器
+	private String slaveAddr;
+	// 开回路列表
+	private String loopNums_ON;
+	// 关回路
+	private String loopNums_OFF;
+
+	public RelayCtrVo() {
+		super();
+	}
+
+	public RelayCtrVo(String slaveAddr, String loopNums_ON, String loopNums_OFF) {
+		super();
+		this.slaveAddr = slaveAddr;
+		this.loopNums_ON = loopNums_ON;
+		this.loopNums_OFF = loopNums_OFF;
+	}
+
+	public String getSlaveAddr() {
+		return slaveAddr;
+	}
+
+	public void setSlaveAddr(String slaveAddr) {
+		this.slaveAddr = slaveAddr;
+	}
+
+	public String getLoopNums_ON() {
+		return loopNums_ON;
+	}
+
+	public void setLoopNums_ON(String loopNums_ON) {
+		this.loopNums_ON = loopNums_ON;
+	}
+
+	public String getLoopNums_OFF() {
+		return loopNums_OFF;
+	}
+
+	public void setLoopNums_OFF(String loopNums_OFF) {
+		this.loopNums_OFF = loopNums_OFF;
+	}
+
+}

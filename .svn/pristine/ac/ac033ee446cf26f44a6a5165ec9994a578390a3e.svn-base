@@ -1,0 +1,80 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.vo 
+ * @author: Administrator   
+ * @date: 2019年2月18日 下午1:49:25 
+ */
+package com.lovdmx.control.vo;
+
+import java.io.Serializable;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: ProtocolParameterVo.java
+ * @Description: 协议参数
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月18日 下午1:49:25
+ *
+ */
+public class ProtocolParameterVo implements Serializable {
+	// @Fields serialVersionUID : TODO
+	private static final long serialVersionUID = 3340311869409190757L;
+	// 读取opCode(唯一标识)
+	private short opCode;
+	// 长度
+	private short length;
+	// CRC16校验码
+	private short parity;
+
+	/**
+	 * @Function: ProtocolParameterVo.java
+	 * @Description: 该函数的功能描述
+	 *
+	 * @param:参数描述
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年2月18日 下午1:56:46
+	 */
+	public ProtocolParameterVo(short opCode, short length, short parity) {
+		super();
+		this.opCode = opCode;
+		this.length = length;
+		this.parity = parity;
+	}
+
+	public void setProtocolParameterVo(short opCode, short length, short parity) {
+		this.opCode = opCode;
+		this.length = length;
+		this.parity = parity;
+	}
+
+	public short getOpCode() {
+		return opCode;
+	}
+
+	public void setOpCode(short opCode) {
+		this.opCode = opCode;
+	}
+
+	public short getLength() {
+		return length;
+	}
+
+	public void setLength(short length) {
+		this.length = length;
+	}
+
+	public short getParity() {
+		return parity;
+	}
+
+	public void setParity(short parity) {
+		this.parity = parity;
+	}
+
+}

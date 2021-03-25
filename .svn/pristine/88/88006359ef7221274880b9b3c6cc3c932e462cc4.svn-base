@@ -1,0 +1,70 @@
+package com.lovdmx.control.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.lovdmx.control.pojo.Subtasks;
+import com.lovdmx.control.vo.VideoOrLmxTaskNameVo;
+
+public interface SubtasksMapper extends BaseMapper<Subtasks> {
+
+	/**
+	 * @Function: SubtasksMapper.java
+	 * @Description: 根据父类ID获取 所有子任务信息
+	 *
+	 * @param:parentId 父类ID
+	 * @return：List<Subtasks>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月21日 下午5:36:41
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月21日 Administrator v1.0.0 修改原因
+	 */
+	List<Subtasks> findByParentId(@Param("parentId") Integer parentId);
+
+	/**
+	 * 
+	 * @Function: SubtasksMapper.java
+	 * @Description: 判断子任务名是否存在
+	 *
+	 * @param:subtaskName 子任务名
+	 * @param: projectId
+	 *             项目ID
+	 * @return：Subtasks
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月2日 下午4:00:57
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月2日 Administrator v1.0.0 修改原因
+	 */
+	Subtasks findSubtaskNameIsExitsBySubtaskName(@Param("subtaskName") String subtaskName,
+			@Param("projectId") Integer projectId);
+
+	/**
+	 * 
+	 * @Function: SubtasksMapper.java
+	 * @Description: 根据子任务id获取 视频或灯光 文件的切割名
+	 *
+	 * @param:arrayIds 数组子任务Id
+	 * @return：List<VideoOrLmxTaskNameVo>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年4月4日 下午3:48:35
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年4月4日 Administrator v1.0.0 修改原因
+	 */
+	List<VideoOrLmxTaskNameVo> findSpiltVideoOrLmxDataByIds(@Param("list") String[] arrayIds);
+}

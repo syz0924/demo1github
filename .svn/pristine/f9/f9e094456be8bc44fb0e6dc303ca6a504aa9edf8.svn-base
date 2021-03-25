@@ -1,0 +1,99 @@
+package com.lovdmx.control.common.quartz;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.lovdmx.control.common.utils.DateUtils;
+import com.lovdmx.control.common.utils.ExcelExportUtils;
+import com.lovdmx.control.common.utils.SocketUtils;
+import com.lovdmx.control.httpVo.Dmx512DeviceDateVo;
+import com.lovdmx.control.httpVo.Dmx512DeviceMacVo;
+import com.lovdmx.control.httpVo.ExcelExportDmx512DeviceVo;
+import com.lovdmx.control.service.Dmx512DeviceDetailsService;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: JobExcelExportDmx512DeviceDetails.java
+ * @Description: 任务 导出Dmx512数据 到Excel 表格中
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年9月20日 下午3:08:49
+ *
+ */
+public class JobExcelExportDmx512DeviceDetails extends SocketUtils {
+
+	@Autowired
+	private Dmx512DeviceDetailsService dmx512DeviceDetailsService;
+
+	/**
+	 * 
+	 * @Function: JobExcelExportDmx512DeviceDetails.java
+	 * @Description: 导出数据到Excel 然后 删除导出的数据
+	 *
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年9月20日 下午3:24:44
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年9月20日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	public void excelExportAndDeleteDmx512Info() {
+		// 获取 今天之前的所有数据
+		List<ExcelExportDmx512DeviceVo> dataList = dmx512DeviceDetailsService
+				.findLesstodayByToday(DateUtils.currentlyStrDate(new Date()));
+		// 公共头
+		String[] commHeadList = new String[] { "项目名称", "节点名称", "RTR MAC地址" };
+		// 公共头数据
+		List<Object> commDataList = new ArrayList<Object>();
+		// sheet各个列的表头
+		String[] headList = new String[] { "创建时间", "温度", "湿度", "报警" };
+		String title = "dmx512实时状态表";
+		// 创建一个Excel文件
+		HSSFWorkbook wb = new HSSFWorkbook();
+		// 遍历所有RTR
+		for (ExcelExportDmx512DeviceVo excelExportDmx512DeviceVo : dataList) {
+			// 清空公共头数据
+			commDataList.clear();
+			// 赋值公共数据
+			commDataList.add(excelExportDmx512DeviceVo.getProjectName());
+			commDataList.add(excelExportDmx512DeviceVo.getRackName());
+			commDataList.add(excelExportDmx512DeviceVo.getRtrMac());
+			// 遍历Dmx512日期
+			for (Dmx512DeviceDateVo dmx512DeviceDateVo : excelExportDmx512DeviceVo.getDmx512DateList()) {
+				// 初始化构造函数
+				ExcelExportUtils excelExportUtils = new ExcelExportUtils(wb, commHeadList, commDataList, headList);
+				// 初始化 excel 字体样式
+				excelExportUtils.initCellStyle();
+				// 遍历当前下的Dmx512信息
+				for (Dmx512DeviceMacVo dmx512DeviceMacVo : dmx512DeviceDateVo.getDmx512MacList()) {
+					// 创建工作目录
+					excelExportUtils.createSheet(dmx512DeviceMacVo.getDmx512Mac(), title,
+							dmx512DeviceMacVo.getDmx512DeviceDetailsVoList());
+				}
+				// 写入
+				excelExportUtils.write(
+						SocketUtils.basePath + File.separator + "export" + File.separator
+								+ excelExportDmx512DeviceVo.getProjectName() + File.separator
+								+ excelExportDmx512DeviceVo.getRackName() + File.separator + "excel",
+						dmx512DeviceDateVo.getDmx512Date() + ".xls");
+			}
+		}
+		// 关闭
+		ExcelExportUtils.close(wb);
+
+		// 删除 今天之前的所有数据
+		dmx512DeviceDetailsService.deleteLesstodayByToday(DateUtils.currentlyStrDate(new Date()));
+	}
+
+}

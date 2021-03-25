@@ -1,0 +1,6 @@
+package com.lovdmx.control.service;
+
+import com.lovdmx.control.pojo.SpriteTasks;
+
+public interface SpriteTasksService extends BaseService<SpriteTasks>{
+}

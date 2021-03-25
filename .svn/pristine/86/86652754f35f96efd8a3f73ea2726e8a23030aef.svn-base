@@ -1,0 +1,30 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.IntelligentGatewayMapper;
+import com.lovdmx.control.pojo.IntelligentGateway;
+import com.lovdmx.control.service.IntelligentGatewayService;
+
+@Service("intelligentGatewayService")
+public class IntelligentGatewayServiceImpl extends BaseServiceImpl<IntelligentGateway>
+		implements IntelligentGatewayService {
+
+	@Autowired
+	private IntelligentGatewayMapper intelligentGatewayMapper;
+
+	@Override
+	public List<IntelligentGateway> findRackJoinIntelligentGatewayByProjectId(Integer projectId) {
+		return intelligentGatewayMapper.findRackJoinIntelligentGatewayByProjectId(projectId);
+	}
+
+	@Override
+	public Integer updateByMac(IntelligentGateway intelligentGateway) {
+		// TODO Auto-generated method stub
+		return intelligentGatewayMapper.updateByMac(intelligentGateway);
+	}
+
+}

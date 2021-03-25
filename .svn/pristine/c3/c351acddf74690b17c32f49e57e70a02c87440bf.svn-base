@@ -1,0 +1,496 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.controller.head 
+ * @author: syz  
+ * @date: 2019年2月21日 下午5:32:48 
+ */
+package com.lovdmx.control.controller.head;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.socket.SpriteServerSocketThread;
+import com.lovdmx.control.common.thread.RTRAnalysisSocketThread;
+import com.lovdmx.control.common.thread.SpriteAnalysisSocketThread;
+import com.lovdmx.control.common.utils.OnLineClientUtils;
+import com.lovdmx.control.common.utils.PageageUtils;
+import com.lovdmx.control.common.utils.ResponseUtils;
+import com.lovdmx.control.common.utils.SocketUtils;
+import com.lovdmx.control.controller.BaseController;
+import com.lovdmx.control.httpVo.FilePathVo;
+import com.lovdmx.control.httpVo.RTRDeviceInfoVo;
+import com.lovdmx.control.httpVo.SplitFileVo;
+import com.lovdmx.control.httpVo.SpriteDeviceInfoVo;
+import com.lovdmx.control.pojo.Subtasks;
+import com.lovdmx.control.pojo.Tasks;
+import com.lovdmx.control.pojo.UploadEdlmx;
+import com.lovdmx.control.pojo.UploadVideos;
+import com.lovdmx.control.service.RackDeviceService;
+import com.lovdmx.control.service.RtrDeviceService;
+import com.lovdmx.control.service.SpriteDeviceService;
+import com.lovdmx.control.service.SubtasksService;
+import com.lovdmx.control.service.TasksService;
+import com.lovdmx.control.service.UploadEdlmxService;
+import com.lovdmx.control.service.UploadVideosService;
+import com.lovdmx.control.service.VideoSpiltService;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: ControlServerController.java
+ * @Description: 中控服务端控制器
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月21日 下午5:32:48
+ *
+ */
+@RequestMapping("/controlServer/")
+@CrossOrigin
+@Controller
+public class ControlServerController extends BaseController {
+
+	@Autowired
+	private SubtasksService subtasksService; // 子任务
+
+	@Autowired
+	private TasksService tasksService; // 定时任务
+
+	@Autowired
+	private UploadVideosService uploadVideosService; // 已上传视频
+
+	@Autowired
+	private UploadEdlmxService uploadEdlmxService; // 已上传灯光文件
+
+	@Autowired
+	private RackDeviceService rackDeviceService; // 机架
+
+	@Autowired
+	private SpriteDeviceService spriteDeviceService; // 录放精灵设备
+
+	@Autowired
+	private RtrDeviceService rtrDeviceService; // RTR服务器
+
+	@Autowired
+	private VideoSpiltService videoSpiltService; // 视频切割
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 获取 定时任务列表信息
+	 *
+	 * @param:projectId 项目ID
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @throws Exception
+	 * @date: 2019年3月5日 上午9:40:34
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月5日 Administrator v1.0.0 修改原因
+	 */
+	@RequestMapping(value = "index", method = RequestMethod.GET)
+	public void index(Integer projectId, String mac, HttpServletResponse response) throws Exception {
+		JSONObject jsonObject = new JSONObject();
+		String result = "";
+		// 根据MAC地址获取设备信息
+		SpriteDeviceInfoVo spriteAnalysisAndRealTimeDataVo = SpriteServerSocketThread.spriteDeviceMap.get(mac);
+		// 判断是否在线
+		if (spriteAnalysisAndRealTimeDataVo == null) {
+			result = "未在线";
+		} else {
+
+			// 组装数据
+			byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1021, null);
+			// 发送
+			SpriteAnalysisSocketThread.transmit(spriteAnalysisAndRealTimeDataVo.getSpriteAnalysisSocketThread(),
+					dataBytes);
+
+			// 所有定时任务
+			List<Tasks> tasksList = tasksService.findByParentId(projectId);
+			// 所有子任务
+			List<Subtasks> subtasksList = subtasksService.findByParentId(projectId);
+			jsonObject.put("tasksList", tasksList);
+			jsonObject.put("subtasksList", subtasksList);
+			jsonObject.put("directoryList", SpriteServerSocketThread.getDirectoryListData());
+			result = "在线";
+		}
+		jsonObject.put("result", result);
+		ResponseUtils.renderText(response, jsonObject.toJSONString());
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 添加子任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月22日 下午4:22:34
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月22日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "addSubtask", method = RequestMethod.GET)
+	public String addSubtask(Subtasks subtask) {
+		// 判断是灯光文件还是视频文件
+		if (subtask.getEnumFileType().getKey() == 0) {
+			// 根据md5值查询 灯光是否存在
+			UploadEdlmx uploadEdlmx = uploadEdlmxService.findByMd5(subtask.getMd5());
+			// 灯光文件存在状态改为1（上传）,路径改为 上传的路径
+			if (uploadEdlmx != null) {
+				subtask.setRtrLoaded((short) 1);
+				subtask.setFilePath(uploadEdlmx.getFilePath());
+			}
+		} else {
+			// 根据md5值查询 视频是否存在
+			UploadVideos uploadVideo = uploadVideosService.findByMd5(subtask.getMd5());
+			// 视频文件存在状态改为1（上传）,路径改为 上传的路径
+			if (uploadVideo != null) {
+				subtask.setRtrLoaded((short) 1);
+				subtask.setFilePath(uploadVideo.getFilePath());
+			}
+		}
+		// 创建时间
+		subtask.setCreateTime(new Date());
+		// 保存
+		Integer num = subtasksService.save(subtask);
+		// 反馈客户端状态
+		return num == 0 ? "false" : "true";
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: (主)录放精灵上传文件
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月2日 下午5:24:35
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月2日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("uploadSpriteFile")
+	public String uploadSpriteFile(String dataJson) throws Exception {
+
+		String result = "";
+		JSONObject json = (JSONObject) JSON.parse(dataJson);
+		// 获取MAC
+		String mac = (String) json.get("mac");
+		// 文件类型
+		Integer fileType = (Integer) json.get("fileType");
+		// 文件 md5值
+		String md5 = (String) json.get("md5");
+
+		SpriteDeviceInfoVo spriteDeviceInfo = OnLineClientUtils.getSpriteClientInfo(mac);
+		// 判断是否在线
+		if (spriteDeviceInfo != null) {
+
+			boolean uploadStatus = false;
+			if (fileType == 0) {
+				UploadVideos uploadVideo = uploadVideosService.findByMd5(md5);
+				uploadStatus = uploadVideo == null ? true : false;
+			} else {
+				UploadEdlmx uploadEdlmx = uploadEdlmxService.findByMd5(md5);
+				uploadStatus = uploadEdlmx == null ? true : false;
+			}
+			// 判断是否存在
+			if (uploadStatus) {
+				// 获取UUID
+				String uuid = UUID.randomUUID().toString();
+				json.put("uuid", uuid);
+				// 添加ProjectAnalysisOpCodeThread对象的map中
+				SocketUtils.projectThreadMap.get(SocketUtils.key + "1").getProjectAnalysisOpCodeThread()
+						.addMapInfo(uuid, json);
+				// 组装发送客户端json
+				JSONObject sendClientJson = new JSONObject();
+				sendClientJson.put("filePath", json.get("filePath"));
+				sendClientJson.put("uuid", json.get("uuid"));
+				// 组装数据
+				byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1025, sendClientJson.toJSONString());
+				// 发送
+				SpriteAnalysisSocketThread.transmit(spriteDeviceInfo.getSpriteAnalysisSocketThread(), dataBytes);
+				result = "上传中";
+			} else {
+				result = "已存在";
+			}
+		} else {
+			result = "未在线";
+		}
+
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 切割指定视频
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月21日 上午10:13:09
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月21日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("sendVideoSplit")
+	public String sendVideoSplit(String data) throws Exception {
+		String result = "";
+		JSONObject json = (JSONObject) JSON.parse(data);
+		// 获取MAC
+		String mac = (String) json.get("mac");
+		// 项目ID
+		Integer projectId = (Integer) json.get("projectId");
+		// 上传视频ID（逗号隔开）
+		String ids = (String) json.get("Ids");
+		// 判断是否在线
+		RTRDeviceInfoVo rtrClientInfo = OnLineClientUtils.getRTRClientInfo(mac);
+		if (rtrClientInfo != null) {
+			// 分割为数组ID
+			String[] arrayId = ids.split(",");
+			// 所有机架ID(逗号隔开)
+			String cabinetNums = rackDeviceService.findGroupCounatRackIdByParojectId(projectId);
+			// 根据数组id 获取为切割的视频数据
+			List<UploadVideos> uploadVideosList = uploadVideosService.findNotSpiltByIds(arrayId);
+			List<FilePathVo> filePathList = new ArrayList<FilePathVo>();
+			// 遍历组装
+			for (UploadVideos uploadVideo : uploadVideosList) {
+				FilePathVo filePath = new FilePathVo(uploadVideo.getFilePath(), uploadVideo.getMd5());
+				filePathList.add(filePath);
+			}
+			SplitFileVo splitFile = new SplitFileVo(cabinetNums, filePathList);
+			// 转成JSON格式数据
+			net.sf.json.JSONObject dataJson = net.sf.json.JSONObject.fromObject(splitFile);
+			// 获取UUID
+			String uuid = UUID.randomUUID().toString();
+			dataJson.put("uuid", uuid);
+
+			// 添加ProjectAnalysisOpCodeThread对象的map中
+			SocketUtils.projectThreadMap.get(SocketUtils.key + "1").getProjectAnalysisOpCodeThread().addMapInfo(uuid,
+					json);
+
+			// 组装数据
+			byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1021, dataJson.toString());
+			// 发送数据
+			RTRAnalysisSocketThread.transmit(rtrClientInfo.getRtrAnalysisSocketThread(), dataBytes);
+			// 判断是否有以分割的数据
+			// if (arrayId.length > uploadVideosList.size()) {
+			// List<UploadVideos> uploadVideosList1 =
+			// uploadVideosService.findSpiltByIds(arrayId);
+			// }
+		} else {
+			result = "未在线";
+		}
+
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 切割指定灯光
+	 *
+	 * @param:
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月21日 上午10:13:52
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月21日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("sendEdlmxSplit")
+	public String sendEdlmxSplit(String data) throws Exception {
+		String result = "";
+		JSONObject json = (JSONObject) JSON.parse(data);
+		// 获取MAC
+		String mac = (String) json.get("mac");
+		// 项目ID
+		Integer projectId = (Integer) json.get("projectId");
+		// 上传视频ID（逗号隔开）
+		String ids = (String) json.get("Ids");
+		// 判断是否在线
+		RTRDeviceInfoVo rtrClientInfo = OnLineClientUtils.getRTRClientInfo(mac);
+		if (rtrClientInfo != null) {
+			// 分割为数组ID
+			String[] arrayId = ids.split(",");
+			// 所有机架ID(逗号隔开)
+			String cabinetNums = rackDeviceService.findGroupCounatRackIdByParojectId(projectId);
+			// 根据数组id 获取为切割的视频数据
+			List<UploadEdlmx> uploadEdlmxList = uploadEdlmxService.findNotSpiltByIds(arrayId);
+			List<FilePathVo> filePathList = new ArrayList<FilePathVo>();
+			// 遍历组装
+			for (UploadEdlmx uploadEdlmx : uploadEdlmxList) {
+				FilePathVo filePath = new FilePathVo(uploadEdlmx.getFilePath(), uploadEdlmx.getMd5());
+				filePathList.add(filePath);
+			}
+			SplitFileVo splitFile = new SplitFileVo(cabinetNums, filePathList);
+			// 转成JSON格式数据
+			net.sf.json.JSONObject dataJson = net.sf.json.JSONObject.fromObject(splitFile);
+			// 获取UUID
+			String uuid = UUID.randomUUID().toString();
+			dataJson.put("uuid", uuid);
+			// 添加ProjectAnalysisOpCodeThread对象的map中
+			SocketUtils.projectThreadMap.get(SocketUtils.key + "1").getProjectAnalysisOpCodeThread().addMapInfo(uuid,
+					json);
+			// 组装数据
+			byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1021, dataJson.toString());
+			// 发送数据
+			RTRAnalysisSocketThread.transmit(rtrClientInfo.getRtrAnalysisSocketThread(), dataBytes);
+			// 判断是否有以分割的数据
+			// if (arrayId.length > uploadEdlmxList.size()) {
+			// List<UploadEdlmx> uploadEdlmxList1 =
+			// uploadEdlmxService.findSpiltByIds(arrayId);
+			// }
+		} else {
+			result = "未在线";
+		}
+
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 添加定时任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月21日 上午10:11:43
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月21日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("addTimedTask")
+	public String addTimedTask(String dataJson) {
+		String result = "";
+		JSONObject json = (JSONObject) JSON.parse(dataJson);
+		// 获取MAC
+		String mac = (String) json.get("mac");
+		RTRDeviceInfoVo rtrClientInfo = OnLineClientUtils.getRTRClientInfo(mac);
+		if (rtrClientInfo != null) {
+
+		} else {
+			result = "未在线";
+		}
+
+		return null;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 发送暂停任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月21日 上午10:45:01
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月21日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("sendPauseTask")
+	public String sendPauseTask(String mac, Integer projectId) throws Exception {
+		String result = "";
+		// 获取MAC
+		RTRDeviceInfoVo rtrClientInfo = OnLineClientUtils.getRTRClientInfo(mac);
+		if (rtrClientInfo != null) {
+			// 组装数据
+			byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1004, null);
+			// 发送数据
+			RTRAnalysisSocketThread.transmit(rtrClientInfo.getRtrAnalysisSocketThread(), dataBytes);
+			result = "发送成功";
+		} else {
+			result = "未在线";
+		}
+		return result;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 发送恢复任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月21日 上午10:45:01
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月21日 Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping("sendRestoreTask")
+	public String sendRestoreTask(String mac, Integer projectId) throws Exception {
+		String result = "";
+		// 获取MAC
+		RTRDeviceInfoVo rtrClientInfo = OnLineClientUtils.getRTRClientInfo(mac);
+		if (rtrClientInfo != null) {
+			// 组装数据
+			byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1005, null);
+			// 发送数据
+			RTRAnalysisSocketThread.transmit(rtrClientInfo.getRtrAnalysisSocketThread(), dataBytes);
+			result = "发送成功";
+		} else {
+			result = "未在线";
+		}
+		return result;
+	}
+}

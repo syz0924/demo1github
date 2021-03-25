@@ -1,0 +1,3043 @@
+$(function(){
+	//添加后端用户
+    $("body").on("click","#manage-add",function(){
+
+    	var pupop_html="";
+
+    	//组装添加用户
+    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:510px;height:460px;' >";
+			pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加管理员</div>";
+			pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:410px'>";
+				pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					pupop_html +="<input type='hidden' name='lgnName' value=''>";
+					pupop_html +="<div class='lovdmx-form-item '>";
+						pupop_html +="<label class='lovdmx-form-lable'>登录名</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='loginName' placeholder='请输入用户名' class='lovdmx-input'></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item '>";
+						pupop_html +="<label class='lovdmx-form-lable'>密码</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='password' name='password' placeholder='请输入用户名' class='lovdmx-input'></div>";
+						pupop_html +="<div class='lovdmx-form-mid lovdmx-word-aux'>6到16个字符</div>"
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item '>";
+						pupop_html +="<label class='lovdmx-form-lable'>昵称</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='nickName' placeholder='请输入用户名' class='lovdmx-input'></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>手机</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='phone' placeholder='请输入号码' class='lovdmx-input'></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>邮箱</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='email' placeholder='请输入邮箱' class='lovdmx-input'></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'></label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='lovdmx-submit-manage' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+			pupop_html +="</div>";
+			pupop_html +="<span class='lovdmx-setwin'></span>";
+			pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+		pupop_html +="</div>";
+
+		$("body").append(pupop_html);
+		addBackground();
+    });
+
+    //编辑后端用户
+    $("body").on("click",".manage-edit",function(){
+    	//ID
+    	var _href=$(this).attr("data-link");
+    	var pupop_html="";
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:400px;height:450px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑管理员</div>";
+					pupop_html +="<div class='lovdmx-content' style='height:400px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<input type='hidden' name='manageId' value='"+data.manageId+"'>";
+							pupop_html +="<input type='hidden' name='lgnName' value='"+data.loginName+"'>";
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>登录名</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' value='"+data.loginName+"' readonly name='loginName' placeholder='请输入登录名' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>昵称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' value='"+data.nickName+"' name='nickName' placeholder='请输入昵称' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>手机</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' value='"+data.phone+"' name='phone' placeholder='请输入号码' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>邮箱</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' value='"+data.email+"' name='email' placeholder='请输入邮箱' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='lovdmx-update-manage' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				$("body").append(pupop_html);
+				addBackground();
+		    }
+		});
+
+    });
+    
+    
+  //添加前端管理员
+    $("body").on("click","#account-add",function(){
+    	//路径
+    	var _href=$(this).attr("data-link");
+    	var pupop_html="";
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	//账号
+		    	var account=data.account;
+		    	//项目
+		    	var projectList=data.projectList;
+		    	//角色
+		    	var roleList=data.roleList;
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:520px;height:520px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加前段管理员</div>";
+					pupop_html +="<div class='lovdmx-content' style='height:470px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>登录名</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='userName' placeholder='请输入登录名' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>昵称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='nickName' placeholder='请输入昵称' value class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>密码</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='password' name='password' placeholder='请输入密码' class='lovdmx-input'></div>";
+								pupop_html +="<div class='lovdmx-form-mid lovdmx-word-aux'>6到16个数字或字符</div>"
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>角色分类</label>";
+								pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+									pupop_html +="<div class='lovdmx-select-title'>";
+										pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='role' data-value='"+roleList[1].roleId+"' readonly value='"+roleList[1].roleName+"' placeholder='请选择' />";
+										pupop_html +="<span class='lovdmx-edge'></span>";
+									pupop_html +="</div>";
+										pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+										//遍历分类
+										$.each(roleList,function(i,role){
+											if(i==1){
+												pupop_html +="<dd data-value='"+role.roleId+"' class='lovdmx-this' >"+role.roleName+"</dd>";
+											}else{
+												pupop_html +="<dd data-value='"+role.roleId+"'>"+role.roleName+"</dd>";
+											}
+										});
+									pupop_html +="</dl>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>项目分类</label>";
+								pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+									pupop_html +="<div class='lovdmx-select-title'>";
+										pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='project' data-value='"+projectList[0].projectId+"' readonly value='"+projectList[0].projectName+"' placeholder='请选择' />";
+										pupop_html +="<span class='lovdmx-edge'></span>";
+									pupop_html +="</div>";
+										pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+										//遍历分类
+										$.each(projectList,function(i,project){
+											if(i==0){
+												pupop_html +="<dd data-value='"+project.projectId+"' class='lovdmx-this' >"+project.projectName+"</dd>";
+											}else{
+												pupop_html +="<dd data-value='"+project.projectId+"'>"+project.projectName+"</dd>";
+											}
+										});
+									pupop_html +="</dl>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>启用状态</label>";
+								pupop_html +="<div class='lovdmx-input-block'>";
+									pupop_html +="<input type='checkbox' lay-filter='switch' lay-verify='required' name='status' checked='checked' lay-skin='switch' lay-text='ON|OFF'>";
+									pupop_html +="<div class='lovdmx-unselect lovdmx-form-switch lovdmx-form-onswitch'><em>ON</em><i></i></div>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='lovdmx-submit-account' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				$("body").append(pupop_html);
+				addBackground();
+		    }
+		});
+
+    });
+    
+    //编辑前端管理员
+    $("body").on("click",".account-edit",function(){
+    	//路径
+    	var _href=$(this).attr("data-link");
+    	var pupop_html="";
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	//账号
+		    	var account=data.account;
+		    	//项目
+		    	var projectList=data.projectList;
+		    	//角色
+		    	var roleList=data.roleList;
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:400px;height:450px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑管理员</div>";
+					pupop_html +="<div class='lovdmx-content' style='height:400px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<input type='hidden' name='accountId' value='"+account.accountId+"'>";
+							pupop_html +="<input type='hidden' name='usName' value='"+account.userName+"'>";
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>登录名</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' value='"+account.userName+"' readonly name='userName' placeholder='请输入登录名' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>昵称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' value='"+account.nickName+"' name='nickName' placeholder='请输入昵称' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>角色分类</label>";
+								pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+									pupop_html +="<div class='lovdmx-select-title'>";
+										pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='role' data-value='"+account.roleId+"' readonly value='"+account.roleName+"' placeholder='请选择' />";
+										pupop_html +="<span class='lovdmx-edge'></span>";
+									pupop_html +="</div>";
+									if(account.roleId!=1){
+										pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+										//遍历分类
+										$.each(roleList,function(i,role){
+											if(roleList.roleId==account.roleId){
+												pupop_html +="<dd data-value='"+role.roleId+"' class='lovdmx-this' >"+role.roleName+"</dd>";
+											}else{
+												pupop_html +="<dd data-value='"+role.roleId+"'>"+role.roleName+"</dd>";
+											}
+										});
+									}
+									pupop_html +="</dl>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>项目分类</label>";
+								pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+									pupop_html +="<div class='lovdmx-select-title'>";
+										pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='project' data-value='"+account.projectId+"' readonly value='"+account.projectName+"' placeholder='请选择' />";
+										pupop_html +="<span class='lovdmx-edge'></span>";
+									pupop_html +="</div>";
+									if(account.roleId!=1){
+										pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+										//遍历分类
+										$.each(projectList,function(i,project){
+											if(project.projectId==account.projectId){
+												pupop_html +="<dd data-value='"+project.projectId+"' class='lovdmx-this' >"+project.projectName+"</dd>";
+											}else{
+												pupop_html +="<dd data-value='"+project.projectId+"'>"+project.projectName+"</dd>";
+											}
+										});
+									}
+									pupop_html +="</dl>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+							
+							var stick_class="";
+							var _checked="";
+							
+							if(account.status==1){
+								stick_class="lovdmx-form-onswitch";
+								_checked="checked";
+							}
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>启用状态</label>";
+								pupop_html +="<div class='lovdmx-input-block'>";
+									pupop_html +="<input type='checkbox' lay-filter='switch' lay-verify='required' name='status' "+_checked+" lay-skin='switch' lay-text='ON|OFF'>";
+									pupop_html +="<div class='lovdmx-unselect lovdmx-form-switch "+stick_class+"'><em>OFF</em><i></i></div>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='lovdmx-update-account' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				$("body").append(pupop_html);
+				addBackground();
+		    }
+		});
+
+    });
+    
+    
+    
+    
+$("body").on("click","#project-add",function(){
+    	
+    	var pupop_html="";
+    	//组装添加用户
+    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:440px;height:240px;' >";
+			pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加项目</div>";
+			pupop_html +="<div class='lovdmx-content' id='lovdmx-add-project'style='height:190px'>";
+				pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+				
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>项目名</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='projectName' placeholder='请输入项目名' class='lovdmx-input'></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'></label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-project' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+			pupop_html +="</div>";
+			pupop_html +="<span class='lovdmx-setwin'></span>";
+			pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+		pupop_html +="</div>";
+		addBackground();
+		$("body").append(pupop_html);
+    });
+    
+$("body").on("click",".project-edit",function(){
+	
+	//ID
+	var _href=$(this).attr("data-link");
+	var pupop_html="";
+	$.ajax({
+	    type: "GET",
+	    url: _href,
+	    success: function(data){
+	    	//项目信息
+	    	var project=data.project;
+	    	//组装添加用户
+	    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:400px;height:240px;' >";
+				pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑项目</div>";
+				pupop_html +="<div class='lovdmx-content' id='lovdmx-edit-project' style='height:190px'>";
+					pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+						pupop_html +="<input type='hidden' name='projectId' value='"+project.projectId+"' >";
+						pupop_html +="<input type='hidden' name='pjName' value='"+project.projectName+"'>";
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'>项目名</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='projectName' value='"+project.projectName+"' placeholder='请输入项目名' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'></label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-project' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+				pupop_html +="<span class='lovdmx-setwin'></span>";
+				pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+				pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+			pupop_html +="</div>";
+			addBackground();
+			$("body").append(pupop_html);
+	    }
+	});
+});
+    
+    
+
+
+
+
+
+//添加设备机柜
+$("body").on("click","#rackDevice-add",function(){
+	//路径
+	var _href=$(this).attr("data-link");
+	var pupop_html="";
+	$.ajax({
+	    type: "GET",
+	    url: _href,
+	    success: function(data){
+	    	//项目
+	    	var projectList=data.projectList;
+	    	//组装添加用户
+	    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:420px;height:650px;' >";
+				pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加设备机柜</div>";
+				pupop_html +="<div class='lovdmx-content' style='height:600px'>";
+					pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'>项目分类</label>";
+							pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+								pupop_html +="<div class='lovdmx-select-title'>";
+									pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='project' data-value='"+projectList[0].projectId+"' readonly value='"+projectList[0].projectName+"' placeholder='请选择' />";
+									pupop_html +="<span class='lovdmx-edge'></span>";
+								pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//遍历分类
+									$.each(projectList,function(i,project){
+										if(i==0){
+											pupop_html +="<dd data-value='"+project.projectId+"' class='lovdmx-this' >"+project.projectName+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+project.projectId+"'>"+project.projectName+"</dd>";
+										}
+									});
+								pupop_html +="</dl>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>机柜名称</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='rackName' placeholder='请输入机柜名称' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>机柜编号</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='rackIndex' placeholder='请输入机柜编号' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>视频切割起点x</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='splitVideoX' placeholder='请输入视频切割起点x' value='0' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>视频切割起点y</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='splitVideoY' placeholder='请输入视频切割起点y' value='0' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>视频切割width</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='splitVideoWidth' placeholder='请输入视频切割width' value='0' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>视频切割height</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='splitVideoHeight' placeholder='请输入视频切割height' value='0' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>经度(小数点)</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='rackLongitude' placeholder='请输入经度' value class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>纬度(小数点)</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='rackLatitude' placeholder='请输入纬度' value class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'></label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-rackDevice' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+				pupop_html +="<span class='lovdmx-setwin'></span>";
+				pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+				pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+			pupop_html +="</div>";
+			$("body").append(pupop_html);
+			addBackground();
+	    }
+	});
+
+});
+
+//添加设备机柜
+$("body").on("click",".rackDevice-edit",function(){
+	//路径
+	var _href=$(this).attr("data-link");
+	var pupop_html="";
+	$.ajax({
+	    type: "GET",
+	    url: _href,
+	    success: function(data){
+	    	//账号
+	    	var rackDevice=data.rackDevice;
+	    	//项目
+	    	var projectList=data.projectList;
+	    	//组装添加用户
+	    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:420px;height:650px;' >";
+				pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>修改设备机柜</div>";
+				pupop_html +="<div class='lovdmx-content' style='height:600px'>";
+					pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					pupop_html +="<input type='hidden' name='rackId' value='"+rackDevice.rackId+"' >";
+					pupop_html +="<input type='hidden' name='beforeRackName' value='"+rackDevice.rackName+"' >";
+					pupop_html +="<input type='hidden' name='beforeRackIndex' value='"+rackDevice.rackIndex+"' >";
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'>项目分类</label>";
+							pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+								pupop_html +="<div class='lovdmx-select-title'>";
+									pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='project' data-value='"+rackDevice.projectId+"' readonly value='"+rackDevice.projectName+"' placeholder='请选择' />";
+									pupop_html +="<span class='lovdmx-edge'></span>";
+								pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//遍历分类
+									$.each(projectList,function(i,project){
+										if(project.projectId==rackDevice.projectId){
+											pupop_html +="<dd data-value='"+project.projectId+"' class='lovdmx-this' >"+project.projectName+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+project.projectId+"'>"+project.projectName+"</dd>";
+										}
+									});
+								pupop_html +="</dl>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>机柜名称</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='rackName' placeholder='请输入机柜名称' value='"+rackDevice.rackName+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>机柜编号</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='rackIndex' placeholder='请输入机柜编号' value='"+rackDevice.rackIndex+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>视频切割起点x</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='splitVideoX' placeholder='请输入视频切割起点x' value='"+rackDevice.splitVideoX+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>视频切割起点y</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='splitVideoY' placeholder='请输入视频切割起点y' value='"+rackDevice.splitVideoY+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>视频切割width</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='splitVideoWidth' placeholder='请输入视频切割width' value='"+rackDevice.splitVideoWidth+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>视频切割height</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='splitVideoHeight' placeholder='请输入视频切割height'  value='"+rackDevice.splitVideoHeight+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>经度(小数点)</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='rackLongitude' placeholder='请输入经度' value='"+rackDevice.rackLongitude+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>纬度(小数点)</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='rackLatitude' placeholder='请输入纬度' value='"+rackDevice.rackLatitude+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'></label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-rackDevice' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+				pupop_html +="<span class='lovdmx-setwin'></span>";
+				pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+				pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+			pupop_html +="</div>";
+			$("body").append(pupop_html);
+			addBackground();
+	    }
+	});
+
+});
+   
+//添加rtr设备
+$("body").on("click","#rtrDevice-add",function(){
+	//路径
+	var _href=$(this).attr("data-link");
+	var pupop_html="";
+	$.ajax({
+	    type: "GET",
+	    url: _href,
+	    success: function(data){
+	    	//机柜信息
+	    	var rackDeviceList=data.rackDeviceList;
+	    	//工作模式
+	    	var curModeList =data.curModeList;
+	    	//组装添加用户
+	    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:420px;height:450px;' >";
+				pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加RTR设备</div>";
+				pupop_html +="<div class='lovdmx-content' style='height:400px'>";
+					pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'>机柜分类</label>";
+							pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+								pupop_html +="<div class='lovdmx-select-title'>";
+									pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='rack' data-value='"+rackDeviceList[0].rackId+"' readonly value='"+rackDeviceList[0].rackName+"' placeholder='请选择' />";
+									pupop_html +="<span class='lovdmx-edge'></span>";
+								pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//遍历分类
+									$.each(rackDeviceList,function(i,rackDevice){
+										if(i==0){
+											pupop_html +="<dd data-value='"+rackDevice.rackId+"' class='lovdmx-this' >"+rackDevice.rackName+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+rackDevice.rackId+"'>"+rackDevice.rackName+"</dd>";
+										}
+									});
+								pupop_html +="</dl>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>RTR MAC地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='rtrMac' placeholder='请输入MAC地址' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'>工作模式</label>";
+							pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+								pupop_html +="<div class='lovdmx-select-title'>";
+									pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='curMode' data-value='1' readonly value='"+curModeList[0]+"' placeholder='请选择' />";
+									pupop_html +="<span class='lovdmx-edge'></span>";
+								pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//遍历分类
+									$.each(curModeList,function(i,curMode){
+										
+										if(i==0){
+											pupop_html +="<dd data-value='"+(i+1)+"' class='lovdmx-this' >"+curMode+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+(i+1)+"'>"+curMode+"</dd>";
+										}
+									});
+								pupop_html +="</dl>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>ip地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='ip' placeholder='请输入ip地址' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>设备模型尺寸</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='modelSize' placeholder='请输入设备模型尺寸'  class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'></label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-rtrDevice' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+				pupop_html +="<span class='lovdmx-setwin'></span>";
+				pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+				pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+			pupop_html +="</div>";
+			$("body").append(pupop_html);
+			addBackground();
+	    }
+	});
+
+});
+
+//编辑rtr设备
+$("body").on("click",".rtrDevice-edit",function(){
+	//路径
+	var _href=$(this).attr("data-link");
+	var pupop_html="";
+	$.ajax({
+	    type: "GET",
+	    url: _href,
+	    success: function(data){
+	    	//RTR设备信息
+	    	var rtrDevice=data.rtrDevice;
+	    	//机柜信息
+	    	var rackDeviceList=data.rackDeviceList;
+	    	//工作模式
+	    	var curModeList =data.curModeList;
+	    	console.log(rtrDevice);
+	    	console.log(rtrDevice.modelSize)
+	    	//组装添加用户
+	    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:420px;height:450px;' >";
+				pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑RTR设备</div>";
+				pupop_html +="<div class='lovdmx-content' style='height:400px'>";
+					pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+						pupop_html +="<input type='hidden' name='rtrId' value='"+rtrDevice.rtrId+"'/>";
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'>机柜分类</label>";
+							pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+								pupop_html +="<div class='lovdmx-select-title'>";
+									pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='rack' data-value='"+rtrDevice.rackId+"' readonly value='"+rtrDevice.rackName+"' placeholder='请选择' />";
+									pupop_html +="<span class='lovdmx-edge'></span>";
+								pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//遍历分类
+									$.each(rackDeviceList,function(i,rackDevice){
+										if(i==rtrDevice.rackId){
+											pupop_html +="<dd data-value='"+rackDevice.rackId+"' class='lovdmx-this' >"+rackDevice.rackName+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+rackDevice.rackId+"'>"+rackDevice.rackName+"</dd>";
+										}
+									});
+								pupop_html +="</dl>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>RTR MAC地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='_rtrMac' placeholder='请输入MAC地址' value='"+rtrDevice.mac+"' readonly='readonly' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'>工作模式</label>";
+							pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+								pupop_html +="<div class='lovdmx-select-title'>";
+									pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='curMode' data-value='1' readonly value='"+rtrDevice.curMode+"' placeholder='请选择' />";
+									pupop_html +="<span class='lovdmx-edge'></span>";
+								pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//遍历分类
+									$.each(curModeList,function(i,curMode){
+										if(curMode==rtrDevice.curMode){
+											pupop_html +="<dd data-value='"+(i+1)+"' class='lovdmx-this' >"+curMode+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+(i+1)+"'>"+curMode+"</dd>";
+										}
+									});
+								pupop_html +="</dl>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>ip地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='ip' placeholder='请输入ip地址' readonly='readonly'  value='"+rtrDevice.ip+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>设备模型尺寸</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='modelSize' placeholder='请输入设备模型尺寸' value='"+(rtrDevice.modelSize==null?'':rtrDevice.modelSize)+"'  class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'></label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-rtrDevice' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+				pupop_html +="<span class='lovdmx-setwin'></span>";
+				pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+				pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+			pupop_html +="</div>";
+			$("body").append(pupop_html);
+			addBackground();
+	    }
+	});
+
+});
+
+
+//添加sprite设备
+$("body").on("click","#spriteDevice-add",function(){
+	//路径
+	var _href=$(this).attr("data-link");
+	var pupop_html="";
+	$.ajax({
+	    type: "GET",
+	    url: _href,
+	    success: function(data){
+	    	//机柜信息
+	    	var rackDeviceList=data.rackDeviceList;
+	    	//组装添加用户
+	    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:420px;height:370px;' >";
+				pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加录放精灵设备</div>";
+				pupop_html +="<div class='lovdmx-content' style='height:320px'>";
+					pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'>机柜分类</label>";
+							pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+								pupop_html +="<div class='lovdmx-select-title'>";
+									pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='rack' data-value='"+rackDeviceList[0].rackId+"' readonly value='"+rackDeviceList[0].rackName+"' placeholder='请选择' />";
+									pupop_html +="<span class='lovdmx-edge'></span>";
+								pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//遍历分类
+									$.each(rackDeviceList,function(i,rackDevice){
+										if(i==0){
+											pupop_html +="<dd data-value='"+rackDevice.rackId+"' class='lovdmx-this' >"+rackDevice.rackName+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+rackDevice.rackId+"'>"+rackDevice.rackName+"</dd>";
+										}
+									});
+								pupop_html +="</dl>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>录放精灵 MAC地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='spriteMac' placeholder='请输入MAC地址' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>ip地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='ip' placeholder='请输入ip地址'  class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'></label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-spriteDevice' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+				pupop_html +="<span class='lovdmx-setwin'></span>";
+				pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+				pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+			pupop_html +="</div>";
+			$("body").append(pupop_html);
+			addBackground();
+	    }
+	});
+
+});
+
+
+//编辑sprite设备
+$("body").on("click",".spriteDevice-edit",function(){
+	//路径
+	var _href=$(this).attr("data-link");
+	var pupop_html="";
+	$.ajax({
+	    type: "GET",
+	    url: _href,
+	    success: function(data){
+	    	//录放精灵设备
+	    	var spriteDevice=data.spriteDevice;
+	    	//机柜信息
+	    	var rackDeviceList=data.rackDeviceList;
+	    	//组装添加用户
+	    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:420px;height:370px;' >";
+				pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑录放精灵设备</div>";
+				pupop_html +="<div class='lovdmx-content' style='height:320px'>";
+					pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+						pupop_html +="<input type='hidden' name='spriteId' value='"+spriteDevice.spriteId+"' />";
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'>机柜分类</label>";
+							pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+								pupop_html +="<div class='lovdmx-select-title'>";
+									pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='rack' data-value='"+rackDeviceList[0].rackId+"' readonly value='"+rackDeviceList[0].rackName+"' placeholder='请选择' />";
+									pupop_html +="<span class='lovdmx-edge'></span>";
+								pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//遍历分类
+									$.each(rackDeviceList,function(i,rackDevice){
+										if(rackDevice.rackId==spriteDevice.rackId){
+											pupop_html +="<dd data-value='"+rackDevice.rackId+"' class='lovdmx-this' >"+rackDevice.rackName+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+rackDevice.rackId+"'>"+rackDevice.rackName+"</dd>";
+										}
+									});
+								pupop_html +="</dl>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>录放精灵 MAC地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='_spriteMac' placeholder='请输入MAC地址' value='"+spriteDevice.mac+"' readonly='readonly' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>IP地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='ip' placeholder='请输入ip地址' value='"+spriteDevice.ip+"' readonly='readonly' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'></label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-spriteDevice' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+				pupop_html +="<span class='lovdmx-setwin'></span>";
+				pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+				pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+			pupop_html +="</div>";
+			$("body").append(pupop_html);
+			addBackground();
+	    }
+	});
+
+});
+
+
+//编辑dmx512控制盒设备
+$("body").on("click",".dmx512Device-edit",function(){
+	//路径
+	var _href=$(this).attr("data-link");
+	var pupop_html="";
+	$.ajax({
+	    type: "GET",
+	    url: _href,
+	    success: function(data){
+	    	//dmx512控制盒设备
+	    	var dmx512Device=data.dmx512Device;
+	    	console.log(dmx512Device);
+	    	//组装添加用户
+	    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:420px;height:500px;' >";
+				pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑录放精灵设备</div>";
+				pupop_html +="<div class='lovdmx-content' style='height:450px'>";
+					pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+						pupop_html +="<input type='hidden' name='dmxId' value='"+dmx512Device.dmxId+"' />";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>RTR MAC</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='_rtrMac' placeholder='请输入RTR MAC地址' value='"+dmx512Device.rtrMac+"' readonly='readonly' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>Dmx512 MAC</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='dmx512Mac' placeholder='请输入Dmx512 MAC地址' value='"+dmx512Device.dmx512Mac+"' readonly='readonly' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>IP地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='ip' placeholder='请输入IP地址' value='"+dmx512Device.ip+"' readonly='readonly' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>Universe信息</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='universe' placeholder='请输入Universe信息' value='"+dmx512Device.universe+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>RDM个数</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='rdmNums' placeholder='请输入RDM个数' value='"+dmx512Device.rdmNums+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>RDM温度</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='rdmts' placeholder='请输入RDM温度' value='"+dmx512Device.rdmts+"' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'></label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-dmx512Device' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+				pupop_html +="<span class='lovdmx-setwin'></span>";
+				pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+				pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+			pupop_html +="</div>";
+			$("body").append(pupop_html);
+			addBackground();
+	    }
+	});
+
+});
+
+//编辑sprite设备
+$("body").on("click",".intelligentGateway-edit",function(){
+	//路径
+	var _href=$(this).attr("data-link");
+	var pupop_html="";
+	$.ajax({
+	    type: "GET",
+	    url: _href,
+	    success: function(data){
+	    	//录放精灵设备
+	    	var intelligentGateway=data.intelligentGateway;
+	    	//机柜信息
+	    	var rackDeviceList=data.rackDeviceList;
+	    	//组装添加用户
+	    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:420px;height:370px;' >";
+				pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑录放精灵设备</div>";
+				pupop_html +="<div class='lovdmx-content' style='height:320px'>";
+					pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+						pupop_html +="<input type='hidden' name='intelligentGatewayId' value='"+intelligentGateway.id+"' />";
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'>机柜分类</label>";
+							pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+								pupop_html +="<div class='lovdmx-select-title'>";
+									pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' name='rack' data-value='"+rackDeviceList[0].rackId+"' readonly value='"+rackDeviceList[0].rackName+"' placeholder='请选择' />";
+									pupop_html +="<span class='lovdmx-edge'></span>";
+								pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//遍历分类
+									$.each(rackDeviceList,function(i,rackDevice){
+										if(rackDevice.rackId==intelligentGateway.rackId){
+											pupop_html +="<dd data-value='"+rackDevice.rackId+"' class='lovdmx-this' >"+rackDevice.rackName+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+rackDevice.rackId+"'>"+rackDevice.rackName+"</dd>";
+										}
+									});
+								pupop_html +="</dl>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>MAC地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='mac' placeholder='请输入MAC地址' value='"+spriteDevice.mac+"' readonly='readonly' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>IP地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='ip' placeholder='请输入ip地址' value='"+spriteDevice.ip+"' readonly='readonly' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>模式</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='ip'  value='"+spriteDevice.mode+"' readonly='readonly' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+					
+						pupop_html +="<div class='lovdmx-form-item '>";
+							pupop_html +="<label class='lovdmx-form-lable'>IP地址</label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='ip' placeholder='请输入ip地址' value='"+spriteDevice.ip+"' readonly='readonly' class='lovdmx-input'></div>";
+						pupop_html +="</div>";
+						
+						pupop_html +="<div class='lovdmx-form-item'>";
+							pupop_html +="<label class='lovdmx-form-lable'></label>";
+							pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-spriteDevice' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+				pupop_html +="<span class='lovdmx-setwin'></span>";
+				pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+				pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+			pupop_html +="</div>";
+			$("body").append(pupop_html);
+			addBackground();
+	    }
+	});
+
+});
+
+
+    
+    //添加父类产品分类
+    $("body").on("click","#productcategory-add",function(){
+    	var pupop_html="";
+
+    	//组装添加用户
+    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:400px;height:240px;' >";
+			pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加产品分类</div>";
+			pupop_html +="<div class='lovdmx-content' style='height:190px'>";
+				pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>父分类名称</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='categoryName' placeholder='请输入父分类名称' class='lovdmx-input'></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'></label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-productCategory' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+			pupop_html +="</div>";
+			pupop_html +="<span class='lovdmx-setwin'></span>";
+			pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+		pupop_html +="</div>";
+		addBackground();
+		$("body").append(pupop_html);
+    });
+    
+    
+  //添加父类产品分类
+    $("body").on("click","#projectCategory-add",function(){
+    	var pupop_html="";
+
+    	//组装添加用户
+    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:400px;height:240px;' >";
+			pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加案例分类名称</div>";
+			pupop_html +="<div class='lovdmx-content' style='height:190px'>";
+				pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>案例分类名称</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='name' placeholder='请输入案例分类名称' class='lovdmx-input'></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'></label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-projectCategory' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+			pupop_html +="</div>";
+			pupop_html +="<span class='lovdmx-setwin'></span>";
+			pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+		pupop_html +="</div>";
+		addBackground();
+		$("body").append(pupop_html);
+    });
+    
+    
+  //添加子类产品分类
+    $("body").on("click", ".category-add", function() {
+    	var pupop_html="";
+    	var _href=$(this).attr("data-link");
+    	
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	//组装
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:420px;height:300px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加分类</div>";
+					pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:250px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>选项</label>";
+								pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select  '>";
+									pupop_html +="<div class='lovdmx-select-title'>";
+										pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' readonly  data-value='"+data.parentProductCategory.id+"'  value='"+data.parentProductCategory.name+"' placeholder='请选择' />";
+										pupop_html +="<span class='lovdmx-edge'></span>";
+									pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//父类ID
+									var parentId=data.parentProductCategory.id;
+									//产品分类list
+									var productCategoryList =data.parentList;
+									for (var i in productCategoryList) {
+										var productCategory=productCategoryList[i];
+										//判断是否是选中的
+										if(parentId==productCategory.id){
+											pupop_html +="<dd data-value='"+productCategory.id+"' class='lovdmx-this'>"+productCategory.name+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+productCategory.id+"'>"+productCategory.name+"</dd>";
+										}
+									}
+									pupop_html +="</dl>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>子分类名称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='categoryName' placeholder='请输入子分类名称' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-category' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				addBackground();
+				$("body").append(pupop_html);
+		    }
+    	});
+    });
+    
+    $("body").on("click", ".productCategory-edit", function() {
+    	//ID
+    	var _href=$(this).attr("data-link");
+    	var pupop_html="";
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:400px;height:240px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑产品分类</div>";
+					pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:190px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<input type='hidden' name='productCategoryId' value='"+data.id+"' >";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>父分类名称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='categoryName' value='"+data.name+"' placeholder='请输入父分类名称' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-productCategory' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				addBackground();
+				$("body").append(pupop_html);
+		    }
+		});
+    });
+    
+    $("body").on("click", ".projectCategory-edit", function() {
+    	//ID
+    	var _href=$(this).attr("data-link");
+    	var pupop_html="";
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:400px;height:240px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑案例分类</div>";
+					pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:190px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<input type='hidden' name='projectCategoryId' value='"+data.id+"' >";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>案例分类名称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='name' value='"+data.name+"' placeholder='请输入案例分类名称' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-projectCategory' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				addBackground();
+				$("body").append(pupop_html);
+		    }
+		});
+    });
+    
+    
+    $("body").on("click", ".category-edit", function() {
+    	//路径
+    	
+    	var _href=$(this).attr("data-link");
+    	
+    	var pupop_html="";
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	//组装
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:420px;height:300px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑分类</div>";
+					pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:250px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<input type='hidden' name='categoryId' value='"+data.productCategory.id+"' >";
+							pupop_html +="<input type='hidden' name='parentId' value='"+data.parentProductCategory.id+"' >";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>选项</label>";
+								pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select  '>";
+									pupop_html +="<div class='lovdmx-select-title'>";
+										pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' readonly  data-value='"+data.parentProductCategory.id+"'  value='"+data.parentProductCategory.name+"' placeholder='请选择' />";
+										pupop_html +="<span class='lovdmx-edge'></span>";
+									pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//父类ID
+									var parentId=data.parentProductCategory.id;
+									//产品分类list
+									var productCategoryList =data.parentList;
+									for (var i in productCategoryList) {
+										var productCategory=productCategoryList[i];
+										//判断是否是选中的
+										if(parentId==productCategory.id){
+											pupop_html +="<dd data-value='"+productCategory.id+"' class='lovdmx-this'>"+productCategory.name+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+productCategory.id+"'>"+productCategory.name+"</dd>";
+										}
+									}
+									pupop_html +="</dl>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>子分类名称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='categoryName' placeholder='请输入子分类名称' value='"+data.productCategory.name+"' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-category' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				addBackground();
+				$("body").append(pupop_html);
+		    }
+		});
+    });
+    
+    $("body").on("click","#productParameterType-add",function(){
+    	var pupop_html="";
+    	//组装添加用户
+    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:400px;height:240px;' >";
+			pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加产品参数分类</div>";
+			pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:190px'>";
+				pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>参数分类名称</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='typeName' placeholder='请输入参数分类名称' class='lovdmx-input'></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'></label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-productParameterType' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+			pupop_html +="</div>";
+			pupop_html +="<span class='lovdmx-setwin'></span>";
+			pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+		pupop_html +="</div>";
+		addBackground();
+		$("body").append(pupop_html);
+    });
+    
+    $("body").on("click","#projectParameterType-add",function(){
+    	var pupop_html="";
+    	//组装添加用户
+    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:400px;height:240px;' >";
+			pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加产品参数分类</div>";
+			pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:190px'>";
+				pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>参数分类名称</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='typeName' placeholder='请输入参数分类名称' class='lovdmx-input'></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'></label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-projectParameterType' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+			pupop_html +="</div>";
+			pupop_html +="<span class='lovdmx-setwin'></span>";
+			pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+		pupop_html +="</div>";
+		addBackground();
+		$("body").append(pupop_html);
+    });
+    
+    
+    $("body").on("click",".productParameterType-edit",function(){
+    	
+    	//路径
+    	var _href=$(this).attr("data-link");
+    	
+    	var pupop_html="";
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:400px;height:240px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑产品参数分类</div>";
+					pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:190px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<input type='hidden' name='id' value='"+data.id+"' >";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>参数分类名称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='typeName' value='"+data.name+"' placeholder='请输入参数分类名称名称' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-productParameterType' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				addBackground();
+				$("body").append(pupop_html);
+		    }
+    	});
+    });
+    
+    $("body").on("click",".projectParameterType-edit",function(){
+    	
+    	//路径
+    	var _href=$(this).attr("data-link");
+    	
+    	var pupop_html="";
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:400px;height:240px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑产品参数分类</div>";
+					pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:190px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<input type='hidden' name='id' value='"+data.id+"' >";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>参数分类名称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='typeName' value='"+data.name+"' placeholder='请输入参数分类名称名称' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-projectParameterType' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				addBackground();
+				$("body").append(pupop_html);
+		    }
+    	});
+    });
+    
+    
+    $("body").on("click","#productParameter-add",function(){
+    	
+    	var pupop_html="";
+    	var _href=$(this).attr("data-link");
+    	
+    	
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:440px;height:290px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加产品参数</div>";
+					pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage'style='height:240px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+						
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>选项</label>";
+								pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select  '>";
+									pupop_html +="<div class='lovdmx-select-title'>";
+										pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' readonly  data-value='"+data[0].id+"'  value='"+data[0].name+"' placeholder='请选择' />";
+										pupop_html +="<span class='lovdmx-edge'></span>";
+									pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//产品参数分类list
+									for (var i in data) {
+										var productParameterType=data[i];
+										//判断是否是选中的
+										if(i==0){
+											pupop_html +="<dd data-value='"+productParameterType.id+"' class='lovdmx-this'>"+productParameterType.name+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+productParameterType.id+"'>"+productParameterType.name+"</dd>";
+										}
+									}
+									pupop_html +="</dl>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+						
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>参数名称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='parameterName' placeholder='请输入参数名称' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-productParameter' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				addBackground();
+				$("body").append(pupop_html);
+		    }
+    	});
+    });
+    
+    
+    $("body").on("click","#projectParameter-add",function(){
+    	
+    	var pupop_html="";
+    	var _href=$(this).attr("data-link");
+    	
+    	
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:440px;height:290px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加案例参数</div>";
+					pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage'style='height:240px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+						
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>选项</label>";
+								pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select  '>";
+									pupop_html +="<div class='lovdmx-select-title'>";
+										pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' readonly  data-value='"+data[0].id+"'  value='"+data[0].name+"' placeholder='请选择' />";
+										pupop_html +="<span class='lovdmx-edge'></span>";
+									pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//产品参数分类list
+									for (var i in data) {
+										var projectParameterType=data[i];
+										//判断是否是选中的
+										if(i==0){
+											pupop_html +="<dd data-value='"+projectParameterType.id+"' class='lovdmx-this'>"+projectParameterType.name+"</dd>";
+										}else{
+											pupop_html +="<dd data-value='"+projectParameterType.id+"'>"+projectParameterType.name+"</dd>";
+										}
+									}
+									pupop_html +="</dl>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+						
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>参数名称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='parameterName' placeholder='请输入参数名称' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-projectParameter' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				addBackground();
+				$("body").append(pupop_html);
+		    }
+    	});
+    });
+    
+    
+    
+    
+    	
+	$("body").on("click",".productParameter-edit",function(){
+		var pupop_html="";
+    	var _href=$(this).attr("data-link");
+ 
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(json){
+		    	
+		    	var productParameter=json.productParameter;
+		    	var parameterTypeList =json.productParameterTypeList;
+		    	
+		    	
+		    	var temphtml="";
+		    	var index=0;
+		    	for (var i in parameterTypeList) {
+					var productParameterType=parameterTypeList[i];
+					//判断是否是选中的
+					if(productParameter.typeId==productParameterType.id){
+						temphtml +="<dd data-value='"+productParameterType.id+"' class='lovdmx-this'>"+productParameterType.name+"</dd>";
+						index=i;
+					}else{
+						temphtml +="<dd data-value='"+productParameterType.id+"'>"+productParameterType.name+"</dd>";
+					}
+				}
+		    	
+		    	
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:440px;height:290px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑产品参数</div>";
+					pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:240px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<input type='hidden' name='id' value='"+productParameter.id+"' >";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>选项</label>";
+								pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select  '>";
+									pupop_html +="<div class='lovdmx-select-title'>";
+										pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' readonly  data-value='"+productParameter.typeId+"'  value='"+parameterTypeList[index].name+"' placeholder='请选择' />";
+										pupop_html +="<span class='lovdmx-edge'></span>";
+									pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//产品参数分类list
+									pupop_html +=temphtml;
+									pupop_html +="</dl>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+						
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>参数名称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='parameterName' value='"+productParameter.name+"' placeholder='请输入参数名称' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-productParameter' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				addBackground();
+				$("body").append(pupop_html);
+		    }
+    	});
+	});
+	
+	
+	$("body").on("click",".projectParameter-edit",function(){
+		var pupop_html="";
+    	var _href=$(this).attr("data-link");
+ 
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(json){
+		    	
+		    	var projectParameter=json.projectParameter;
+		    	var parameterTypeList =json.projectParameterTypeList;
+		    	
+		    	
+		    	var temphtml="";
+		    	var index=0;
+		    	for (var i in parameterTypeList) {
+					var projectParameterType=parameterTypeList[i];
+					//判断是否是选中的
+					if(projectParameter.typeId==projectParameterType.id){
+						temphtml +="<dd data-value='"+projectParameterType.id+"' class='lovdmx-this'>"+projectParameterType.name+"</dd>";
+						index=i;
+					}else{
+						temphtml +="<dd data-value='"+projectParameterType.id+"'>"+projectParameterType.name+"</dd>";
+					}
+				}
+		    	
+		    	
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:440px;height:290px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑产品参数</div>";
+					pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:240px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<input type='hidden' name='id' value='"+projectParameter.id+"' >";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>选项</label>";
+								pupop_html +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select  '>";
+									pupop_html +="<div class='lovdmx-select-title'>";
+										pupop_html +="<input type='text' class='lovdmx-input lovdmx_unselect' readonly  data-value='"+projectParameter.typeId+"'  value='"+parameterTypeList[index].name+"' placeholder='请选择' />";
+										pupop_html +="<span class='lovdmx-edge'></span>";
+									pupop_html +="</div>";
+									pupop_html +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+									//产品参数分类list
+									pupop_html +=temphtml;
+									pupop_html +="</dl>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+						
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>参数名称</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='parameterName' value='"+projectParameter.name+"' placeholder='请输入参数名称' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-projectParameter' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+				addBackground();
+				$("body").append(pupop_html);
+		    }
+    	});
+	});
+	
+	
+	
+	
+    $("body").on("click","#product-add",function(){
+    	var _href=$(this).attr("data-link");
+    	
+    	var pupop_html="";
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(data){
+		    	
+		    	var product_add="";
+		    	
+		    	var path =$("#pageContext").val();
+		    	
+		    	var oneCategory=null;
+		    	//分类
+		    	var categoryList=data.categoryList;
+		    	if(categoryList.length>0){
+		    		oneCategory =categoryList[0];
+		    	}else{
+		    		layer.alert("请先添加产品分类!!!", {
+						icon : 5
+					});
+		    		return ;
+		    	}
+		    	//产品参数
+		    	var productParameterList =data.productParameterList;
+		    	if(productParameterList.length>0){
+		    	}else{
+		    		layer.alert("请先添加产品参数!!!", {
+						icon : 5
+					});
+		    		return ;
+		    	}
+		    	
+			    product_add +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window'style='left:350px;top:70px;width:1000px;height:750px;' >";
+			    	product_add +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加产品</div>";
+			    	product_add +="<div class='lovdmx-content' id='lovdmx-add-user' style='height:700px'>";
+			    		product_add +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品分类</label>";
+			    				product_add +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+			    					product_add +="<div class='lovdmx-select-title'>";
+			    						product_add +="<input type='text' class='lovdmx-input lovdmx_unselect' name='categoryId' data-value='"+oneCategory.id+"' readonly value='"+oneCategory.name+"' placeholder='请选择' />";
+			    						product_add +="<span class='lovdmx-edge'></span>";
+			    					product_add +="</div>";
+			    					product_add +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+			    					//遍历分类
+		    						for(var i=0;i<categoryList.length;i++){
+		    							if(i==0){
+		    								product_add +="<dd data-value='"+categoryList[i].id+"' class='lovdmx-this' >"+categoryList[i].name+"</dd>";
+		    							}else{
+		    								product_add +="<dd data-value='"+categoryList[i].id+"'>"+categoryList[i].name+"</dd>";
+		    							}
+		    						}
+			    					product_add +="</dl>";
+			    				product_add +="</div>";
+			    			product_add +="</div>";
+			    			product_add +="<div class='lovdmx-form-item '>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品名称</label>";
+			    				product_add +="<div class='lovdmx-input-inline'><input type='text' name='productName' placeholder='请输入用户名' class='lovdmx-input'></div>";
+			    			product_add +="</div>";
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品图片</label>";
+			    				product_add +="<div class='lovdmx-upload-preview'><ul id='upload-productImg' class='fl_child clearFix'>";
+			    					product_add +="<li><input type='file' name='productImg' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+			    				product_add +="</ul></div>";
+			    			product_add +="</div>";
+	
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品展示图</label>";
+			    				product_add +="<div class='lovdmx-upload-preview'><ul id='upload-productImgs' class='fl_child clearFix'>";
+				    				product_add +="<li><input type='file' name='productImgs' hidden='hidden' onchange='uploadPicture(this)' /><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+				    				product_add +="<li><input type='file' name='productImgs' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+				    				product_add +="<li><input type='file' name='productImgs' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+				    				product_add +="<li><input type='file' name='productImgs' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+			    				product_add +="</ul></div>";
+			    			product_add +="</div>";
+	
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>图对应视频</label>";
+			    				product_add +="<table class='table' id='upload-productVideos' cellspacing='0' cellpadding='0' border='0'>";
+			    					product_add +="<thead>";
+			    						product_add +="<tr>";
+			    							product_add +="<th>上传视频图片</th>";
+			    							product_add +="<th>对应</th>";
+			    							product_add +="<th>上传视频</th>";
+			    						product_add +="</tr>";
+			    					product_add +="</thead>";
+			    					product_add +="<tbody>";
+			    						product_add +="<tr>";
+			    							product_add +="<td><input type='file' name='productVideoImgs' hidden='hidden' onchange='uploadPicture(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/zanwu.png' ></td>";
+			    							product_add +="<td><===></td>";
+			    							product_add +="<td><input type='file' name='productVideos' hidden='hidden' onchange='uploadVideo(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/zanwuVideo.png' ></td>";
+			    						product_add +="</tr>";
+			    						
+				    					product_add +="<tr>";
+			    							product_add +="<td><input type='file' name='productVideoImgs' hidden='hidden' onchange='uploadPicture(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/zanwu.png' ></td>";
+			    							product_add +="<td><===></td>";
+			    							product_add +="<td><input type='file' name='productVideos' hidden='hidden' onchange='uploadVideo(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/zanwuVideo.png' ></td>";
+			    						product_add +="</tr>";
+		    						
+				    					product_add +="<tr>";
+			    							product_add +="<td><input type='file' name='productVideoImgs' hidden='hidden' onchange='uploadPicture(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/zanwu.png' ></td>";
+			    							product_add +="<td><===></td>";
+			    							product_add +="<td><input type='file' name='productVideos' hidden='hidden' onchange='uploadVideo(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/zanwuVideo.png' ></td>";
+			    						product_add +="</tr>";
+	    						
+				    					product_add +="<tr>";
+			    							product_add +="<td><input type='file' name='productVideoImgs' hidden='hidden' onchange='uploadPicture(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/zanwu.png' ></td>";
+			    							product_add +="<td><===></td>";
+			    							product_add +="<td><input type='file' name='productVideos' hidden='hidden' onchange='uploadVideo(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/zanwuVideo.png' ></td>";
+			    						product_add +="</tr>";
+			    						
+			    					product_add +="</tbody>";
+			    				product_add +="</table>";
+			    			product_add +="</div>";
+	
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品案例图</label>";
+			    				product_add +="<div class='lovdmx-selectbox fl_child clearFix'>";
+			    					product_add +="<div class='select-bar'>";
+			    						product_add +="<span>未选</span>";
+			    						product_add +="<select multiple='multiple' id='select1'>";
+			    						//组装参数
+		    							for(var i=0;i<productParameterList.length;i++){
+		    								product_add +="<option data-typeId='"+productParameterList[i].typeId+"' value='"+productParameterList[i].id+"'>"+productParameterList[i].name+"</option>";
+		    							}
+			    						product_add +="</select>";
+			    					product_add +="</div>";
+			    					product_add +="<div class='btn-bar'>";
+			    						product_add +="<p id='parameter_add'><input type='button' class='lovdmx-btn' value='>' title='移动选中项到右侧'></p>";
+			    						product_add +="<p id='parameter_addAll'><input type='button' class='lovdmx-btn' value='>>' title='全部移动到右侧'></p>";
+			    						product_add +="<p id='parameter_remove'><input type='button' class='lovdmx-btn' value='<' title='移动选中项到左侧'></p>";
+			    						product_add +="<p id='parameter_removeAll'><input type='button' class='lovdmx-btn' value='<<' title='全部移动到左侧'></p>";
+			    					product_add +="</div>";
+			    					product_add +="<div class='select-bar'>";
+			    						product_add +="<span>已选</span>";
+			    						product_add +="<select multiple='multiple' id='select2'>";
+			    						product_add +="</select>";
+			    					product_add +="</div>";
+			    					product_add +="<div class='select-bar'><button class='lovdmx-btn' type='button' onclick='updateParameter();' >更新参数</button></div>";
+			    				product_add +="</div>";
+			    				
+			    			product_add +="</div>";
+	
+			    			product_add +="<div class='lovdmx-form-item' id='parameter'>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品案例图</label>";
+			    				product_add +="<div class='lovdmx-input-block fl_child clearFix'>";
+			    				product_add +="</div>";
+			    			product_add +="</div>";
+	
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>发布时间</label>";
+			    				product_add +="<div class='lovdmx-input-inline'>";
+			    					product_add +="<input type='datetime-local' name='publishTime' class='lovdmx-input'  id='publish' placeholder='yyyy-MM-ddTHH:mm:ss'>";
+			    				product_add +="</div>";
+			    			product_add +="</div>";
+	
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'></label>";
+			    				product_add +="<div class='lovdmx-input-inline'><input type='button'  placeholder='提交' id='submit-product'  class='lovdmx-btn' value='提交'></div>";
+			    			product_add +="</div>";
+			    		product_add +="</div>";
+			    	product_add +="</div>";
+			    	product_add +="<span class='lovdmx-setwin'></span>";
+			    	product_add +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			    	product_add +="<i class='iconfont icon-ic_close close'></i>";
+			    product_add +="</div>";
+		    	
+			    addBackground();
+				$("body").append(product_add);
+				
+		    }
+    	});
+    	
+    });
+    
+    
+    
+    
+    
+    $("body").on("click",".product-edit",function(){
+		var pupop_html="";
+    	var _href=$(this).attr("data-link");
+ 
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(json){
+		    	//路径
+		    	var path =$("#pageContext").val();
+		    	
+		    	var product = json.product;
+		    	var categoryList=json.categoryList;
+		    	var productContentList=json.productContentList;
+		    	var productParameterList=json.productParameterList;
+		    	var parameterList =json.parameterList;
+		    	
+		    	var product_add="";
+		    	
+		    	var tempCategory="";
+		    	var categoryName="";
+		    	//遍历分类
+				for(var i=0;i<categoryList.length;i++){
+					var category =categoryList[i];
+					if(category.id==product.categoryId){
+						tempCategory +="<dd data-value='"+category.id+"' class='lovdmx-this' >"+category.name+"</dd>";
+						categoryName=category.name;
+					}else{
+						tempCategory +="<dd data-value='"+category.id+"'>"+category.name+"</dd>";
+					}
+				}
+		    	
+			    product_add +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window'style='left:350px;top:70px;width:1000px;height:750px;' >";
+			    	product_add +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑产品</div>";
+			    	product_add +="<div class='lovdmx-content' id='lovdmx-add-user' style='height:700px'>";
+			    		product_add +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+			    		product_add+="<input type='hidden' value='"+product.productId+"' name='productId'>";
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品分类</label>";
+			    				product_add +="<div class='lovdmx-input-inline lovdmx-form-select lovdmx-form-select'>";
+			    					product_add +="<div class='lovdmx-select-title'>";
+			    						product_add +="<input type='text' class='lovdmx-input lovdmx_unselect' name='categoryId' data-value='"+product.categoryId+"' readonly value='"+categoryName+"' placeholder='请选择' />";
+			    						product_add +="<span class='lovdmx-edge'></span>";
+			    					product_add +="</div>";
+			    					product_add +="<dl class='lovdmx-anim lovdmx-anim-upbit'>";
+			    					product_add +=tempCategory;
+			    					product_add +="</dl>";
+			    				product_add +="</div>";
+			    			product_add +="</div>";
+			    			product_add +="<div class='lovdmx-form-item '>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品名称</label>";
+			    				product_add +="<div class='lovdmx-input-inline'><input type='text' name='productName' value='"+product.productName+"'  placeholder='请输入用户名' class='lovdmx-input'></div>";
+			    			product_add +="</div>";
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品图片</label>";
+			    				product_add +="<div class='lovdmx-upload-preview'><ul id='upload-productImg' class='fl_child clearFix'>";
+			    					product_add +="<li><input type='file' name='productImg' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/"+product.productImg+"' class='lovdmx-upload-img upload' /></li>";
+			    				product_add +="</ul></div>";
+			    			product_add +="</div>";
+	
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品展示图</label>";
+			    				product_add +="<div class='lovdmx-upload-preview'><ul id='upload-productImgs' class='fl_child clearFix'>";
+			    				
+			    					for(var i=0;i<product.imgList.length;i++){
+			    						var imgPath=product.imgList[i];
+			    						product_add +="<li><input type='file' name='productImgs' hidden='hidden' onchange='uploadPicture(this)' /><img src='"+path+"/"+imgPath+"' class='lovdmx-upload-img upload' /></li>";
+			    					}
+			    				product_add +="</ul></div>";
+			    			product_add +="</div>";
+	
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>图对应视频</label>";
+			    				product_add +="<table class='table' id='upload-productVideos' cellspacing='0' cellpadding='0' border='0'>";
+			    					product_add +="<thead>";
+			    						product_add +="<tr>";
+			    							product_add +="<th>上传视频图片</th>";
+			    							product_add +="<th>对应</th>";
+			    							product_add +="<th>上传视频</th>";
+			    						product_add +="</tr>";
+			    					product_add +="</thead>";
+			    					product_add +="<tbody>";
+			    						for(var i=0;i<product.videoImgList.length;i++){
+			    							
+			    							var videoImgPath =product.videoImgList[i];
+			    							var videoPath =product.videoList[i];
+			    							
+				    						product_add +="<tr>";
+				    							product_add +="<td><input type='file' name='productVideoImgs' hidden='hidden' onchange='uploadPicture(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/"+videoImgPath+"' ></td>";
+				    							product_add +="<td><===></td>";
+				    							product_add +="<td><input type='file' name='productVideos' hidden='hidden' onchange='updateUploadVideo(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/video.jpg' ></td>";
+				    						product_add +="</tr>";
+			    						}
+			    						
+			    					product_add +="</tbody>";
+			    				product_add +="</table>";
+			    			product_add +="</div>";
+	
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品案例图</label>";
+			    				product_add +="<div class='lovdmx-selectbox fl_child clearFix'>";
+			    					product_add +="<div class='select-bar'>";
+			    						product_add +="<span>未选</span>";
+			    						product_add +="<select multiple='multiple' id='select1'>";
+			    						//组装参数
+		    							for(var i=0;i<parameterList.length;i++){
+		    								var parameter =parameterList[i];
+		    								product_add +="<option data-typeId='"+parameter.typeId+"' value='"+parameter.id+"'>"+parameter.name+"</option>";
+		    							}
+			    						product_add +="</select>";
+			    					product_add +="</div>";
+			    					product_add +="<div class='btn-bar'>";
+			    						product_add +="<p id='parameter_add'><input type='button' class='lovdmx-btn' value='>' title='移动选中项到右侧'></p>";
+			    						product_add +="<p id='parameter_addAll'><input type='button' class='lovdmx-btn' value='>>' title='全部移动到右侧'></p>";
+			    						product_add +="<p id='parameter_remove'><input type='button' class='lovdmx-btn' value='<' title='移动选中项到左侧'></p>";
+			    						product_add +="<p id='parameter_removeAll'><input type='button' class='lovdmx-btn' value='<<' title='全部移动到左侧'></p>";
+			    					product_add +="</div>";
+			    					product_add +="<div class='select-bar'>";
+			    						product_add +="<span>已选</span>";
+			    						product_add +="<select multiple='multiple' id='select2'>";
+			    						//组装参数
+		    							for(var i=0;i<productParameterList.length;i++){
+		    								var parameter =productParameterList[i];
+		    								product_add +="<option data-typeId='"+parameter.typeId+"' value='"+parameter.id+"'>"+parameter.name+"</option>";
+		    							}
+			    						product_add +="</select>";
+			    					product_add +="</div>";
+			    					product_add +="<div class='select-bar'><button class='lovdmx-btn' type='button' onclick='updateParameter();' >更新参数</button></div>";
+			    				product_add +="</div>";
+			    				
+			    			product_add +="</div>";
+	
+			    			product_add +="<div class='lovdmx-form-item' id='parameter'>";
+			    				product_add +="<label class='lovdmx-form-lable'>产品案例图</label>";
+			    				product_add +="<div class='lovdmx-input-block fl_child clearFix'>";
+			    				for(var i=0;i<productParameterList.length;i++){
+    								var productParameter =productParameterList[i];
+    								product_add +="<div class='lovdmx-unselect lovdmx-form-checkbox  primary parameter"+productParameter.id+"' data-typeId='"+productParameter.typeId+"'  data-id='"+productParameter.id+"'>";
+    								product_add +="<span>"+productParameter.name+"</span>";
+    								product_add +="<i class='icon-iconfontcheck lovdmx-icon iconfont icon-ok'></i>";
+    								product_add +="</div>";
+			    				}
+			    				product_add +="</div>";
+			    			product_add +="</div>";
+			    			
+			    			for(var k=0;k<productContentList.length;k++){
+			    				var productContent =productContentList[k];
+			    				var parameter =productContent.parameter;
+			    				var typeId=parameter.typeId;
+			    				if(typeId==1){
+			    					product_add +=addParameterImgType(productContent,parameter,path);
+			    				}else if(typeId==2){
+			    					product_add +=addParameterPerformanceType(productContent,parameter);
+			    				}else if(typeId==3){
+			    					product_add +=addParameterSpecificationType(productContent,parameter);
+			    				}else if(typeId==4){
+			    					product_add +=addParameterFileType(productContent,parameter,path);
+			    				}
+			    			}
+	
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'>发布时间</label>";
+			    				product_add +="<div class='lovdmx-input-inline'>";
+			    					product_add +="<input type='datetime-local' name='publishTime' class='lovdmx-input' value='"+product.time+"'  id='publish' placeholder='yyyy-MM-dd HH:mm:ss'>";
+			    				product_add +="</div>";
+			    			product_add +="</div>";
+	
+			    			product_add +="<div class='lovdmx-form-item'>";
+			    				product_add +="<label class='lovdmx-form-lable'></label>";
+			    				product_add +="<div class='lovdmx-input-inline'><input type='button'  placeholder='提交' id='update-product'  class='lovdmx-btn' value='提交'></div>";
+			    			product_add +="</div>";
+			    		product_add +="</div>";
+			    	product_add +="</div>";
+			    	product_add +="<span class='lovdmx-setwin'></span>";
+			    	product_add +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			    	product_add +="<i class='iconfont icon-ic_close close'></i>";
+			    product_add +="</div>";
+			    
+			    addBackground();
+				$("body").append(product_add);
+		    }
+    	});
+    });
+    
+    
+    
+    $("body").on("click","#aboutUs-add",function(){
+    	var pupop_html="";
+    	//路径
+    	var path =$("#pageContext").val();
+
+    	//组装添加用户
+    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:720px;height:650px;' >";
+			pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加关于我们</div>";
+			pupop_html +="<div class='lovdmx-content' id='lovdmx-add-manage' style='height:600px'>";
+				pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					
+					pupop_html +="<div class='lovdmx-form-item '>";
+						pupop_html +="<label class='lovdmx-form-lable'>公司简介描述</label>";
+						pupop_html +="<table class='table'>";
+							pupop_html +="<thead>";
+								pupop_html +="<tr>";
+									pupop_html +="<th>";
+										pupop_html +="<button class='lovdmx-btn' id='add-aboutusInfo' type='button'>添加简介</button>";
+									pupop_html +="</th>";
+									pupop_html +="<th>操作</th>";
+								pupop_html +="</tr>";
+							pupop_html +="</thead>";
+							pupop_html +="<tbody>";
+								pupop_html +="<tr>";
+									pupop_html +="<td><input type='text' name='content' placeholder='请输入简介信息' class='lovdmx-input'></td>";
+									pupop_html +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+								pupop_html +="</tr>";
+							pupop_html +="</tbody>";
+						pupop_html +="</table>";
+					pupop_html +="</div>";
+					
+					pupop_html +="<div class='lovdmx-form-item about-us'>";
+						pupop_html +="<label class='lovdmx-form-lable'>简介图</label>";
+	    				pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+		    				pupop_html +="<li><input type='file' name='introImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+		    				pupop_html +="</ul></div>";
+		    		pupop_html +="</div>";
+	    			pupop_html +="<div class='lovdmx-form-item about-us'>";
+		    			pupop_html +="<label class='lovdmx-form-lable'>历程图</label>";
+						pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+							pupop_html +="<li><input type='file' name='courseImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+						pupop_html +="</ul></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item about-us'>";
+						pupop_html +="<label class='lovdmx-form-lable'>组织结构图</label>";
+						pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+							pupop_html +="<li><input type='file' name='constructionImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+						pupop_html +="</ul></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item about-us'>";
+						pupop_html +="<label class='lovdmx-form-lable'>地址图</label>";
+						pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+							pupop_html +="<li><input type='file' name='addressImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+						pupop_html +="</ul></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item about-us'>";
+						pupop_html +="<label class='lovdmx-form-lable'></label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-aboutUs' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+			pupop_html +="</div>";
+			pupop_html +="<span class='lovdmx-setwin'></span>";
+			pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+		pupop_html +="</div>";
+
+		$("body").append(pupop_html);
+		addBackground();
+    	
+    });
+    
+    $("body").on("click",".aboutUs-edit",function(){
+		var _href=$(this).attr("data-link");
+		    	
+	    	var pupop_html="";
+	    	$.ajax({
+			    type: "GET",
+			    url: _href,
+			    success: function(data){
+			    	
+			    	var aboutUs = data;
+			    	var introList=aboutUs.introList;
+			    	var pupop_html="";
+			    	//路径
+			    	var path =$("#pageContext").val();
+
+			    	//组装添加用户
+			    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:720px;height:650px;' >";
+						pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑关于我们</div>";
+						pupop_html +="<div class='lovdmx-content' style='height:600px'>";
+							pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<input type='hidden' value='"+aboutUs.id+"' name='id'>";
+								pupop_html +="<div class='lovdmx-form-item '>";
+									pupop_html +="<label class='lovdmx-form-lable'>公司简介描述</label>";
+									pupop_html +="<table class='table'>";
+										pupop_html +="<thead>";
+											pupop_html +="<tr>";
+												pupop_html +="<th>";
+													pupop_html +="<button class='lovdmx-btn' id='add-aboutusInfo' type='button'>添加简介</button>";
+												pupop_html +="</th>";
+												pupop_html +="<th>操作</th>";
+											pupop_html +="</tr>";
+										pupop_html +="</thead>";
+										pupop_html +="<tbody>";
+											for(var i=0;i<introList.length;i++){
+												pupop_html +="<tr>";
+													pupop_html +="<td><input type='text' name='content' placeholder='请输入简介信息' value='"+introList[i]+"' class='lovdmx-input'></td>";
+													pupop_html +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+												pupop_html +="</tr>";
+											}
+										pupop_html +="</tbody>";
+									pupop_html +="</table>";
+								pupop_html +="</div>";
+								
+								pupop_html +="<div class='lovdmx-form-item about-us'>";
+									pupop_html +="<label class='lovdmx-form-lable'>简介图</label>";
+				    				pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+					    				pupop_html +="<li><input type='file' name='introImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/"+aboutUs.introImg+"' class='lovdmx-upload-img upload' /></li>";
+					    				pupop_html +="</ul></div>";
+					    		pupop_html +="</div>";
+				    			pupop_html +="<div class='lovdmx-form-item about-us'>";
+					    			pupop_html +="<label class='lovdmx-form-lable'>历程图</label>";
+									pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+										pupop_html +="<li><input type='file' name='courseImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/"+aboutUs.courseImg+"' class='lovdmx-upload-img upload' /></li>";
+									pupop_html +="</ul></div>";
+								pupop_html +="</div>";
+								pupop_html +="<div class='lovdmx-form-item about-us'>";
+									pupop_html +="<label class='lovdmx-form-lable'>组织结构图</label>";
+									pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+										pupop_html +="<li><input type='file' name='constructionImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/"+aboutUs.organizationalChart+"' class='lovdmx-upload-img upload' /></li>";
+									pupop_html +="</ul></div>";
+								pupop_html +="</div>";
+								pupop_html +="<div class='lovdmx-form-item about-us'>";
+									pupop_html +="<label class='lovdmx-form-lable'>地址图</label>";
+									pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+										pupop_html +="<li><input type='file' name='addressImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/"+aboutUs.addressImg+"' class='lovdmx-upload-img upload' /></li>";
+									pupop_html +="</ul></div>";
+								pupop_html +="</div>";
+								pupop_html +="<div class='lovdmx-form-item about-us'>";
+									pupop_html +="<label class='lovdmx-form-lable'></label>";
+									pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-aboutUs' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+						pupop_html +="<span class='lovdmx-setwin'></span>";
+						pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+						pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+					pupop_html +="</div>";
+
+					$("body").append(pupop_html);
+					addBackground();
+			    }
+	    	});
+    });
+    
+    $("body").on("click","#footer-add",function(){
+    	
+    	var pupop_html="";
+    	//路径
+    	var path =$("#pageContext").val();
+
+    	//组装添加用户
+    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:720px;height:650px;' >";
+			pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加页脚</div>";
+			pupop_html +="<div class='lovdmx-content'  style='height:600px'>";
+				pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					
+				
+					pupop_html +="<div class='lovdmx-form-item '>";
+						pupop_html +="<label class='lovdmx-form-lable'>公司名</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='companyName'  placeholder='请输入公司名' class='lovdmx-input'></div>";
+					pupop_html +="</div>";
+					
+					
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>(手机端)顶部背景图</label>";
+	    				pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+		    				pupop_html +="<li><input type='file' name='headImg' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+		    				pupop_html +="</ul></div>";
+		    		pupop_html +="</div>";
+					
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>页脚logo图</label>";
+	    				pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+		    				pupop_html +="<li><input type='file' name='logoImg' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+		    				pupop_html +="</ul></div>";
+		    		pupop_html +="</div>";
+				
+					pupop_html +="<div class='lovdmx-form-item '>";
+						pupop_html +="<label class='lovdmx-form-lable'>公司信息描述</label>";
+						pupop_html +="<table class='table'>";
+							pupop_html +="<thead>";
+								pupop_html +="<tr>";
+									pupop_html +="<th>";
+										pupop_html +="<button class='lovdmx-btn add-footerInfo' type='button'>添加公司信息</button>";
+									pupop_html +="</th>";
+									pupop_html +="<th>操作</th>";
+								pupop_html +="</tr>";
+							pupop_html +="</thead>";
+							pupop_html +="<tbody>";
+								pupop_html +="<tr>";
+									pupop_html +="<td><input type='text' name='addressInfo' placeholder='请输入信息' class='lovdmx-input'></td>";
+									pupop_html +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+								pupop_html +="</tr>";
+							pupop_html +="</tbody>";
+						pupop_html +="</table>";
+					pupop_html +="</div>";
+					
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>app图</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='button'  class='lovdmx-btn add-app' value='添加app'></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>图对应视频</label>";
+						pupop_html +="<table class='table' id='upload-productVideos' cellspacing='0' cellpadding='0' border='0'>";
+							pupop_html +="<thead>";
+								pupop_html +="<tr>";
+									pupop_html +="<th>app图</th>";
+									pupop_html +="<th>对应</th>";
+									pupop_html +="<th>访问地址</th>";
+									pupop_html +="<th>操作</th>";
+								pupop_html +="</tr>";
+							pupop_html +="</thead>";
+							pupop_html +="<tbody>";
+								pupop_html +="<tr>";
+									pupop_html +="<td><input type='file' name='appImg' hidden='hidden' onchange='uploadPicture(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/zanwu.png' ></td>";
+									pupop_html +="<td><===></td>";
+									pupop_html +="<td><input type='text' name='appPath' placeholder='请输入简介信息' class='lovdmx-input'></td>";
+									pupop_html +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+								pupop_html +="</tr>";
+							pupop_html +="</tbody>";
+						pupop_html +="</table>";
+					pupop_html +="</div>";
+					
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>二维码图</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='button'  class='lovdmx-btn add-img' value='添加二维码图'></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'></label>";
+						pupop_html +="<div class='lovdmx-upload-preview'><ul id='upload-appImgs' class='add-picture fl_child clearFix'>";
+							pupop_html +="<li><input type='file' name='ewmImg' hidden='hidden' onchange='uploadPicture(this)' /><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /><i class='iconfont icon-ic_close remove-img'></i></li>";
+						pupop_html +="</ul></div>";
+					pupop_html +="</div>";
+					
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'></label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-footer' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+			pupop_html +="</div>";
+			pupop_html +="<span class='lovdmx-setwin'></span>";
+			pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+		pupop_html +="</div>";
+		
+		addBackground();
+		$("body").append(pupop_html);
+    });
+    
+    
+    $("body").on("click",".footer-edit",function(){
+    	var pupop_html="";
+    	var _href=$(this).attr("data-link");
+ 
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(json){
+		    	//路径
+		    	var path =$("#pageContext").val();
+		    	var _footer=json.footer;
+		    	
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:720px;height:650px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑页脚</div>";
+					pupop_html +="<div class='lovdmx-content'  style='height:600px'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							
+							pupop_html +="<input type='hidden' value='"+_footer.id+"' name='footerId' >";
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>公司名</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='companyName' value='"+_footer.companyName+"'  placeholder='请输入公司名' class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>(手机端)顶部背景图</label>";
+			    				pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+				    				pupop_html +="<li><input type='file' name='headImg' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/"+_footer.headImg+"' class='lovdmx-upload-img upload' /></li>";
+				    				pupop_html +="</ul></div>";
+				    		pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>页脚logo图</label>";
+			    				pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+				    				pupop_html +="<li><input type='file' name='logoImg' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/"+_footer.logoImg+"' class='lovdmx-upload-img upload' /></li>";
+				    				pupop_html +="</ul></div>";
+				    		pupop_html +="</div>";
+						
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>公司信息描述</label>";
+								pupop_html +="<table class='table'>";
+									pupop_html +="<thead>";
+										pupop_html +="<tr>";
+											pupop_html +="<th>";
+												pupop_html +="<button class='lovdmx-btn add-footerInfo' type='button'>添加公司信息</button>";
+											pupop_html +="</th>";
+											pupop_html +="<th>操作</th>";
+										pupop_html +="</tr>";
+									pupop_html +="</thead>";
+									pupop_html +="<tbody>";
+										var addressInfo_list =_footer.addressInfo_list;
+										for(var i=0;i<addressInfo_list.length;i++){
+											pupop_html +="<tr>";
+												pupop_html +="<td><input type='text' name='addressInfo' value='"+addressInfo_list[i]+"' placeholder='请输入信息' class='lovdmx-input'></td>";
+												pupop_html +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+											pupop_html +="</tr>";
+										}
+									pupop_html +="</tbody>";
+								pupop_html +="</table>";
+							pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>app图</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button'  class='lovdmx-btn add-app' value='添加app'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>图对应视频</label>";
+								pupop_html +="<table class='table' id='upload-productVideos' cellspacing='0' cellpadding='0' border='0'>";
+									pupop_html +="<thead>";
+										pupop_html +="<tr>";
+											pupop_html +="<th>app图</th>";
+											pupop_html +="<th>对应</th>";
+											pupop_html +="<th>访问地址</th>";
+											pupop_html +="<th>操作</th>";
+										pupop_html +="</tr>";
+									pupop_html +="</thead>";
+									pupop_html +="<tbody>";
+									//app 图片
+									var appImg_list=_footer.appImg_list;
+									//app 访问地址
+									var appLink_list=_footer.appLink_list;
+									for(var i=0;i<appImg_list.length;i++){                                                                                                                 
+										pupop_html +="<tr>";
+											pupop_html +="<td><input type='file' data-type='1' data-index='"+i+"' name='appImg' hidden='hidden' onchange='uploadPicture(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/"+appImg_list[i]+"' ></td>";
+											pupop_html +="<td><===></td>";
+											pupop_html +="<td><input type='text' name='appPath' value='"+appLink_list[i]+"' placeholder='请输入简介信息' class='lovdmx-input'></td>";
+											pupop_html +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+										pupop_html +="</tr>";
+									}
+									pupop_html +="</tbody>";
+								pupop_html +="</table>";
+							pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>二维码图</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button'  class='lovdmx-btn add-img' value='添加二维码图'></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item' >";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-upload-preview' style='margin-left:120px;'><ul id='upload-appImgs' class='add-picture fl_child clearFix'>";
+									var ewmImg_list=_footer.ewmImg_list;
+									for(var i=0;i<ewmImg_list.length;i++){
+										pupop_html +="<li><input type='file' data-type='1' data-index='"+i+"' name='ewmImg' hidden='hidden' onchange='uploadPicture(this)' /><img src='"+path+"/"+ewmImg_list[i]+"' class='lovdmx-upload-img upload' /><i class='iconfont icon-ic_close remove-img'></i></li>";
+									}
+								pupop_html +="</ul></div>";
+							pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-footer' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+		    	
+		    	addBackground();
+				$("body").append(pupop_html);
+		    }
+    	});
+    });
+    
+    
+    $("#slideshow-add").click(function(){
+    	var pupop_html="";
+
+    	//路径
+    	var path =$("#pageContext").val();
+    	//组装添加用户
+    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:510px;height:460px;' >";
+			pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加轮播图</div>";
+			pupop_html +="<div class='lovdmx-content' style='height:410px'>";
+				pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>轮播图片</label>";
+						pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+							pupop_html +="<li><input type='file' name='image' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+						pupop_html +="</ul></div>";
+					pupop_html +="</div>";
+					pupop_html +="<div class='lovdmx-form-item '>";
+						pupop_html +="<label class='lovdmx-form-lable'>访问地址</label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='url' placeholder='请输入访问地址' class='lovdmx-input'></div>";
+					pupop_html +="</div>";
+					
+					pupop_html +="<div class='lovdmx-form-item '>";
+						pupop_html +="<label class='lovdmx-form-lable'>置顶</label>";
+						pupop_html +="<div class='lovdmx-input-block'>";
+							pupop_html +="<input type='checkbox' lay-filter='switch' lay-verify='required' name='istop' lay-skin='switch' lay-text='ON|OFF'>";
+							pupop_html +="<div class='lovdmx-unselect lovdmx-form-switch'><em>OFF</em><i></i></div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'>发布时间</label>";
+						pupop_html +="<div class='lovdmx-input-inline'>";
+							pupop_html +="<input type='datetime-local' name='publishTime' class='lovdmx-input'  id='publish' placeholder='yyyy-MM-ddTHH:mm:ss'>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					
+					pupop_html +="<div class='lovdmx-form-item'>";
+						pupop_html +="<label class='lovdmx-form-lable'></label>";
+						pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='submit-slideshow' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+					pupop_html +="</div>";
+				pupop_html +="</div>";
+			pupop_html +="</div>";
+			pupop_html +="<span class='lovdmx-setwin'></span>";
+			pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+		pupop_html +="</div>";
+
+		$("body").append(pupop_html);
+		addBackground();
+    });
+    
+    $("body").on("click",".slideshow-edit",function(){
+    	var pupop_html="";
+    	var _href=$(this).attr("data-link");
+ 
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(json){
+		    	//路径
+		    	var path =$("#pageContext").val();
+		    	var _slideshow=json;
+		    	
+		    	//组装添加用户
+		    	pupop_html +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window' style='left:700px;top:250px;width:510px;height:460px;' >";
+					pupop_html +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加轮播图</div>";
+					pupop_html +="<div class='lovdmx-content' style='height:410px'>";
+					pupop_html +="<input type='hidden' value='"+_slideshow.id+"' name='id'>";
+						pupop_html +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>轮播图片</label>";
+								pupop_html +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+									pupop_html +="<li><input type='file' name='image' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/"+_slideshow.img+"' class='lovdmx-upload-img upload' /></li>";
+								pupop_html +="</ul></div>";
+							pupop_html +="</div>";
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>访问地址</label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='text' name='url' placeholder='请输入用户名'value='"+_slideshow.url+"'  class='lovdmx-input'></div>";
+							pupop_html +="</div>";
+							
+							var stick_class="";
+							var _checked="";
+							
+							if(_slideshow.istop==1){
+								stick_class="lovdmx-form-onswitch";
+								_checked="checked";
+							}
+							
+							pupop_html +="<div class='lovdmx-form-item '>";
+								pupop_html +="<label class='lovdmx-form-lable'>置顶</label>";
+								pupop_html +="<div class='lovdmx-input-block'>";
+									pupop_html +="<input type='checkbox' lay-filter='switch' lay-verify='required' name='istop' "+_checked+" lay-skin='switch' lay-text='ON|OFF'>";
+									pupop_html +="<div class='lovdmx-unselect lovdmx-form-switch "+stick_class+"'><em>OFF</em><i></i></div>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'>发布时间</label>";
+								pupop_html +="<div class='lovdmx-input-inline'>";
+									pupop_html +="<input type='datetime-local' name='publishTime' class='lovdmx-input' value='"+_slideshow.timeStamp+"'  id='publish' placeholder='yyyy-MM-ddTHH:mm:ss'>";
+								pupop_html +="</div>";
+							pupop_html +="</div>";
+							
+							pupop_html +="<div class='lovdmx-form-item'>";
+								pupop_html +="<label class='lovdmx-form-lable'></label>";
+								pupop_html +="<div class='lovdmx-input-inline'><input type='button' id='update-slideshow' placeholder='提交' class='lovdmx-btn' value='确认'></div>";
+							pupop_html +="</div>";
+						pupop_html +="</div>";
+					pupop_html +="</div>";
+					pupop_html +="<span class='lovdmx-setwin'></span>";
+					pupop_html +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+					pupop_html +="<i class='iconfont icon-ic_close close'></i>";
+				pupop_html +="</div>";
+
+				$("body").append(pupop_html);
+				addBackground();
+		    	
+		    }
+    	});
+    });
+    
+    
+    $("body").on("click","#news-add",function(){
+    	//路径
+    	var path =$("#pageContext").val();
+    	var news_add="";
+	    news_add +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window'style='left:350px;top:70px;width:1000px;height:750px;' >";
+	    	news_add +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加新闻</div>";
+	    	news_add +="<div class='lovdmx-content' id='lovdmx-add-user' style='height:700px'>";
+	    		news_add +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+	    			news_add +="<div class='lovdmx-form-item '>";
+	    				news_add +="<label class='lovdmx-form-lable'>新闻标题</label>";
+	    				news_add +="<div class='lovdmx-input-inline'><input type='text' name='title' placeholder='请输入新闻标题' class='lovdmx-input'></div>";
+	    			news_add +="</div>";
+	    			
+		    		news_add +="<div class='lovdmx-form-item '>";
+		    			news_add +="<label class='lovdmx-form-lable'>新闻(引导)词</label>";
+		    			news_add +="<table class='table'>";
+		    				news_add +="<thead>";
+		    					news_add +="<tr>";
+		    						news_add +="<th>";
+		    							news_add +="<button class='lovdmx-btn' id='add-news-word' type='button'>添加(引导)词</button>";
+		    						news_add +="</th>";
+		    						news_add +="<th>操作</th>";
+		    					news_add +="</tr>";
+		    				news_add +="</thead>";
+		    				news_add +="<tbody>";
+		    					news_add +="<tr>";
+		    						news_add +="<td><input type='text' name='word' placeholder='请输入(引导)词' class='lovdmx-input'></td>";
+		    						news_add +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+		    					news_add +="</tr>";
+		    				news_add +="</tbody>";
+		    			news_add +="</table>";
+		    		news_add +="</div>";
+		    		
+			    	news_add +="<div class='lovdmx-form-item '>";
+		    			news_add +="<label class='lovdmx-form-lable'>新闻内容</label>";
+		    			news_add +="<table class='table'>";
+		    				news_add +="<thead>";
+		    					news_add +="<tr>";
+		    						news_add +="<th>";
+		    							news_add +="<button class='lovdmx-btn' id='add-news-content' type='button'>添加内容</button>";
+		    						news_add +="</th>";
+		    						news_add +="<th>操作</th>";
+		    					news_add +="</tr>";
+		    				news_add +="</thead>";
+		    				news_add +="<tbody>";
+		    					news_add +="<tr>";
+		    						news_add +="<td><input type='text' name='content' placeholder='请输入新闻内容' class='lovdmx-input'></td>";
+		    						news_add +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+		    					news_add +="</tr>";
+		    				news_add +="</tbody>";
+		    			news_add +="</table>";
+		    		news_add +="</div>";
+		    		
+			    	news_add +="<div class='lovdmx-form-item'>";
+	    				news_add +="<label class='lovdmx-form-lable'>新闻背景图片</label>";
+	    				news_add +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+	    					news_add +="<li><input type='file' name='newsBgImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+	    				news_add +="</ul></div>";
+	    			news_add +="</div>";
+	    			news_add +="<div class='lovdmx-form-item'>";
+	    				news_add +="<label class='lovdmx-form-lable'>新闻图片</label>";
+	    				news_add +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+	    					news_add +="<li><input type='file' name='newsImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /></li>";
+	    				news_add +="</ul></div>";
+	    			news_add +="</div>";
+	    			
+		    		news_add +="<div class='lovdmx-form-item '>";
+	    				news_add +="<label class='lovdmx-form-lable'>(公众号)地址</label>";
+	    				news_add +="<div class='lovdmx-input-inline'><input type='text' name='link' placeholder='请输入新闻标题' class='lovdmx-input'></div>";
+	    			news_add +="</div>";
+	    			
+	    			news_add +="<div class='lovdmx-form-item'>";
+	    				news_add +="<label class='lovdmx-form-lable'>运行时间</label>";
+	    				news_add +="<div class='lovdmx-input-inline'>";
+	    					news_add +="<input type='date' name='runTime' class='lovdmx-input'  id='publish' placeholder='yyyy-MM-dd'>";
+	    				news_add +="</div>";
+	    			news_add +="</div>";
+	    			
+	    			news_add +="<div class='lovdmx-form-item '>";
+		    			news_add +="<label class='lovdmx-form-lable'>置顶</label>";
+		    			news_add +="<div class='lovdmx-input-block'>";
+			    			news_add +="<input type='checkbox' class='none' lay-filter='switch' lay-verify='required' name='istop' lay-skin='switch' lay-text='ON|OFF'>";
+			    			news_add +="<div class='lovdmx-unselect lovdmx-form-switch'><em>OFF</em><i></i></div>";
+		    			news_add +="</div>";
+	    			news_add +="</div>";
+	
+	    			news_add +="<div class='lovdmx-form-item'>";
+	    				news_add +="<label class='lovdmx-form-lable'></label>";
+	    				news_add +="<div class='lovdmx-input-inline'><input type='button'  placeholder='提交' id='submit-news'  class='lovdmx-btn' value='提交'></div>";
+	    			news_add +="</div>";
+	    		news_add +="</div>";
+	    	news_add +="</div>";
+	    	news_add +="<span class='lovdmx-setwin'></span>";
+	    	news_add +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+	    	news_add +="<i class='iconfont icon-ic_close close'></i>";
+	    news_add +="</div>";
+	    $("body").append(news_add);
+		addBackground();
+    	
+    });
+    
+    
+    
+    $("body").on("click",".news-edit",function(){
+    	var pupop_html="";
+    	var _href=$(this).attr("data-link");
+ 
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(json){
+		    	//路径
+		    	var path =$("#pageContext").val();
+		    	var _news=json;
+		    	
+		    	var news_edit="";
+		    	news_edit +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window'style='left:350px;top:70px;width:1000px;height:750px;' >";
+		    		news_edit +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>编辑新闻</div>";
+		    		news_edit +="<div class='lovdmx-content' id='lovdmx-add-user' style='height:700px'>";
+		    			news_edit +="<input value='"+_news.newsId+"' name='newsId' type='hidden'";
+		    			news_edit +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+		    				news_edit +="<div class='lovdmx-form-item '>";
+		    					news_edit +="<label class='lovdmx-form-lable'>新闻标题</label>";
+		    					news_edit +="<div class='lovdmx-input-inline'><input type='text' name='title' value='"+_news.title+"' placeholder='请输入新闻标题' class='lovdmx-input'></div>";
+		    				news_edit +="</div>";
+		    				
+		    				news_edit +="<div class='lovdmx-form-item '>";
+		    					news_edit +="<label class='lovdmx-form-lable'>新闻(引导)词</label>";
+		    					news_edit +="<table class='table'>";
+		    						news_edit +="<thead>";
+		    							news_edit +="<tr>";
+		    								news_edit +="<th>";
+		    									news_edit +="<button class='lovdmx-btn' id='add-news-word' type='button'>添加(引导)词</button>";
+		    								news_edit +="</th>";
+		    								news_edit +="<th>操作</th>";
+		    							news_edit +="</tr>";
+		    						news_edit +="</thead>";
+		    						news_edit +="<tbody>";
+		    							var wordList= _news.wordList;
+		    							for(var i =0;i<wordList.length;i++){
+			    							news_edit +="<tr>";
+			    								news_edit +="<td><input type='text' name='word' value='"+wordList[i]+"' placeholder='请输入(引导)词' class='lovdmx-input'></td>";
+			    								news_edit +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+			    							news_edit +="</tr>";
+		    							}
+		    						news_edit +="</tbody>";
+		    					news_edit +="</table>";
+		    				news_edit +="</div>";
+		    				
+		    				news_edit +="<div class='lovdmx-form-item '>";
+		    					news_edit +="<label class='lovdmx-form-lable'>新闻内容</label>";
+		    					news_edit +="<table class='table'>";
+		    						news_edit +="<thead>";
+		    							news_edit +="<tr>";
+		    								news_edit +="<th>";
+		    									news_edit +="<button class='lovdmx-btn' id='add-news-content' type='button'>添加内容</button>";
+		    								news_edit +="</th>";
+		    								news_edit +="<th>操作</th>";
+		    							news_edit +="</tr>";
+		    						news_edit +="</thead>";
+		    						news_edit +="<tbody>";
+		    						var contentList = _news.contentList;
+		    						for(var i =0;i<contentList.length;i++){
+		    							news_edit +="<tr>";
+		    								news_edit +="<td><input type='text' name='content' value='"+contentList[i]+"' placeholder='请输入新闻内容' class='lovdmx-input'></td>";
+		    								news_edit +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+		    							news_edit +="</tr>";
+		    						}
+		    						news_edit +="</tbody>";
+		    					news_edit +="</table>";
+		    				news_edit +="</div>";
+		    				
+		    				news_edit +="<div class='lovdmx-form-item'>";
+		    					news_edit +="<label class='lovdmx-form-lable'>新闻背景图片</label>";
+		    					news_edit +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+		    						news_edit +="<li><input type='file' name='newsBgImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/"+_news.bgImg+"' class='lovdmx-upload-img upload' /></li>";
+		    					news_edit +="</ul></div>";
+		    				news_edit +="</div>";
+		    				news_edit +="<div class='lovdmx-form-item'>";
+		    					news_edit +="<label class='lovdmx-form-lable'>新闻图片</label>";
+		    					news_edit +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+		    						news_edit +="<li><input type='file' name='newsImage' hidden='hidden' onchange='uploadPicture(this)'/><img src='"+path+"/"+_news.img+"' class='lovdmx-upload-img upload' /></li>";
+		    					news_edit +="</ul></div>";
+		    				news_edit +="</div>";
+		    				
+		    				news_edit +="<div class='lovdmx-form-item '>";
+		    					news_edit +="<label class='lovdmx-form-lable'>(公众号)地址</label>";
+		    					news_edit +="<div class='lovdmx-input-inline'><input type='text' name='link' value='"+_news.link+"' placeholder='请输入新闻标题' class='lovdmx-input'></div>";
+		    				news_edit +="</div>";
+		    				
+		    				news_edit +="<div class='lovdmx-form-item'>";
+		    					news_edit +="<label class='lovdmx-form-lable'>运行时间</label>";
+		    					news_edit +="<div class='lovdmx-input-inline'>";
+		    						news_edit +="<input type='date' name='runTime' class='lovdmx-input' value='"+_news.time+"'  id='publish' placeholder='yyyy-MM-dd'>";
+		    					news_edit +="</div>";
+		    				news_edit +="</div>";
+		    				
+		    				var stick_class="";
+		    				var _checked="";
+		    				if(_news.istop==1){
+								stick_class="lovdmx-form-onswitch";
+								_checked="checked";
+							}
+							
+		    				news_edit +="<div class='lovdmx-form-item '>";
+			    				news_edit +="<label class='lovdmx-form-lable'>置顶</label>";
+			    				news_edit +="<div class='lovdmx-input-block'>";
+				    				news_edit +="<input type='checkbox' lay-filter='switch' class='none' lay-verify='required' name='istop' "+_checked+" lay-skin='switch' lay-text='ON|OFF'>";
+				    				news_edit +="<div class='lovdmx-unselect lovdmx-form-switch "+stick_class+"'><em>OFF</em><i></i></div>";
+			    				news_edit +="</div>";
+		    				news_edit +="</div>";
+		    				
+		    				news_edit +="<div class='lovdmx-form-item'>";
+		    					news_edit +="<label class='lovdmx-form-lable'></label>";
+		    					news_edit +="<div class='lovdmx-input-inline'><input type='button'  placeholder='提交' id='update-news'  class='lovdmx-btn' value='提交'></div>";
+		    				news_edit +="</div>";
+		    		news_edit +="</div>";
+		    		news_edit +="<span class='lovdmx-setwin'></span>";
+		    		news_edit +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+		    		news_edit +="<i class='iconfont icon-ic_close close'></i>";
+		    	news_edit +="</div>";
+		    	$("body").append(news_edit);
+		    	addBackground();
+		    	
+		    }
+    	 });
+    });
+    
+    $("#dynamicNews-add").click(function(){
+    	//路径
+    	var path =$("#pageContext").val();
+    	var dynamicNews_add="";
+    	
+	    dynamicNews_add +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window'style='left:350px;top:70px;width:790px;height:700px;' >";
+	    	dynamicNews_add +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加新闻动态</div>";
+	    	dynamicNews_add +="<div class='lovdmx-content' id='lovdmx-add-user' style='height:650px'>";
+	    		dynamicNews_add +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+	    			
+	    			dynamicNews_add +="<div class='lovdmx-form-item '>";
+	    				dynamicNews_add +="<label class='lovdmx-form-lable'>新闻动态信息</label>";
+	    				dynamicNews_add +="<table class='table'>";
+	    					dynamicNews_add +="<thead>";
+	    						dynamicNews_add +="<tr>";
+	    							dynamicNews_add +="<th>";
+	    								dynamicNews_add +="<button class='lovdmx-btn' id='add-dynamicNews-content' type='button'>信息内容</button>";
+	    							dynamicNews_add +="</th>";
+	    							dynamicNews_add +="<th>操作</th>";
+	    						dynamicNews_add +="</tr>";
+	    					dynamicNews_add +="</thead>";
+	    					dynamicNews_add +="<tbody>";
+	    						dynamicNews_add +="<tr>";
+	    							dynamicNews_add +="<td><input type='text' name='content' placeholder='请输入内容' class='lovdmx-input'></td>";
+	    							dynamicNews_add +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+	    						dynamicNews_add +="</tr>";
+	    					dynamicNews_add +="</tbody>";
+	    				dynamicNews_add +="</table>";
+	    			dynamicNews_add +="</div>";
+	    			
+		    		dynamicNews_add +="<div class='lovdmx-form-item'>";
+	    				dynamicNews_add +="<label class='lovdmx-form-lable'>类型</label>";
+	    				dynamicNews_add +="<div class='lovdmx-upload-preview'>";
+	    					dynamicNews_add +="<button class='lovdmx-select-btn active' data-type='1'>图片</button>";
+	    					dynamicNews_add +="<button class='lovdmx-select-btn' data-type='2'>视频</button>";
+	    				dynamicNews_add +="</div>";
+	    			dynamicNews_add +="</div>";
+	    			
+	    			dynamicNews_add +="<div class='lovdmx-form-item dynamicNews-img'>";
+		    			dynamicNews_add +="<label class='lovdmx-form-lable'>新闻动态图</label>";
+		    			dynamicNews_add +="<div class='lovdmx-input-inline'><input type='button'  class='lovdmx-btn add-dynamicNews-img' value='添加图'></div>";
+		    		dynamicNews_add +="</div>";
+		    		dynamicNews_add +="<div class='lovdmx-form-item dynamicNews-img ' >";
+		    			dynamicNews_add +="<label class='lovdmx-form-lable'></label>";
+	    				dynamicNews_add +="<div class='lovdmx-upload-preview ' style='margin-left:120px;'><ul id='upload-appImgs' class='add-picture fl_child clearFix'>";
+	    					dynamicNews_add +="<li><input type='file' name='imgs' hidden='hidden' onchange='uploadPicture(this)' /><img src='"+path+"/image/zanwu.png' class='lovdmx-upload-img upload' /><i class='iconfont icon-ic_close remove-img'></i></li>";
+	    				dynamicNews_add +="</ul></div>";
+	    			dynamicNews_add +="</div>";
+	    			
+	    			dynamicNews_add +="<div class='lovdmx-form-item none dynamicNews-video'>";
+	    				dynamicNews_add +="<label class='lovdmx-form-lable'>视频</label>";
+	    				dynamicNews_add +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+	    					dynamicNews_add +="<li><input type='file' name='video' hidden='hidden' onchange='uploadVideo(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/zanwuVideo.png' ></li>";
+	    				dynamicNews_add +="</ul></div>";
+	    			dynamicNews_add +="</div>";
+	    			
+	    			dynamicNews_add +="<div class='lovdmx-form-item'>";
+	    				dynamicNews_add +="<label class='lovdmx-form-lable'>发布时间</label>";
+	    				dynamicNews_add +="<div class='lovdmx-input-inline'>";
+	    					dynamicNews_add +="<input type='date' name='publishTime' class='lovdmx-input'  id='publish' placeholder='yyyy-MM-dd'>";
+	    				dynamicNews_add +="</div>";
+	    			dynamicNews_add +="</div>";
+	
+	    			dynamicNews_add +="<div class='lovdmx-form-item'>";
+	    				dynamicNews_add +="<label class='lovdmx-form-lable'></label>";
+	    				dynamicNews_add +="<div class='lovdmx-input-inline'><input type='button'  placeholder='提交' id='submit-dynamicNews'  class='lovdmx-btn' value='提交'></div>";
+	    			dynamicNews_add +="</div>";
+	    		dynamicNews_add +="</div>";
+	    	dynamicNews_add +="</div>";
+	    	dynamicNews_add +="<span class='lovdmx-setwin'></span>";
+	    	dynamicNews_add +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+	    	dynamicNews_add +="<i class='iconfont icon-ic_close close'></i>";
+	    dynamicNews_add +="</div>";
+    	
+    	
+	    $("body").append(dynamicNews_add);
+		addBackground();
+    });
+    
+    
+    $("body").on("click",".dynamicNews-edit",function(){
+    	
+    	var dynamicNews_edit="";
+    	var _href=$(this).attr("data-link");
+ 
+    	$.ajax({
+		    type: "GET",
+		    url: _href,
+		    success: function(json){
+		    	//路径
+		    	var path =$("#pageContext").val();
+		    	var _dynamicNews=json;
+		    	
+			    dynamicNews_edit +="<div class='lovdmx-popup-window lovdmx-admin' data-value='window' id='lovdmx-popup-window'style='left:350px;top:70px;width:790px;height:700px;' >";
+			    	dynamicNews_edit +="<div class='lovdmx-title' id='drag' style='cursor: move;' onselectstart='return false'>添加新闻动态</div>";
+			    	dynamicNews_edit +="<div class='lovdmx-content' id='lovdmx-add-user' style='height:650px'>";
+			    		dynamicNews_edit +="<div class='lovdmx-form' style='padding: 20px 30px 0 0;'>";
+			    		dynamicNews_edit +="<input type='hidden' value='"+_dynamicNews.newsId+"' name='newsId' >";
+			    			dynamicNews_edit +="<div class='lovdmx-form-item '>";
+			    				dynamicNews_edit +="<label class='lovdmx-form-lable'>新闻动态信息</label>";
+			    				dynamicNews_edit +="<table class='table'>";
+			    					dynamicNews_edit +="<thead>";
+			    						dynamicNews_edit +="<tr>";
+			    							dynamicNews_edit +="<th>";
+			    								dynamicNews_edit +="<button class='lovdmx-btn' id='add-dynamicNews-content' type='button'>信息内容</button>";
+			    							dynamicNews_edit +="</th>";
+			    							dynamicNews_edit +="<th>操作</th>";
+			    						dynamicNews_edit +="</tr>";
+			    					dynamicNews_edit +="</thead>";
+			    					dynamicNews_edit +="<tbody>";
+			    					var contentList= _dynamicNews.contentList;
+		    						for(var i=0;i<contentList.length;i++){
+			    						dynamicNews_edit +="<tr>";
+			    							dynamicNews_edit +="<td><input type='text' name='content' placeholder='请输入内容' value='"+contentList[i]+"' class='lovdmx-input'></td>";
+			    							dynamicNews_edit +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+			    						dynamicNews_edit +="</tr>";
+		    						}
+			    					dynamicNews_edit +="</tbody>";
+			    				dynamicNews_edit +="</table>";
+			    			dynamicNews_edit +="</div>";
+			    			//类型状态
+			    			var img_active="";
+			    			var video_active="";
+			    			
+			    			var img_status="";
+			    			var video_status="";
+			    			
+			    			if(_dynamicNews.typeId==1){
+			    				img_active="active";
+			    				img_status="";
+			    				video_status="none";
+			    			}else{
+			    				video_active="active";
+			    				img_status="none";
+			    				video_status="";
+			    			}
+			    			
+			    			dynamicNews_edit +="<div class='lovdmx-form-item'>";
+			    				dynamicNews_edit +="<label class='lovdmx-form-lable'>类型</label>";
+			    				dynamicNews_edit +="<div class='lovdmx-upload-preview'>";
+			    					dynamicNews_edit +="<button class='lovdmx-select-btn "+img_active+"'  data-type='1'>图片</button>";
+			    					dynamicNews_edit +="<button class='lovdmx-select-btn "+video_active+"' data-type='2'>视频</button>";
+			    				dynamicNews_edit +="</div>";
+			    			dynamicNews_edit +="</div>";
+			    			
+			    			dynamicNews_edit +="<div class='lovdmx-form-item "+img_status+" dynamicNews-img'>";
+			    				dynamicNews_edit +="<label class='lovdmx-form-lable'>新闻动态图</label>";
+			    				dynamicNews_edit +="<div class='lovdmx-input-inline'><input type='button'  class='lovdmx-btn add-dynamicNews-img' value='添加图'></div>";
+			    			dynamicNews_edit +="</div>";
+			    			dynamicNews_edit +="<div class='lovdmx-form-item "+img_status+" dynamicNews-img ' >";
+			    				dynamicNews_edit +="<label class='lovdmx-form-lable'></label>";
+			    				dynamicNews_edit +="<div class='lovdmx-upload-preview ' style='margin-left:120px;'><ul id='upload-appImgs' class='add-picture fl_child clearFix'>";
+			    					var imgList= _dynamicNews.imgList;
+			    					if(imgList!=null && imgList.length>0){
+			    						for(var i=0;i<imgList.length;i++){
+			    							dynamicNews_edit +="<li><input type='file' name='imgs' data-type='1' data-index='"+i+"'  hidden='hidden' onchange='uploadPicture(this)' /><img src='"+path+"/"+imgList[i]+"' class='lovdmx-upload-img upload' /><i class='iconfont icon-ic_close remove-img'></i></li>";
+			    						}
+			    					}
+			    				dynamicNews_edit +="</ul></div>";
+			    			dynamicNews_edit +="</div>";
+			    			
+			    			dynamicNews_edit +="<div class='lovdmx-form-item "+video_status+" dynamicNews-video'>";
+			    				dynamicNews_edit +="<label class='lovdmx-form-lable'>视频</label>";
+			    				dynamicNews_edit +="<div class='lovdmx-upload-preview'><ul class='fl_child clearFix'>";
+			    					if(_dynamicNews.typeId==2){
+			    						dynamicNews_edit +="<li><input type='file' name='video' hidden='hidden' onchange='updateUploadVideo(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/video.jpg' ></li>";
+			    					}else{
+			    						dynamicNews_edit +="<li><input type='file' name='video' hidden='hidden' onchange='uploadVideo(this)' /><img class='lovdmx-upload-img upload' src='"+path+"/image/zanwuVideo.png' ></li>";
+			    					}
+			    				dynamicNews_edit +="</ul></div>";
+			    			dynamicNews_edit +="</div>";
+			    			
+			    			dynamicNews_edit +="<div class='lovdmx-form-item'>";
+			    				dynamicNews_edit +="<label class='lovdmx-form-lable'>发布时间</label>";
+			    				dynamicNews_edit +="<div class='lovdmx-input-inline'>";
+			    					dynamicNews_edit +="<input type='date' name='publishTime' class='lovdmx-input' value='"+_dynamicNews.time+"'  id='publish' placeholder='yyyy-MM-dd'>";
+			    				dynamicNews_edit +="</div>";
+			    			dynamicNews_edit +="</div>";
+	
+			    			dynamicNews_edit +="<div class='lovdmx-form-item'>";
+			    				dynamicNews_edit +="<label class='lovdmx-form-lable'></label>";
+			    				dynamicNews_edit +="<div class='lovdmx-input-inline'><input type='button'  placeholder='提交' id='update-dynamicNews'  class='lovdmx-btn' value='提交'></div>";
+			    			dynamicNews_edit +="</div>";
+			    		dynamicNews_edit +="</div>";
+			    	dynamicNews_edit +="</div>";
+			    	dynamicNews_edit +="<span class='lovdmx-setwin'></span>";
+			    	dynamicNews_edit +="<span class='lovdmx-resize' id='lovdmx-resize'></span>";
+			    	dynamicNews_edit +="<i class='iconfont icon-ic_close close'></i>";
+			    dynamicNews_edit +="</div>";
+		    	
+			    $("body").append(dynamicNews_edit);
+				addBackground();
+		    }
+    	});
+    	
+    });
+    
+    
+});
+
+//添加背景
+function addBackground(){
+	var background="";
+	background +="<div class='lovdmx-shade' id='lovdmx-shade2' style='z-index: 9999; background-color: rgb(0, 0, 0); opacity: 0.3;'></div>";
+	$("body").append(background);
+}
+
+
+//添加图片类型
+function addParameterImgType(productContent,parameter,path) {
+	var addImg="";
+	addImg +="<div class='lovdmx-form-item none new-parameter upload-parameter"+parameter.id+"' data-id='"+productContent.id+"'>";
+		addImg +="<label class='lovdmx-form-lable'>"+parameter.name+"</label>";
+		addImg +="<div class='lovdmx-upload-preview'>";
+			addImg +="<ul class='fl_child clearFix'>";
+				addImg +="<li><input type='file' name='file' hidden='hidden' onchange='uploadPicture(this)'><img src='"+path+"/"+productContent.img+"' class='lovdmx-upload-img upload'>";
+				addImg +="</li>";
+			addImg +="</ul>";
+		addImg +="</div>";
+	addImg +="</div>";
+	
+	return addImg;
+}
+// 添加性能描述类型
+function addParameterPerformanceType(productContent,parameter) {
+	var addPerformance="";
+	
+	addPerformance +="<div class='lovdmx-form-item none new-parameter upload-parameter"+parameter.id+"'  data-id='"+productContent.id+"'>";
+		addPerformance +="<label class='lovdmx-form-lable'>"+parameter.name+"</label>";
+		addPerformance +="<table class='table table-parameter'>";
+			addPerformance +="<thead>";
+				addPerformance +="<tr>";
+					addPerformance +="<th>";
+						addPerformance +="<button class='lovdmx-btn' id='add-performance' type='button'>添加特点</button>";
+					addPerformance +="</th>";
+					addPerformance +="<th>操作</th>";
+				addPerformance +="</tr>";
+			addPerformance +="</thead>";
+			addPerformance +="<tbody>";
+			
+			for(var i=0;i<productContent.contentList.length;i++){
+				var value = productContent.contentList[i];
+				addPerformance +="<tr>";
+					addPerformance +="<td><input type='text' name='content' value='"+value+"' placeholder='请输入 注释' class='lovdmx-input'></td>";
+					addPerformance +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+				addPerformance +="</tr>";
+			}
+				
+			addPerformance +="</tbody>";
+			
+			addPerformance +="<tfoot>";
+				addPerformance +="<tr>";
+					addPerformance +="<td colspan='2'><input type='text' name='annotation' value='"+productContent.annotation+"'  placeholder='请输入规格参数' class='lovdmx-input'></td>";
+				addPerformance +="</tr>";
+			addPerformance +="</tfoot>";
+		addPerformance +="</table>";
+	addPerformance +="</div>";
+	
+	return addPerformance;
+}
+
+// 添加规格类型
+function addParameterSpecificationType(productContent,parameter) {
+	var specificationList=productContent.specificationList;
+	var addSpecification="";
+	
+	addSpecification +="<div class='lovdmx-form-item none new-parameter upload-parameter"+parameter.id+"' data-id='"+productContent.id+"'>";
+		addSpecification +="<label class='lovdmx-form-lable'>"+parameter.name+"</label>";
+		addSpecification +="<table class='table table-parameter'>";
+			addSpecification +="<thead>";
+				addSpecification +="<tr>";
+					addSpecification +="<th colspan='2'>";
+					addSpecification +="<button class='lovdmx-btn' id='add-specification' type='button'>添加规格</button>";
+					addSpecification +="</th>";
+					addSpecification +="<th>操作</th>";
+				addSpecification +="</tr>";
+			addSpecification +="</thead>";
+			addSpecification +="<tbody>";
+				for(var i=0;i<specificationList.length;i++){
+					var value =specificationList[i];
+					var split = value.split("&!&");
+					addSpecification +="<tr>";
+						for(var j=0;j<split.length;j++){
+							addSpecification +="<td><input type='text' name='username' value='"+split[j]+"' placeholder='请输入规格参数' class='lovdmx-input'></td>";
+						}
+						addSpecification +="<td><a class='lovdmx-btn lovdmx-btn-del lovdmx-btn-xs  remove-table-tr'><i class='icon-shanchu lovdmx-icon iconfont '></i>删除</a></td>";
+					addSpecification +="</tr>";
+				}
+			addSpecification +="</tbody>";
+		addSpecification +="</table>";
+	addSpecification +="</div>";
+	
+	return addSpecification;
+}
+
+// 添加文件类型
+function addParameterFileType(productContent,parameter,path) {
+	var addFile = "";
+	
+	addFile +="<div class='lovdmx-form-item none new-parameter upload-parameter"+parameter.id+"'  data-id='"+productContent.id+"'>";
+		addFile +="<label class='lovdmx-form-lable'>"+parameter.name+"</label>";
+		addFile +="<div class='lovdmx-input-inline'><input type='text' placeholder='请上传文件' value='"+path+"/"+productContent.file+"' class='lovdmx-input'></div>";
+		addFile +="<input type='file' name='file' onchange='uploadFile(this)'  class='lovdmx-upload-file'>";
+		addFile +="<button class='lovdmx-btn upload-file' type='button'>上传图片</button>";
+	addFile +="</div>";
+	
+	return addFile;
+}
+
+
+

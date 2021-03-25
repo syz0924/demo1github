@@ -1,0 +1,10 @@
+package com.lovdmx.control.service.impl;
+
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.pojo.SpriteDevice;
+import com.lovdmx.control.service.SpriteDeviceService;
+
+@Service("spriteDeviceService")
+public class SpriteDeviceServiceImpl extends BaseServiceImpl<SpriteDevice> implements SpriteDeviceService {
+}

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.RtrDeviceMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.RtrDevice">
+		<id column="rtr_id" property="rtrId" jdbcType="INTEGER" />
+		<result column="mac" property="mac" jdbcType="CHAR" />
+		<result column="ip" property="ip" jdbcType="CHAR" />
+		<result column="rack_index" property="rackIndex" jdbcType="INTEGER" />
+		<result column="rack_name" property="rackName" jdbcType="VARCHAR" />
+		<result column="project_name" property="projectName" jdbcType="VARCHAR" />
+		<result column="model_size" property="modelSize" jdbcType="VARCHAR" />
+		<result column="cur_mode" property="curMode" jdbcType="CHAR" />
+		<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+		<result column="is_online" property="isOnline" jdbcType="DECIMAL" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		rtr_id, mac, ip, model_size, cur_mode, rack_id,
+		is_online
+	</sql>
+	<select id="findAll" resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.RtrDevice">
+		select
+		<include refid="Base_Column_List" />
+		from dev_rtr_device
+	</select>
+
+	<select id="findByRtrMacOrModeIdOrIsOnlineOrRackId"
+		resultMap="BaseResultMap" parameterType="com.lovdmx.control.pojo.RtrDevice">
+		select rtrd.rtr_id rtr_id, rtrd.mac mac, rtrd.ip ip,
+		rtrd.model_size
+		model_size, rtrd.cur_mode cur_mode, rtrd.rack_id
+		rack_id,
+		rtrd.is_online is_online,racd.rack_name rack_name,racd.rack_index
+		rack_index,prop.project_name project_name from
+		dev_rtr_device
+		rtrd inner
+		join dev_rack_device racd on
+		rtrd.rack_id=racd.rack_id inner join
+		pro_project prop on
+		racd.project_id=prop.project_id
+		<where>
+			<if test="mac != null and mac != ''">
+				AND rtrd.mac LIKE CONCAT(CONCAT('%',#{mac},'%'))
+			</if>
+			<if test="modeId != null and modeId != ''">
+				and rtrd.cur_mode = #{modeId}
+			</if>
+			<if test="isOnline != null">
+				and rtrd.is_online = #{isOnline}
+			</if>
+			<if test="rackId != null and rackId != ''">
+				and rtrd.rack_id = #{rackId}
+			</if>
+		</where>
+		order by racd.rack_index
+	</select>
+
+	<select id="findByMac" resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.RtrDevice">
+		select
+		<include refid="Base_Column_List" />
+		from dev_rtr_device where mac=#{rtrMac}
+	</select>
+
+	<select id="findByRackId" resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.RtrDevice">
+		select
+		<include refid="Base_Column_List" />
+		from dev_rtr_device where rack_id=#{rackId}
+	</select>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.RtrDevice">
+		select
+		<include refid="Base_Column_List" />
+		from dev_rtr_device
+		where rtr_id = #{rtrId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findByMd5Array" resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.RtrDevice">
+		select
+		<include refid="Base_Column_List" />
+		from dev_rtr_device
+		where mac in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="findRTRNotExistRTRDeviceInfo">
+		select rtd.rack_id as rack_id,rtd.mac as mac,rtd.ip
+		as ip,rtd.model_size as model_size,rtd.cur_mode as
+		cur_mode,rtd.rack_id as rack_id,rtd.is_online as is_online from
+		dev_rtr_device as rtd inner join dev_rack_device as rad on
+		rtd.rack_id=rad.rack_id where rad.project_id=#{projectId} and rtd.mac
+		=#{mac}
+	</select>
+
+	<select id="findByParentId" resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.RtrDevice">
+		select
+		<include refid="Base_Column_List" />
+		from dev_rtr_device
+		where rack_id = #{parentId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="com.lovdmx.control.pojo.RtrDevice">
+		delete from
+		dev_rtr_device
+		where rtr_id = #{rtrId,jdbcType=INTEGER}
+	</delete>
+
+
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="rtrId"
+		parameterType="java.util.List">
+		insert into dev_rtr_device
+		(mac,ip,model_size,
+		cur_mode,rack_id,is_online)
+		values
+		<if test="list !=null">
+			<foreach collection="list" item="item" separator="," close=";">
+				(#{item.mac},#{item.ip},#{item.modelSize},#{item.curMode},#{item.rackId},#{item.isOnline})
+			</foreach>
+		</if>
+	</insert>
+
+
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.RtrDevice"
+		useGeneratedKeys="true" keyProperty="rtrId">
+		insert into dev_rtr_device
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="rtrId != null">
+				rtr_id,
+			</if>
+			<if test="mac != null">
+				mac,
+			</if>
+			<if test="ip != null">
+				ip,
+			</if>
+			<if test="modelSize != null">
+				model_size,
+			</if>
+			<if test="curMode != null">
+				cur_mode,
+			</if>
+			<if test="rackId != null">
+				rack_id,
+			</if>
+			<if test="isOnline != null">
+				is_online,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="rtrId != null">
+				#{rtrId,jdbcType=INTEGER},
+			</if>
+			<if test="mac != null">
+				#{mac,jdbcType=CHAR},
+			</if>
+			<if test="ip != null">
+				#{ip,jdbcType=CHAR},
+			</if>
+			<if test="modelSize != null">
+				#{modelSize,jdbcType=VARCHAR},
+			</if>
+			<if test="curMode != null">
+				#{curMode,jdbcType=CHAR},
+			</if>
+			<if test="rackId != null">
+				#{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="isOnline != null">
+				#{isOnline,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.RtrDevice">
+		update dev_rtr_device
+		<set>
+			<if test="mac != null">
+				mac = #{mac,jdbcType=CHAR},
+			</if>
+			<if test="ip != null">
+				ip = #{ip,jdbcType=CHAR},
+			</if>
+			<if test="modelSize != null">
+				model_size = #{modelSize,jdbcType=VARCHAR},
+			</if>
+			<if test="curMode != null">
+				cur_mode = #{curMode,jdbcType=CHAR},
+			</if>
+			<if test="rackId != null">
+				rack_id = #{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="isOnline != null">
+				is_online = #{isOnline,jdbcType=DECIMAL},
+			</if>
+		</set>
+		where rtr_id = #{rtrId,jdbcType=INTEGER}
+	</update>
+</mapper>

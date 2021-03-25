@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.RelayMapper">
+	<resultMap id="BaseResultMap"
+		type="com.lovdmx.control.pojo.Relay">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="gateway_mac" property="gatewayMac"
+			jdbcType="CHAR" />
+		<result column="rs485to_net_ip" property="rs485toNetIp"
+			jdbcType="CHAR" />
+		<result column="port" property="port" jdbcType="INTEGER" />
+		<result column="slave_addr" property="slaveAddr"
+			jdbcType="INTEGER" />
+		<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+		<result column="rack_name" property="rackName"
+			jdbcType="VARCHAR" />
+		<result column="number" property="number" jdbcType="INTEGER" />
+		<result column="electric_relay_loopON"
+			property="electricRelayLoopON" jdbcType="CHAR" />
+		<result column="electric_relay_loopOFF"
+			property="electricRelayLoopOFF" jdbcType="CHAR" />
+		<result column="is_online" property="isOnline"
+			jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, gateway_mac, rs485to_net_ip,port, slave_addr,number,
+		electric_relay_loopON,
+		electric_relay_loopOFF,is_online
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from ea_relay
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+
+	<select id="findByRelay" resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.Relay">
+		select rel.id, rel.gateway_mac, rel.rs485to_net_ip,port,
+		rel.slave_addr,number,
+		rel.electric_relay_loopON,
+		rel.electric_relay_loopOFF,rel.is_online,racd.rack_name,racd.rack_id
+		from ea_relay
+		rel inner join
+		ea_intelligent_gateway intg on
+		rel.gateway_mac=intg.mac
+		left
+		join
+		dev_rack_device racd on
+		intg.rack_id=racd.rack_id
+		<where>
+			<if test="gatewayMac != null and gatewayMac != ''">
+				AND rel.gateway_mac LIKE
+				CONCAT(CONCAT('%',#{gatewayMac},'%'))
+			</if>
+			<if test="rackId != null and rackId != ''">
+				AND racd.rack_id=#{rackId}
+			</if>
+			<if test="projectId != null and projectId != ''">
+				AND racd.project_id=#{projectId}
+			</if>
+		</where>
+		order by racd.rack_index is null,racd.rack_index
+	</select>
+
+	<select id="findGrouprs485toNetIpBygatewayMac"
+		resultMap="BaseResultMap">
+		select
+		rs485to_net_ip
+		from ea_relay where
+		gateway_mac=#{gatewayMac}
+		group by
+		rs485to_net_ip
+	</select>
+
+	<select id="findByGatewayMacAndRs485toNetIp"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from ea_relay where gateway_mac=#{gatewayMac} and
+		rs485to_net_ip=#{rs485toNetIp} order by rs485to_net_ip
+	</select>
+
+	<select id="findByGatewayMac" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from ea_relay where gateway_mac=#{gatewayMac} order by rs485to_net_ip
+	</select>
+
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		delete from
+		ea_relay
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert"
+		parameterType="com.lovdmx.control.pojo.Relay">
+		insert into ea_relay
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="gatewayMac != null">
+				gateway_mac,
+			</if>
+			<if test="rs485toNetIp != null">
+				rs485to_net_ip,
+			</if>
+			<if test="port != null">
+				port,
+			</if>
+			<if test="slaveAddr != null">
+				slave_addr,
+			</if>
+			<if test="number != null">
+				number,
+			</if>
+			<if test="electricRelayLoopON != null">
+				electric_relay_loopON,
+			</if>
+			<if test="electricRelayLoopOFF != null">
+				electric_relay_loopOFF,
+			</if>
+			<if test="isOnline != null">
+				is_online,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="gatewayMac != null">
+				#{gatewayMac,jdbcType=CHAR},
+			</if>
+			<if test="rs485toNetIp != null">
+				#{rs485toNetIp,jdbcType=CHAR},
+			</if>
+			<if test="port != null">
+				#{port,jdbcType=INTEGER},
+			</if>
+			<if test="slaveAddr != null">
+				#{slaveAddr,jdbcType=INTEGER},
+			</if>
+			<if test="number != null">
+				#{number,jdbcType=INTEGER},
+			</if>
+			<if test="electricRelayLoopON != null">
+				#{electricRelayLoopON,jdbcType=CHAR},
+			</if>
+			<if test="electricRelayLoopOFF != null">
+				#{electricRelayLoopOFF,jdbcType=CHAR},
+			</if>
+			<if test="isOnline != null">
+				#{isOnline,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="update"
+		parameterType="com.lovdmx.control.pojo.Relay">
+		update ea_relay
+		<set>
+			<if test="gatewayMac != null">
+				gateway_mac = #{gatewayMac,jdbcType=CHAR},
+			</if>
+			<if test="rs485toNetIp != null">
+				rs485to_net_ip = #{rs485toNetIp,jdbcType=CHAR},
+			</if>
+			<if test="port != null">
+				port = #{port,jdbcType=INTEGER},
+			</if>
+			<if test="slaveAddr != null">
+				slave_addr = #{slaveAddr,jdbcType=INTEGER},
+			</if>
+			<if test="number != null">
+				number = #{number,jdbcType=INTEGER},
+			</if>
+			<if test="electricRelayLoopON != null">
+				electric_relay_loopON =
+				#{electricRelayLoopON,jdbcType=CHAR},
+			</if>
+			<if test="electricRelayLoopOFF != null">
+				electric_relay_loopOFF =
+				#{electricRelayLoopOFF,jdbcType=CHAR},
+			</if>
+			<if test="isOnline != null">
+				is_online =
+				#{isOnline,jdbcType=INTEGER},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

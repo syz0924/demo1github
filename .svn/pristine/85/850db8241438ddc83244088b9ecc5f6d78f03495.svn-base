@@ -1,0 +1,114 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.common.thread 
+ * @author: Administrator   
+ * @date: 2019年1月18日 下午3:15:06 
+ */
+package com.lovdmx.control.common.thread;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RTRServiceSocketThread.java
+ * @Description: RTR服务端socket
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年1月18日 下午3:15:06
+ *
+ */
+public class RTRServerSocketThread extends ThreadUtil implements Runnable {
+
+	public static Socket socket = null;
+
+	// 服务端socket
+	private ServerSocket serverScoket = null;
+
+	// 端口号
+	private static final int ServerPort = 9006;
+
+	// Map中Integer 代表发送端的标识
+	// 根据key 来开启线程，所有的线程都保存到map键值对中
+	public static Map<String,RTRAnalysisSocketThread> map = new ConcurrentHashMap<String,RTRAnalysisSocketThread>();
+
+	/**
+	 * @see java.lang.Runnable#run()
+	 * @Function: RTRServiceSocketThread.java
+	 * @Description: 监听RTR客户端线程
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年1月18日 下午3:32:45
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年1月18日 Administrator v1.0.0 修改原因
+	 */
+	@Override
+	public void run() {
+
+		try {
+			serverScoket = new ServerSocket();
+
+			serverScoket.bind(new InetSocketAddress(ServerIP, ServerPort));
+			// 端口复用
+			serverScoket.setReuseAddress(true);
+			log.error("socket start");
+
+			while (FLAG) {
+				try {
+					// 侦听并接受到此套接字的连接。
+					socket = serverScoket.accept();
+					// 打印连接地址
+					log.error(socket.getInetAddress().getHostAddress());
+					// 指定超时时间
+					socket.setSoTimeout(1000 * 60);
+
+					RTRAnalysisSocketThread rtrAnalysisSocketThread = new RTRAnalysisSocketThread(socket);
+					boolean running = rtrAnalysisSocketThread.isRunning();
+					if (running) {
+						//MAC 地址
+						String mac = rtrAnalysisSocketThread.getMac();
+						if(!map.containsKey(mac)){
+							// 开启心跳包线程
+							Thread t = new Thread(rtrAnalysisSocketThread);
+							// t.start();
+							threadPoolTaskExecutor.execute(t);
+							
+							//  保存客户端信息到集合中
+							map.put(mac, rtrAnalysisSocketThread);
+						}else {
+							log.error("该线程 已在线!!!!!");
+						}
+						
+					} else {
+						log.error("格式错误!!!!!!!!!");
+					}
+				} catch (IOException e) {
+					log.error("ioe", e);
+				} catch (Exception e) {
+					e.printStackTrace();
+					log.error("Exc", e);
+				}
+
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+}

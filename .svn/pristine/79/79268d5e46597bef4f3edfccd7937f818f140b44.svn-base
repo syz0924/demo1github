@@ -1,0 +1,6 @@
+package com.lovdmx.control.service;
+
+import com.lovdmx.control.pojo.UploadVideos;
+
+public interface UploadVideosService extends BaseService<UploadVideos>{
+}

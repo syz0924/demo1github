@@ -1,0 +1,6 @@
+package com.lovdmx.control.mapper;
+
+import com.lovdmx.control.pojo.Dmx512Device;
+
+public interface Dmx512DeviceMapper extends BaseMapper<Dmx512Device> {
+}

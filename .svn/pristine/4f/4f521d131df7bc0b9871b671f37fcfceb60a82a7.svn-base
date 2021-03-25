@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<link rel="shortcut icon" href=./static/img/lei.jpg type=image/x-icon>
+<title>admin</title>
+<link href=./static/css/app.b9d4ebd0326565c1abb0c84e6640f0e0.css
+	rel=stylesheet>
+</head>
+<body>
+	<div id=app></div>
+	<script type=text/javascript
+		src=./static/js/manifest.3ad1d5771e9b13dbdad2.js></script>
+	<script type=text/javascript
+		src=./static/js/vendor.1aaa680a3f201bfc5c89.js></script>
+	<script type=text/javascript
+		src=./static/js/app.025ed9bee7b68556a0dc.js></script>
+</body>
+</html>

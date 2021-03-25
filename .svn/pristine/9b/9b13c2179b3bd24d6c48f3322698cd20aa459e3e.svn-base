@@ -1,0 +1,27 @@
+package com.lovdmx.control.mapper;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.lovdmx.control.pojo.EdlmxSplit;
+
+public interface EdlmxSplitMapper extends BaseMapper<EdlmxSplit> {
+
+	/**
+	 * 
+	 * @Function: EdlmxSplitMapper.java
+	 * @Description: 根据md5, 获取切割的数量
+	 *
+	 * @param:md5 文件MD5值
+	 * @return：Integer
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月19日 下午2:35:37
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月19日 Administrator v1.0.0 修改原因
+	 */
+	Integer findCountByMainMd5(@Param("md5") String md5);
+}

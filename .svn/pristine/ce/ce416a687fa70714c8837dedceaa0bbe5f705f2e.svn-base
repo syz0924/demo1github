@@ -1,0 +1,6 @@
+package com.lovdmx.control.service;
+
+import com.lovdmx.control.pojo.Account;
+
+public interface AccountService extends BaseService<Account>{
+}

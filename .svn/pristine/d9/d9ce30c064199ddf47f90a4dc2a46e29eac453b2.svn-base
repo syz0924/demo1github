@@ -1,0 +1,97 @@
+package com.lovdmx.control.common.socket;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import com.lovdmx.control.service.ProjectService;
+import com.lovdmx.control.service.UploadEdlmxService;
+import com.lovdmx.control.service.UploadVideosService;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: UtilThread.java
+ * @Description: 该类的功能描述
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年1月18日 下午5:21:35
+ *
+ */
+public class SocketUtils {
+
+	public static Log log = LogFactory.getLog(SocketUtils.class);
+	// 线程池
+	public static ThreadPoolTaskExecutor threadPoolTaskExecutor;
+	// 项目业务层
+	public static ProjectService projectService;
+	// 已上传视频业务层
+	public static UploadVideosService uploadVideosService;
+	// 已上传灯光业务层
+	public static UploadEdlmxService uploadEdlmxService;
+	// IP
+	public static final String ServerIP = "10.10.10.106";
+	// 状态
+	public static final boolean FLAG = true;
+
+	public SocketUtils() {
+	}
+
+	// 初始化业务层 对象
+	public static void setInitServiceObject(ThreadPoolTaskExecutor threadPoolTaskExecutor,
+			ProjectService projectService, UploadVideosService uploadVideosService,
+			UploadEdlmxService uploadEdlmxService) {
+		SocketUtils.threadPoolTaskExecutor = threadPoolTaskExecutor;
+		SocketUtils.projectService = projectService;
+		SocketUtils.uploadVideosService = uploadVideosService;
+		SocketUtils.uploadEdlmxService = uploadEdlmxService;
+	}
+
+	/**
+	 * 
+	 * @Function: ClientServiceUtils.java
+	 * @Description: 关闭流
+	 *
+	 * @param: socket
+	 *             socket对象
+	 * @param: dis
+	 *             输入流
+	 * @param: dos
+	 *             输出流
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年1月17日 下午2:42:58
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年1月17日 Administrator v1.0.0 修改原因
+	 */
+	public static void close(Socket socket, DataInputStream dis, DataOutputStream dos) {
+		try {
+			if (dis != null) {
+				dis.close();
+				dis = null;
+			}
+			if (dos != null) {
+				dos.close();
+				dos = null;
+			}
+			if (socket != null) {
+				socket.close();
+				socket = null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("关闭流异常======>>" + e);
+		}
+	}
+
+}

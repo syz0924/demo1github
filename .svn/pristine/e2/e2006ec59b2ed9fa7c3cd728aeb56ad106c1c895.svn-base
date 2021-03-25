@@ -1,0 +1,307 @@
+package com.lovdmx.control.common.thread;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.exception.OpCodeNotExitException;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: RTRAnalysisSocketThread.java
+ * @Description: 解析客户端连接Socket的信息
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年1月18日 下午5:17:01
+ *
+ */
+public class RTRAnalysisSocketThread extends ThreadUtil implements Runnable {
+
+	// 服务端socket
+	private Socket socket;
+
+	// 判断传送格式是否正确
+	private boolean isRunning;
+
+	// 启动线程
+	private boolean isOK = true;
+	// UID
+	private String UID;
+
+	// 输出流
+	private DataOutputStream dos = null;
+
+	// 输入流
+	private DataInputStream dis = null;
+
+	// 心跳包 次数
+	private int pktIndex = -1;
+
+	// 心跳包反馈
+	private byte[] bytes = new byte[23];
+
+	// 线程状态
+	private boolean isStop = true;
+	// MAC 地址
+	private String mac;
+
+	public RTRAnalysisSocketThread(Socket socket) {
+		this.socket = socket;
+		this.isRunning = init();
+	}
+
+	public void setOK(boolean isOK) {
+		this.isOK = isOK;
+	}
+
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	public void setRunning(boolean isRunning) {
+		this.isRunning = isRunning;
+	}
+
+	public String getMac() {
+		return mac;
+	}
+
+	/**
+	 * 
+	 * @Function: RTRAnalysisSocketThread.java
+	 * @Description: 初始化,判断客户端连接格式是否正确
+	 *
+	 * @param:描述1描述
+	 * @return：boolean
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年1月22日 下午4:01:46
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年1月22日 Administrator v1.0.0 修改原因
+	 */
+	public boolean init() {
+
+		try {
+			if (dis == null) {
+				dis = new DataInputStream(socket.getInputStream());
+			}
+			// 获取 客户端的数据
+			JSONObject jSONObject = judgeFormat(dis);
+			boolean running = (boolean) jSONObject.get("isRunning");
+			// 判断 格式 是否正确
+			if (running) {
+				// 获取opCode
+				short opCode = (short) jSONObject.get("opCode");
+				receiveData(opCode, dis);
+				return true;
+			} else {
+				return false;
+			}
+		} catch (SocketTimeoutException e) {
+			log.error("init=========>>>> Socket timed out!");
+		} catch (OpCodeNotExitException e) {
+			log.error("init=========>>>>" + e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("init=========>>>>" + e);
+		}
+
+		return false;
+	}
+
+	/**
+	 * @see java.lang.Runnable#run()
+	 * @Function: RTRAnalysisSocketThread.java
+	 * @Description: 解析Socket的信息线程
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年1月18日 下午5:17:23
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年1月18日 Administrator v1.0.0 修改原因
+	 */
+	@Override
+	public void run() {
+		boolean is_Stop = false;
+		int index = 0;
+		try {
+			// 心跳获取客户端传的值
+			while (isOK) {
+				synchronized (this) {
+					is_Stop = isStop;
+				}
+				if (is_Stop) {
+					if (dis == null)
+						dis = new DataInputStream(socket.getInputStream());
+					// 接收
+
+					// receive();
+					JSONObject json = judgeFormat(dis);
+					isRunning = (boolean) json.get("isRunning");
+					if (!isRunning) {
+						// 格式错误
+						log.error("解析格式错误=============>>>>>");
+						throw new Exception();
+					}
+					// 获取opCode，判断是否是反馈数据
+					short opCode = (short) json.get("opCode");
+					receiveData(opCode, dis);
+
+					if (dos == null)
+						dos = new DataOutputStream(socket.getOutputStream());
+					if (opCode == 1088) {
+						// 组装心跳包
+						// 回客户端消息
+						dos.write(bytes);
+					}
+				} else {
+					// 休眠
+					Thread.sleep(300);
+				}
+			}
+			// 客户端 关闭时
+		} catch (SocketTimeoutException e) {
+			log.error("run=========>>>>Socket timed out!");
+			// 移除客戶端的相关信息
+			// ClientServiceUtils.removeThread(rtrClient, UID);
+			// 关闭流
+			// ClientServiceUtils.close(socket, dis, dos);
+		} catch (IOException e) {
+			log.error("run=========>>>>Socket close");
+			// 移除客戶端的相关信息
+			// ClientServiceUtils.removeThread(rtrClient, UID);
+			// 关闭流
+			// ClientServiceUtils.close(socket, dis, dos);
+		} catch (OpCodeNotExitException e) {
+			log.error("run=========>>>>" + e.getMessage());
+			// 移除客戶端的相关信息
+			// ClientServiceUtils.removeThread(rtrClient, UID);
+			// 关闭流
+			// ClientServiceUtils.close(socket, dis, dos);
+		} catch (Exception e) {
+			// 移除客戶端的相关信息
+			// ClientServiceUtils.removeThread(rtrClient, UID);
+			// 关闭流
+			// ClientServiceUtils.close(socket, dis, dos);
+			// log.error("run error=========>>>" + e.getMessage());
+		}
+	}
+
+	/**
+	 * 
+	 * @Function: RTRAnalysisSocketThread.java
+	 * @Description: 判断文件格式
+	 *
+	 * @param dis
+	 *            输入流
+	 * @return：IOException, SocketTimeoutException
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年1月22日 下午3:59:02
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年1月22日 Administrator v1.0.0 修改原因
+	 */
+	public synchronized JSONObject judgeFormat(DataInputStream dis) throws IOException, SocketTimeoutException {
+		JSONObject jsonObject = new JSONObject();
+		byte[] byHead = new byte[7];
+		// 读取头部
+		dis.readFully(byHead, 0, 7);
+		// 把读取的字节数组转成字符串
+		String head = new String(byHead);
+		System.err.println("==========>>>" + head);
+		if (head.equals("Lov-Dmx")) {
+			// 读取一个字节
+			dis.read();
+			// 读取opCode(唯一标识)
+			short opCode = dis.readShort();
+			// 读取客户端的IP地址
+			dis.readFully(new byte[4]);
+
+			// 读取客户端的端口号
+			dis.readFully(new byte[2]);
+
+			// 读取UID
+			byte[] byUID = new byte[4];
+			dis.readFully(byUID);
+			if (UID == null) {
+				StringBuilder builder = new StringBuilder();
+				for (int i = 0; i < byUID.length; i++) {
+					byte b = byUID[i];
+					String val = b + "";
+					if (val.length() == 2) {
+						builder.append("0");
+					} else if (val.length() == 1) {
+						builder.append("00");
+					}
+					builder.append(b);
+					if (byUID.length - 1 > i) {
+						builder.append(".");
+					}
+				}
+				this.UID = builder.toString();
+				pktIndex = 1;
+			}
+			jsonObject.put("isRunning", true);
+			jsonObject.put("opCode", opCode);
+		} else {
+			jsonObject.put("isRunning", false);
+		}
+		return jsonObject;
+	}
+
+	/**
+	 * 
+	 * @Function: RTRAnalysisSocketThread.java
+	 * @Description: 根据opCode 读取客户端数据
+	 *
+	 * @param opCode
+	 *            标识
+	 * @param dis
+	 *            输入流
+	 * @return JSONObject
+	 * @throws SocketTimeoutException(抛出
+	 *             超时异常), OpCodeNotExitException(抛出 自定义OpCode异常)
+	 *
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年1月22日 下午4:00:04
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年1月22日 Administrator v1.0.0 修改原因
+	 */
+	public synchronized JSONObject receiveData(short opCode, DataInputStream dis)
+			throws IOException, SocketTimeoutException, OpCodeNotExitException, Exception {
+		JSONObject jSONObject = new JSONObject();
+		if (opCode == 1088) {
+			// 角色ID
+			dis.read();
+			dis.readShort();
+		} else if (opCode == 2200) {
+		} else {
+			// opCode不存在
+			throw new OpCodeNotExitException("opCode  not exist");
+		}
+		return jSONObject;
+	}
+
+}

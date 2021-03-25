@@ -1,0 +1,6 @@
+package com.lovdmx.control.mapper;
+
+import com.lovdmx.control.pojo.Subtasks;
+
+public interface SubtasksMapper extends BaseMapper<Subtasks>{
+}

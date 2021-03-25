@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.SpriteDeviceMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.SpriteDevice">
+		<id column="sprite_id" property="spriteId" jdbcType="INTEGER" />
+		<result column="mac" property="mac" jdbcType="CHAR" />
+		<result column="ip" property="ip" jdbcType="CHAR" />
+		<result column="rack_id" property="rackId" jdbcType="INTEGER" />
+		<result column="is_online" property="isOnline" jdbcType="DECIMAL" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		sprite_id, mac, ip, rack_id, is_online
+	</sql>
+
+	<select id="findAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_sprite_device
+	</select>
+
+	<select id="findByMd5Array" resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.SpriteDevice">
+		select
+		<include refid="Base_Column_List" />
+		from dev_sprite_device
+		where mac in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.SpriteDevice">
+		select
+		<include refid="Base_Column_List" />
+		from dev_sprite_device
+		where sprite_id = #{spriteId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findByParentId" resultMap="BaseResultMap"
+		parameterType="com.lovdmx.control.pojo.SpriteDevice">
+		select
+		<include refid="Base_Column_List" />
+		from dev_sprite_device
+		where rack_id = #{parentId,jdbcType=INTEGER}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="com.lovdmx.control.pojo.SpriteDevice">
+		delete from
+		dev_sprite_device
+		where sprite_id = #{spriteId,jdbcType=INTEGER}
+		and
+		mac
+		= #{mac,jdbcType=CHAR}
+	</delete>
+
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="spriteId"
+		parameterType="java.util.List">
+		insert into dev_sprite_device
+		(mac,ip,rack_id,is_online)
+		values
+		<if test="list !=null">
+			<foreach collection="list" item="item" separator="," close=";">
+				(#{item.mac},#{item.ip},#{item.rackId},#{item.isOnline})
+			</foreach>
+		</if>
+	</insert>
+
+
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.SpriteDevice">
+		insert into dev_sprite_device
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="spriteId != null">
+				sprite_id,
+			</if>
+			<if test="mac != null">
+				mac,
+			</if>
+			<if test="ip != null">
+				ip,
+			</if>
+			<if test="rackId != null">
+				rack_id,
+			</if>
+			<if test="isOnline != null">
+				is_online,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="spriteId != null">
+				#{spriteId,jdbcType=INTEGER},
+			</if>
+			<if test="mac != null">
+				#{mac,jdbcType=CHAR},
+			</if>
+			<if test="ip != null">
+				#{ip,jdbcType=CHAR},
+			</if>
+			<if test="rackId != null">
+				#{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="isOnline != null">
+				#{isOnline,jdbcType=DECIMAL},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.SpriteDevice">
+		update dev_sprite_device
+		<set>
+			<if test="mac != null">
+				mac = #{mac,jdbcType=CHAR},
+			</if>
+			<if test="ip != null">
+				ip = #{ip,jdbcType=CHAR},
+			</if>
+			<if test="rackId != null">
+				rack_id = #{rackId,jdbcType=INTEGER},
+			</if>
+			<if test="isOnline != null">
+				is_online = #{isOnline,jdbcType=DECIMAL},
+			</if>
+		</set>
+		where sprite_id = #{spriteId,jdbcType=INTEGER}
+	</update>
+</mapper>

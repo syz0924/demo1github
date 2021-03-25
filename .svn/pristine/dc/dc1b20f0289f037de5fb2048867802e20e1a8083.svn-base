@@ -1,0 +1,934 @@
+package com.lovdmx.control.controller.head1;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSONObject;
+import com.lovdmx.control.common.thread.AnalysisClientSocketThread;
+import com.lovdmx.control.common.utils.DateUtils;
+import com.lovdmx.control.common.utils.JsonUtils;
+import com.lovdmx.control.common.utils.MD5Utils;
+import com.lovdmx.control.common.utils.OnLineClientUtils;
+import com.lovdmx.control.common.utils.PageageUtils;
+import com.lovdmx.control.common.utils.SocketUtils;
+import com.lovdmx.control.controller.BaseController;
+import com.lovdmx.control.pojo.Account;
+import com.lovdmx.control.pojo.IntelligentGateway;
+import com.lovdmx.control.pojo.Log;
+import com.lovdmx.control.pojo.RealtimeTasks;
+import com.lovdmx.control.pojo.Relay;
+import com.lovdmx.control.pojo.RelayTaskDetails;
+import com.lovdmx.control.pojo.TimedTasks;
+import com.lovdmx.control.pojo.enums.EnumOperationMode;
+import com.lovdmx.control.service.IntelligentGatewayService;
+import com.lovdmx.control.service.RealtimeTasksService;
+import com.lovdmx.control.service.RelayService;
+import com.lovdmx.control.service.RelayTaskDetailsService;
+import com.lovdmx.control.service.TimedTasksService;
+import com.lovdmx.control.vo.RelayCtrVo;
+import com.lovdmx.control.vo.RelayRealTimeTaskCtrVo;
+import com.lovdmx.control.vo.RelayRealTimeTaskDataFormatVo;
+import com.lovdmx.control.vo.RelayRealTimeTaskInfoVo;
+import com.lovdmx.control.vo.RelayTaskDetailsVo;
+import com.lovdmx.control.vo.RelayTimedTaskCtrVo;
+import com.lovdmx.control.vo.RelayTimedTaskDataFormatVo;
+import com.lovdmx.control.vo.RelayTimedTaskInfoVo;
+import com.lovdmx.control.vo.SocketClientInfoVo;
+
+/**
+ * 
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: StrongCurrentController.java
+ * @Description: 强电管理控制器
+ *
+ * @version: v1.1.0
+ * @author: syz
+ * @date: 2019年10月15日 下午1:48:18
+ *
+ */
+@Controller
+@CrossOrigin
+@RequestMapping("/strongCurrent/")
+public class StrongCurrentController extends BaseController {
+
+	// 网关
+	@Autowired
+	private IntelligentGatewayService intelligentGatewayService;
+
+	// 继电器
+	@Autowired
+	private RelayService relayService;
+
+	// 继电器定时任务
+	@Autowired
+	private RealtimeTasksService realtimeTasksService;
+
+	// 继电器实时让吴
+	@Autowired
+	private TimedTasksService timedTasksService;
+
+	// 继电器定时任务详情
+	@Autowired
+	private RelayTaskDetailsService relayTaskDetailsService;
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 获取网关信息
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月14日 上午11:03:48
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年5月14日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getIntelligentGatewayInfo", method = RequestMethod.GET)
+	public JSONObject getIntelligentGatewayInfo(HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			List<IntelligentGateway> intelligentGatewayList = intelligentGatewayService
+					.findRackJoinIntelligentGatewayByProjectId(account.getProjectId());
+			// 获取子类所有信息
+			for (IntelligentGateway intelligentGateway : intelligentGatewayList) {
+				List<Relay> groupRelayIp = relayService.findGrouprs485toNetIpBygatewayMac(intelligentGateway.getMac());
+				for (Relay relay : groupRelayIp) {
+					relay.setRelayList(relayService.findByGatewayMacAndRs485toNetIp(intelligentGateway.getMac(),
+							relay.getRs485toNetIp()));
+				}
+				intelligentGateway.setGroupRelayIp(groupRelayIp);
+			}
+
+			resultJson.put("intelligentGatewayList", intelligentGatewayList);
+			result = "true";
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 根据网关MAC 获取继电器信息
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月14日 上午11:03:48
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年5月14日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getRelayInfoByGatewayMac", method = RequestMethod.GET)
+	public JSONObject getRelayInfoByGatewayMac(String gatewayMac, HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 根据rs485toNetIp 分组
+			List<Relay> relayList = relayService.findByGatewayMac(gatewayMac);
+			resultJson.put("relayList", relayList);
+			result = "true";
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 根据继电器ID 获取定时任务详情
+	 *
+	 * @param: relayId 继电器ID
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月14日 上午11:03:48
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年5月14日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getRelayTaskDetailsInfo", method = RequestMethod.GET)
+	public JSONObject getRelayTaskDetailsInfo(Integer relayId, HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 根据继电器id 获取定时任务
+			List<RelayTaskDetails> relayTaskDetailsList = relayTaskDetailsService.findByRelayId(relayId);
+			resultJson.put("relayTaskDetailsList", relayTaskDetailsList);
+			result = "true";
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 根据网关MAC 分组获取 rs485toNetIp
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月18日 下午3:39:50
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年5月18日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getRs485toNetIp", method = RequestMethod.GET)
+	public JSONObject getRs485toNetIp(String gatewayMac, HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 根据rs485toNetIp 分组
+			List<Relay> rs485toNetIpList = relayService.findGrouprs485toNetIpBygatewayMac(gatewayMac);
+			resultJson.put("rs485toNetIpList", rs485toNetIpList);
+			result = "true";
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 根据网关MAC 和 rs485toNetIp 获取485转ip 子类下的所有继电器
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月18日 下午3:39:50
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年5月18日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getSonRelayInfoByRs485toNetIp", method = RequestMethod.GET)
+	public JSONObject getSonRelayInfoByRs485toNetIp(String gatewayMac, String rs485toNetIp, HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 根据网关Mac和 485转ip获取子类的所有继电器
+			List<Relay> sonRelayList = relayService.findByGatewayMacAndRs485toNetIp(gatewayMac, rs485toNetIp);
+			resultJson.put("sonRelayList", sonRelayList);
+			result = "true";
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 判断即时任务是否存在
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月25日 下午3:13:23
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年5月25日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "findRealtimeTaskIsExitByTaskName", method = RequestMethod.GET)
+	public JSONObject findRealtimeTaskExitsByTaskName(String taskName, HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 根据任务名 判断是否存在
+			RealtimeTasks realtimeTasks = realtimeTasksService.findByTaskName(account.getProjectId(), taskName);
+			resultJson.put("exitState", realtimeTasks == null ? false : true);
+			result = "true";
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: ControlServerController.java
+	 * @Description: 获取所有即时任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月25日 下午5:14:42
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年5月25日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getRealtimeTaskAll", method = RequestMethod.GET)
+	public JSONObject getRealtimeTaskAll(HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 根据任务名 判断是否存在
+			List<RealtimeTasks> realtimeTasksList = realtimeTasksService.findByProjectId(account.getProjectId());
+			resultJson.put("realtimeTasksList", realtimeTasksList);
+			result = "true";
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: WebControlServerController.java
+	 * @Description: 根据任务id 删除智能网关实时任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年6月3日 上午10:48:19
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年6月3日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "deleteRealtimeTask", method = RequestMethod.GET)
+	public JSONObject deleteRealtimeTask(Integer taskId, HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 关闭事务自动提交
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		TransactionStatus status = platformTransactionManager.getTransaction(def);
+		try {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+			// 判断是否在线
+			if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+				RealtimeTasks realtimeTasks = realtimeTasksService.findById(taskId);
+				// 删除
+				realtimeTasksService.deleteById(taskId);
+
+				Log log = new Log(account.getProjectId(), account.getAccountId(), EnumOperationMode.DELETE.name(),
+						account.getUserName() + "删除" + realtimeTasks.getTaskName() + "实时任务", new Date(), new Date());
+				addlogInfo(log);
+				platformTransactionManager.commit(status);
+				result = "succeed";
+			} else {
+				result = "false";
+			}
+		} catch (Exception ex) {
+			result = "fail";
+			ex.printStackTrace();
+			platformTransactionManager.rollback(status);
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: WebControlServerController.java
+	 * @Description:获取智能网关中的所有定时任务
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年6月4日 上午11:41:40
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年6月4日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "getGatewayTimedTaskAll", method = RequestMethod.GET)
+	public JSONObject getGatewayTimedTaskAll(HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 根据任务名 判断是否存在
+			List<TimedTasks> timedTasksList = timedTasksService.findByProjectId(account.getProjectId());
+			resultJson.put("timedTasksList", timedTasksList);
+			result = "true";
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: WebControlServerController.java
+	 * @Description: 根据任务名 判断定时任务是否存在
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年6月4日 上午11:53:36
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年6月4日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "findGatewayTimedTaskExit", method = RequestMethod.GET)
+	public JSONObject findGatewayTimedTaskExit(String taskName, HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 根据任务名 判断是否存在
+			TimedTasks timedTasks = timedTasksService.findByTaskName(taskName);
+			result = timedTasks == null ? "true" : "already exists";
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+
+	}
+
+	/**
+	 * 
+	 * @Function: WebControlServerController.java
+	 * @Description: 編輯网关实时任务信息
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年6月5日 上午11:30:26
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年6月5日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "editRealtimeTask", method = RequestMethod.GET)
+	public JSONObject editRealtimeTask(Integer taskId, HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 跟id查询
+			RealtimeTasks realtimeTasks = realtimeTasksService.findById(taskId);
+			resultJson.put("realtimeTasks", realtimeTasks);
+			result = "true";
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: WebControlServerController.java
+	 * @Description: 修改智能网关实时任务名
+	 *
+	 * @param:描述1描述
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年6月5日 上午11:36:30
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年6月5日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "updateRealtimeTask", method = RequestMethod.GET)
+	public JSONObject updateRealtimeTask(RealtimeTasks realtimeTasks, HttpSession session) {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+
+		// 关闭事务自动提交
+		DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+		def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		TransactionStatus status = platformTransactionManager.getTransaction(def);
+		try {
+			// 账号
+			Account account = (Account) session.getAttribute("lovdmxAdmin");
+			// 判断是否在线
+			if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+
+				RealtimeTasks task = realtimeTasksService.findById(realtimeTasks.getTaskId());
+				// 修改
+				realtimeTasksService.update(realtimeTasks);
+
+				Log log = new Log(account.getProjectId(), account.getAccountId(), EnumOperationMode.UPDATE.name(),
+						"把" + realtimeTasks.getTaskName() + "修改为" + task.getTaskName() + "实时任务名", new Date(),
+						new Date());
+				// 添加日志
+				addlogInfo(log);
+				result = "succeed";
+			} else {
+				result = "false";
+			}
+		} catch (Exception ex) {
+			result = "fail";
+			ex.printStackTrace();
+			platformTransactionManager.rollback(status);
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: SendControlServerController.java
+	 * @Description: 发送(中控) 添加 继电器定时任务
+	 *
+	 * @param: relayTimedTaskDataFormat 定时任务数据
+	 * @return：JSONObject
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月15日 下午3:35:07
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年5月15日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "sendAddRelayTimedTask", method = RequestMethod.POST)
+	public JSONObject sendAddRelayTimedTask(
+			@RequestBody(required = false) RelayTimedTaskDataFormatVo relayTimedTaskDataFormat, HttpSession session)
+			throws Exception {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 获取中控客户端信息
+			SocketClientInfoVo socketClientInfoVo = OnLineClientUtils.getControlClient();
+			if (socketClientInfoVo != null) {
+				// 任务详情
+				RelayTimedTaskInfoVo taskMsg = relayTimedTaskDataFormat.getTaskMsg();
+				// 定时任务
+				List<RelayTimedTaskCtrVo> timlyTasks = taskMsg.getTimlyTasks();
+				// 根据网关Mac 区分定时任务
+				Map<String, RelayTaskDetailsVo> map = new HashMap<String, RelayTaskDetailsVo>();
+				// 0:保存 1:修改
+				Integer saveOrUpdate = 1;
+
+				TimedTasks timedTasks = null;
+				if (timlyTasks != null) {
+					// 星期（逗号隔开）
+					String dayofweek = taskMsg.getDayofweek();
+					// 分割
+					String[] split = dayofweek.split(",");
+					// 遍历组装数据
+					for (RelayTimedTaskCtrVo relayTimedTaskCtr : timlyTasks) {
+						List<RelayCtrVo> ctrInfo = relayTimedTaskCtr.getTasks();
+						for (RelayCtrVo relayCtr : ctrInfo) {
+							// 判断map是否存在
+							RelayTaskDetailsVo relayTaskDetailsVo = map.get(relayTimedTaskCtr.getGatewayMac());
+							List<RelayTaskDetails> list = null;
+							if (relayTaskDetailsVo == null) {
+								// 不存在 初始化
+								relayTaskDetailsVo = new RelayTaskDetailsVo();
+								relayTaskDetailsVo.setRackId(relayTimedTaskCtr.getRackId());
+								list = new ArrayList<RelayTaskDetails>();
+								relayTaskDetailsVo.setRelayTaskDetailsList(list);
+								map.put(relayTimedTaskCtr.getGatewayMac(), relayTaskDetailsVo);
+							} else {
+								list = relayTaskDetailsVo.getRelayTaskDetailsList();
+							}
+							// 遍历星期
+							for (String weekId : split) {
+								// 组装继电器详情定时任务信息
+								RelayTaskDetails relayTaskDetails = new RelayTaskDetails(Integer.parseInt(weekId),
+										relayCtr.getRelayId(), relayCtr.getLoopNums());
+								list.add(relayTaskDetails);
+							}
+						}
+					}
+					// 内容md5值
+					String taskMd5 = MD5Utils
+							.encrypByMD5(JsonUtils.objectToJson(taskMsg.getTimlyTasks()) + taskMsg.getDayofweek()
+									+ taskMsg.getStartTime() + taskMsg.getEndTime() + taskMsg.getDelaymsc());
+					relayTimedTaskDataFormat.getTaskMsg().setTaskMd5(taskMd5);
+					// 智能网关定时任务
+					timedTasks = new TimedTasks(relayTimedTaskDataFormat.getTaskName(), taskMd5, taskMsg.getTaskMode(),
+							Integer.parseInt(taskMsg.getDelaymsc()), null, taskMsg.getDayofweek(),
+							JsonUtils.objectToJson(taskMsg.getTimlyTasks()), account.getProjectId(),
+							DateUtils.fmtStrDateToTime(taskMsg.getStartTime()),
+							DateUtils.fmtStrDateToTime(taskMsg.getEndTime()), new Date());
+					saveOrUpdate = 0;
+				}
+
+				// 获取UUID
+				String uuid = UUID.randomUUID().toString();
+				// 设置uuid
+				taskMsg.setUuid(uuid);
+				relayTimedTaskDataFormat.setUuid(uuid);
+
+				// json 数据
+				String dataJson = JsonUtils.objectToJson(relayTimedTaskDataFormat);
+
+				// 组装web数据（用于后续操作）
+				JSONObject webJsonData = new JSONObject();
+				// 日志
+				Log log = new Log(account.getProjectId(), account.getAccountId(), EnumOperationMode.ADD.name(),
+						relayTimedTaskDataFormat.getRackId(), new Date(), new Date());
+				webJsonData.put("log", log);
+				webJsonData.put("map", map);
+				webJsonData.put("timedTasks", timedTasks);
+				webJsonData.put("saveOrUpdate", saveOrUpdate);
+				webJsonData.put("taskMode", taskMsg.getTaskMode());
+				// 添加ProjectAnalysisOpCodeThread对象的map中
+				SocketUtils.projectThreadMap.get(SocketUtils.key + account.getProjectId())
+						.getProjectAnalysisOpCodeThread().addMapInfo(uuid, webJsonData);
+				// 组装数据
+				byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1017, dataJson);
+				// 发送数据
+				AnalysisClientSocketThread.transmit(socketClientInfoVo.getAnalysisSocketThread(), dataBytes);
+				result = "send successful";
+			} else {
+				result = "not online";
+			}
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: SendControlServerController.java
+	 * @Description: 发送(中控) 继电器实时任务
+	 *
+	 * @param: relayRealTimeTaskDataFormat 即时任务数据
+	 * @return：JSONObject
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月18日 上午10:02:36
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年5月18日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "sendAddIntelligentGatewayTimedTask", method = RequestMethod.POST)
+	public JSONObject sendAddIntelligentGatewayTimedTask(
+			@RequestBody(required = false) RelayRealTimeTaskDataFormatVo relayRealTimeTaskDataFormat,
+			HttpSession session) throws Exception {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 获取中控客户端信息
+			SocketClientInfoVo socketClientInfoVo = OnLineClientUtils.getControlClient();
+			if (socketClientInfoVo != null) {
+				// 任务详情
+				RelayRealTimeTaskInfoVo taskMsg = relayRealTimeTaskDataFormat.getTaskMsg();
+				// 即时任务
+				List<RelayRealTimeTaskCtrVo> realTimeTasks = taskMsg.getRealTimeTasks();
+
+				if (realTimeTasks != null) {
+					if (relayRealTimeTaskDataFormat.getSaveState()) {
+
+						relayRealTimeTaskDataFormat.setSaveState(false);
+
+						RealtimeTasks realtimeTasks = new RealtimeTasks(relayRealTimeTaskDataFormat.getTaskName(),
+								new Date(), JsonUtils.objectToJson(relayRealTimeTaskDataFormat),
+								account.getProjectId());
+						// 保存即时任务
+						realtimeTasksService.save(realtimeTasks);
+					}
+					// 数据md5值
+					taskMsg.setTaskMd5(MD5Utils.encrypByMD5(JsonUtils.objectToJson(realTimeTasks)));
+				}
+
+				// 获取UUID
+				String uuid = UUID.randomUUID().toString();
+				// 设置uuid
+				taskMsg.setUuid(uuid);
+				relayRealTimeTaskDataFormat.setUuid(uuid);
+				// json 数据
+				String dataJson = JsonUtils.objectToJson(relayRealTimeTaskDataFormat);
+
+				// 组装web数据（用于后续操作）
+				JSONObject webJsonData = new JSONObject();
+				// 日志
+				Log log = new Log(account.getProjectId(), account.getAccountId(), EnumOperationMode.ADD.name(), null,
+						new Date(), new Date());
+				webJsonData.put("log", log);
+				// 添加ProjectAnalysisOpCodeThread对象的map中
+				SocketUtils.projectThreadMap.get(SocketUtils.key + account.getProjectId())
+						.getProjectAnalysisOpCodeThread().addMapInfo(uuid, webJsonData);
+				// 组装数据
+				byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1018, dataJson);
+				// 发送数据
+				AnalysisClientSocketThread.transmit(socketClientInfoVo.getAnalysisSocketThread(), dataBytes);
+				result = "send successful";
+			} else {
+				result = "not online";
+			}
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+	/**
+	 * 
+	 * @Function: SendControlServerController.java
+	 * @Description: 发送(中控) 删除智能网关定时任务
+	 *
+	 * @param: timedTasks 智能网关定时任务
+	 * @return：JSONObject
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年5月18日 上午10:02:36
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年5月18日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "sendDeleteIntelligentGatewayRelayTimedTask", method = RequestMethod.POST)
+	public JSONObject sendDeleteIntelligentGatewayRelayTimedTask(@RequestBody TimedTasks timedTasks,
+			HttpSession session) throws Exception {
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 获取中控客户端信息
+			SocketClientInfoVo socketClientInfoVo = OnLineClientUtils.getControlClient();
+			if (socketClientInfoVo != null) {
+
+				// 获取定时任务信息
+				timedTasks = timedTasksService.findById(timedTasks.getTaskId());
+
+				if (timedTasks.getRackIds() != null && timedTasks.getRackIds().length() > 0) {
+
+					JSONObject dataJson = new JSONObject();
+					// 获取UUID
+					String uuid = UUID.randomUUID().toString();
+					dataJson.put("uuid", uuid);
+					dataJson.put("rackId", timedTasks.getRackIds());
+					// 信息
+					JSONObject taskMsg = new JSONObject();
+					taskMsg.put("uuid", uuid);
+					taskMsg.put("taskmd5", timedTasks.getTaskMd5());
+					dataJson.put("taskMsg", taskMsg);
+
+					// 组装web数据（用于后续操作）
+					JSONObject webJsonData = new JSONObject();
+					// 日志
+					Log log = new Log(account.getProjectId(), account.getAccountId(), EnumOperationMode.DELETE.name(),
+							null, new Date(), new Date());
+					webJsonData.put("log", log);
+					webJsonData.put("timedTasks", timedTasks);
+					// 添加ProjectAnalysisOpCodeThread对象的map中
+					SocketUtils.projectThreadMap.get(SocketUtils.key + account.getProjectId())
+							.getProjectAnalysisOpCodeThread().addMapInfo(uuid, webJsonData);
+					// 组装数据
+					byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1024, dataJson.toJSONString());
+					// 发送数据
+					AnalysisClientSocketThread.transmit(socketClientInfoVo.getAnalysisSocketThread(), dataBytes);
+				} else {
+					// 删除定时任务
+					timedTasksService.deleteById(timedTasks.getTaskId());
+				}
+				result = "send successful";
+			} else {
+				result = "not online";
+			}
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+
+	}
+
+	/**
+	 * 
+	 * @Function: StrongCurrentController.java
+	 * @Description: 发送中控 根据任务模式删除智能网关定时任务
+	 *
+	 * @param: timedTasks 定时任务
+	 * @return：JSONObject
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年11月13日 上午11:16:17
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------* 2019年11月13日
+	 *        Administrator v1.0.0 修改原因
+	 */
+	@ResponseBody
+	@RequestMapping(value = "sendDeleteIntelligentGatewayTimedTaskByTaskMode", method = RequestMethod.POST)
+	public JSONObject sendDeleteIntelligentGatewayTimedTaskByTaskMode(@RequestBody TimedTasks timedTasks,
+			HttpSession session) throws Exception {
+		// 反馈
+		JSONObject resultJson = new JSONObject();
+		String result = "";
+		// 账号
+		Account account = (Account) session.getAttribute("lovdmxAdmin");
+
+		// 判断是否在线
+		if (OnLineClientUtils.judgeAccountIsOnline(account)) {
+			// 获取中控客户端信息
+			SocketClientInfoVo socketClientInfoVo = OnLineClientUtils.getControlClient();
+			if (socketClientInfoVo != null) {
+				// 赋值项目id
+				timedTasks.setProjectId(account.getProjectId());
+
+				JSONObject dataJson = new JSONObject();
+				// 获取UUID
+				String uuid = UUID.randomUUID().toString();
+				dataJson.put("uuid", uuid);
+				dataJson.put("rackId", timedTasks.getRackIds());
+				// 信息
+				JSONObject taskMsg = new JSONObject();
+				taskMsg.put("uuid", uuid);
+				taskMsg.put("taskMode", timedTasks.getTaskMode());
+				dataJson.put("taskMsg", taskMsg);
+
+				// 组装web数据（用于后续操作）
+				JSONObject webJsonData = new JSONObject();
+				// 日志
+				Log log = new Log(account.getProjectId(), account.getAccountId(), EnumOperationMode.DELETE.name(), null,
+						new Date(), new Date());
+				webJsonData.put("log", log);
+				webJsonData.put("timedTasks", timedTasks);
+				// 添加ProjectAnalysisOpCodeThread对象的map中
+				SocketUtils.projectThreadMap.get(SocketUtils.key + account.getProjectId())
+						.getProjectAnalysisOpCodeThread().addMapInfo(uuid, webJsonData);
+				// 组装数据
+				byte[] dataBytes = PageageUtils.assemblyDataPackage(0x1031, dataJson.toJSONString());
+				// 发送数据
+				AnalysisClientSocketThread.transmit(socketClientInfoVo.getAnalysisSocketThread(), dataBytes);
+				result = "send successful";
+			} else {
+				result = "not online";
+			}
+		} else {
+			result = "false";
+		}
+		resultJson.put("result", result);
+		return resultJson;
+	}
+
+}

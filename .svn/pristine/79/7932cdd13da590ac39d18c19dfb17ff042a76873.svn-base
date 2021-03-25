@@ -1,0 +1,22 @@
+package com.lovdmx.control.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.lovdmx.control.mapper.ProjectMapper;
+import com.lovdmx.control.pojo.Project;
+import com.lovdmx.control.service.ProjectService;
+
+@Service("projectService")
+public class ProjectServiceImpl extends BaseServiceImpl<Project> implements ProjectService {
+
+	@Autowired
+	private ProjectMapper projectMapper;
+
+	@Override
+	public Project findProjectCentreAllDeviceInfo(Integer projectId) {
+		return projectMapper.findProjectCentreAllDeviceInfo(projectId);
+	}
+}

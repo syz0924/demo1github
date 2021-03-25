@@ -1,0 +1,108 @@
+package com.lovdmx.control.common.thread;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: UtilThread.java
+ * @Description: 该类的功能描述
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年1月18日 下午5:21:35
+ *
+ */
+public class ThreadUtil {
+
+	public static Log log = LogFactory.getLog(ThreadUtil.class);
+
+	// 包头
+	public static byte[] byHead = new byte[11];
+
+	// 包尾
+	public static byte[] byEnd = new byte[2];
+
+	// 线程池
+	public static ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+	// IP
+	public static final String ServerIP = "10.10.10.100";
+
+	// 状态
+	public static final boolean FLAG = true;
+
+	// 初始化 包头包尾
+	static {
+		// 包头
+		byHead[0] = 'C';
+		byHead[1] = 'C';
+		byHead[2] = 'S';
+		// OpCode
+		byHead[3] = 0x00;
+		byHead[4] = 0x00;
+		// 版本号
+		byHead[5] = 0x00;
+		byHead[6] = 0x01;
+		// 内容长度
+		byHead[7] = 0x00;
+		byHead[8] = 0x00;
+		// 校验码
+		byHead[9] = 0x00;
+		byHead[10] = 0x00;
+
+		// 包尾
+		byEnd[0] = 0x0D; // /r回车
+		byEnd[1] = 0x0A; // /n换行
+	}
+
+	/**
+	 * 
+	 * @Function: ClientServiceUtils.java
+	 * @Description: 关闭流
+	 *
+	 * @param: socket
+	 *             socket对象
+	 * @param: dis
+	 *             输入流
+	 * @param: dos
+	 *             输出流
+	 * @return：返回结果描述
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: Administrator
+	 * @date: 2019年1月17日 下午2:42:58
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年1月17日 Administrator v1.0.0 修改原因
+	 */
+	public static void close(Socket socket, DataInputStream dis, DataOutputStream dos) {
+		try {
+			if (dis != null) {
+				dis.close();
+				dis = null;
+			}
+			if (dos != null) {
+				dos.close();
+				dos = null;
+			}
+			if (socket != null) {
+				socket.close();
+				socket = null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("关闭流异常======>>" + e);
+		}
+	}
+
+
+}

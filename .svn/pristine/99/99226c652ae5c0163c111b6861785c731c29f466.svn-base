@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lovdmx.control.mapper.UploadEdlmxMapper">
+	<resultMap id="BaseResultMap" type="com.lovdmx.control.pojo.UploadEdlmx">
+		<id column="edlmx_id" property="edlmxId" jdbcType="INTEGER" />
+		<result column="file_path" property="filePath" jdbcType="VARCHAR" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="rtr_loaded" property="rtrLoaded" jdbcType="DECIMAL" />
+		<result column="file_index" property="fileIndex" jdbcType="DECIMAL" />
+		<result column="md5" property="md5" jdbcType="CHAR" />
+		<result column="upload_role" property="uploadRole" jdbcType="INTEGER" />
+		<result column="lmx_times" property="lmxTimes" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		edlmx_id, file_path, project_id, rtr_loaded, file_index,
+		md5,upload_role,lmx_times
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_edlmx
+		where edlmx_id = #{edlmxId,jdbcType=INTEGER}
+	</select>
+
+	<select id="findNotSpiltByIds" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_edlmx
+		where edlmx_id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+		rtr_loaded = 0
+	</select>
+
+	<select id="findSpiltByIds" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_edlmx
+		where edlmx_id in
+		<foreach collection="list" item="item" open="(" separator=","
+			close=")">
+			#{item}
+		</foreach>
+		rtr_loaded = 1
+	</select>
+
+	<select id="findByProjectId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_edlmx
+		where project_id = #{projectId}
+	</select>
+
+	<select id="findWebUploadLastInfoByProjectIdAndUploadRole"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_edlmx
+		where project_id = #{projectId} and
+		upload_role=#{uploadRole} order by edlmx_id desc limit 1
+	</select>
+
+	<select id="findByMd5" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from dev_upload_edlmx
+		where md5 = #{md5,jdbcType=VARCHAR}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		dev_upload_edlmx
+		where edlmx_id = #{edlmxId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.lovdmx.control.pojo.UploadEdlmx">
+		insert into dev_upload_edlmx
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="edlmxId != null">
+				edlmx_id,
+			</if>
+			<if test="filePath != null">
+				file_path,
+			</if>
+			<if test="projectId != null">
+				project_id,
+			</if>
+			<if test="rtrLoaded != null">
+				rtr_loaded,
+			</if>
+			<if test="fileIndex != null">
+				file_index,
+			</if>
+			<if test="md5 != null">
+				md5,
+			</if>
+			<if test="uploadRole != null">
+				upload_role,
+			</if>
+			<if test="lmxTimes != null">
+				lmx_times,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="edlmxId != null">
+				#{edlmxId,jdbcType=INTEGER},
+			</if>
+			<if test="filePath != null">
+				#{filePath,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				#{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="rtrLoaded != null">
+				#{rtrLoaded,jdbcType=DECIMAL},
+			</if>
+			<if test="fileIndex != null">
+				#{fileIndex,jdbcType=DECIMAL},
+			</if>
+			<if test="md5 != null">
+				#{md5,jdbcType=CHAR},
+			</if>
+			<if test="uploadRole != null">
+				#{uploadRole,jdbcType=INTEGER},
+			</if>
+			<if test="lmxTimes != null">
+				#{lmxTimes,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="update" parameterType="com.lovdmx.control.pojo.UploadEdlmx">
+		update dev_upload_edlmx
+		<set>
+			<if test="filePath != null">
+				file_path = #{filePath,jdbcType=VARCHAR},
+			</if>
+			<if test="projectId != null">
+				project_id = #{projectId,jdbcType=INTEGER},
+			</if>
+			<if test="rtrLoaded != null">
+				rtr_loaded = #{rtrLoaded,jdbcType=DECIMAL},
+			</if>
+			<if test="fileIndex != null">
+				file_index = #{fileIndex,jdbcType=DECIMAL},
+			</if>
+			<if test="md5 != null">
+				md5 = #{md5,jdbcType=CHAR},
+			</if>
+			<if test="uploadRole != null">
+				upload_role = #{uploadRole,jdbcType=INTEGER},
+			</if>
+			<if test="lmxTimes != null">
+				lmx_times = #{lmxTimes,jdbcType=INTEGER},
+			</if>
+		</set>
+		where edlmx_id = #{edlmxId,jdbcType=INTEGER}
+	</update>
+</mapper>

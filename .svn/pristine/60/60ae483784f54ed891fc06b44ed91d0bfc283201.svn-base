@@ -1,0 +1,59 @@
+/**   
+ * Copyright © 2019 eSunny Info. Tech Ltd. All rights reserved.
+ * 
+ * 功能描述：
+ * @Package: com.lovdmx.control.httpVo 
+ * @author: syz  
+ * @date: 2019年2月27日 上午10:39:26 
+ */
+package com.lovdmx.control.httpVo;
+
+import com.lovdmx.control.common.thread.RealTimeDeviceInfoThread;
+import com.lovdmx.control.common.thread.SpriteAnalysisSocketThread;
+
+/**
+ * Copyright: Copyright (c) 2019 LanRu-Caifu
+ * 
+ * @ClassName: SpriteAndRealVo.java
+ * @Description: 解析录放精灵客户端和发送设备信息线程(数据)
+ *
+ * @version: v1.0.0
+ * @author: syz
+ * @date: 2019年2月27日 上午10:39:26
+ *
+ */
+public class SpriteAnalysisAndRealTimeDataVo {
+
+	// 录放精灵 解析客户端线程
+	private SpriteAnalysisSocketThread spriteAnalysisSocketThread;
+	// 发送最新设备信息 线程
+	private RealTimeDeviceInfoThread realTimeDeviceInfoThread;
+
+	public SpriteAnalysisAndRealTimeDataVo() {
+
+	}
+
+	public SpriteAnalysisAndRealTimeDataVo(SpriteAnalysisSocketThread spriteAnalysisSocketThread,
+			RealTimeDeviceInfoThread realTimeDeviceInfoThread) {
+		super();
+		this.spriteAnalysisSocketThread = spriteAnalysisSocketThread;
+		this.realTimeDeviceInfoThread = realTimeDeviceInfoThread;
+	}
+
+	public SpriteAnalysisSocketThread getSpriteAnalysisSocketThread() {
+		return spriteAnalysisSocketThread;
+	}
+
+	public void setSpriteAnalysisSocketThread(SpriteAnalysisSocketThread spriteAnalysisSocketThread) {
+		this.spriteAnalysisSocketThread = spriteAnalysisSocketThread;
+	}
+
+	public RealTimeDeviceInfoThread getRealTimeDeviceInfoThread() {
+		return realTimeDeviceInfoThread;
+	}
+
+	public void setRealTimeDeviceInfoThread(RealTimeDeviceInfoThread realTimeDeviceInfoThread) {
+		this.realTimeDeviceInfoThread = realTimeDeviceInfoThread;
+	}
+
+}

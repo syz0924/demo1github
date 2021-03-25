@@ -1,0 +1,64 @@
+package com.lovdmx.control.service;
+
+import java.util.List;
+
+import com.lovdmx.control.pojo.UploadVideos;
+
+public interface UploadVideosService extends BaseService<UploadVideos> {
+
+	/**
+	 * @Function: UploadVideosService.java
+	 * @Description: 根据md5值查询
+	 *
+	 * @param: md5:文件的md5值
+	 * @return：UploadVideos
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月22日 下午4:42:12
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月22日 Administrator v1.0.0 修改原因
+	 */
+	UploadVideos findByMd5(String md5);
+
+	/**
+	 * @Function: UploadVideosService.java
+	 * @Description: 根据项目ID和上传角色查询 最后一条上传信息
+	 *
+	 * @param:projectId 项目ID
+	 * @param: uploadRole
+	 *             上传角色
+	 * @return：UploadVideos
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年2月28日 上午11:14:17
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年2月28日 Administrator v1.0.0 修改原因
+	 */
+	UploadVideos findWebUploadLastInfoByProjectIdAndUploadRole(Integer projectId, Integer uploadRole);
+
+	/**
+	 * @Function: UploadVideosService.java
+	 * @Description: 根据项目ID获取所有已上传视频信息
+	 *
+	 * @param:projectId 项目ID
+	 * @return：List<UploadVideos>
+	 * @throws：异常描述
+	 *
+	 * @version: v1.0.0
+	 * @author: syz
+	 * @date: 2019年3月1日 下午1:59:10
+	 *
+	 *        Modification History: Date Author Version Description
+	 *        ---------------------------------------------------------*
+	 *        2019年3月1日 Administrator v1.0.0 修改原因
+	 */
+	List<UploadVideos> findByProjectId(Integer projectId);
+}

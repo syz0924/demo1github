@@ -1,0 +1,263 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var="path" value="${pageContext.request.contextPath }"></c:set>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!DOCTYPE html>
+<html>
+<head>
+<title>雷舞后台-管理员列表</title>
+<link rel="shortcut icon" href="${path}/img/lei.jpg" type="image/x-icon" />
+<link rel="stylesheet" href="${path}/js/layui/css/layui.css"
+	type="text/css" />
+<link href="${path}/css/style.css" rel="stylesheet" type="text/css" />
+<link href="${path}/css/public.css" rel="stylesheet" type="text/css" />
+<link type="text/css" rel="stylesheet" href="${path }/js/sg/css/sg.css"></link>
+<link type="text/css" rel="stylesheet"
+	href="${path }/js/upload/upload.css"></link>
+<link rel="stylesheet" type="text/css"
+	href="${path }/css/iconfont/iconfont.css">
+<script type="text/javascript" src="${path}/js/jquery.min.js"></script>
+<script type="text/javascript" src="${path}/js/jquery.js"></script>
+</head>
+
+<body>
+	<%@include file="/common/header.jsp"%>
+
+	<div class="container">
+		<%@include file="/common/left.jsp"%>
+		<div class="col-md lovdmx-fluid">
+
+			<form class="lovdmx-form" action="${path }/ht/account/index.do"
+				method="GET">
+				<div class="lovdmx-inline">
+					<label class="lovdmx-form-label">MAC</label>
+					<div class="lovdmx-input-block">
+						<input type="text" name="macAddress" value="${param.macAddress }"
+							class="lovdmx-input" placeholder="请输入" />
+					</div>
+				</div>
+				<div class="lovdmx-inline">
+					<label class="lovdmx-form-label">项目名</label>
+					<div class="lovdmx-input-block">
+						<input type="text" name="projectName"
+							value="${param.projectName }" class="lovdmx-input"
+							placeholder="请输入" />
+					</div>
+				</div>
+
+				<div class="lovdmx-inline">
+					<label class="lovdmx-form-label">账号</label>
+					<div class="lovdmx-input-block">
+						<input type="text" name="userName" value="${param.userName }"
+							class="lovdmx-input" placeholder="请输入" />
+					</div>
+				</div>
+
+				<div class="lovdmx-inline">
+					<label class="lovdmx-form-label">在线状态</label>
+					<div class="lovdmx-input-block">
+						<div class="lovdmx-unselect lovdmx-form-select ">
+							<c:choose>
+								<c:when test="${empty account.isOnline }">
+									<div class="lovdmx-select-title">
+										<input type="text"
+											class="lovdmx-input lovdmx_unselect select_is_online"
+											readonly value="所有" data-value="-1" placeholder="请选择" /><input
+											type="hidden" class="lovdmx-input" name="isOnline" value="-1" />
+										<span class="lovdmx-edge"></span>
+									</div>
+									<dl class="lovdmx-anim lovdmx-anim-upbit">
+										<dd data-value="-1" class="lovdmx-this">所有</dd>
+										<dd data-value="0">未在线</dd>
+										<dd data-value="1">在线</dd>
+									</dl>
+								</c:when>
+								<c:otherwise>
+									<div class="lovdmx-select-title">
+										<input type="text"
+											class="lovdmx-input lovdmx_unselect select_is_online"
+											readonly value="${account.isOnline eq 1 ?'在线':'未在线' }"
+											data-value="${account.isOnline }" placeholder="请选择" /><input
+											type="hidden" class="lovdmx-input"
+											value='${account.isOnline }' name="isOnline" /> <span
+											class="lovdmx-edge"></span>
+									</div>
+									<dl class="lovdmx-anim lovdmx-anim-upbit">
+										<dd data-value="-1">所有</dd>
+										<dd data-value="0"
+											class="${account.isOnline eq 0 ?'lovdmx-this':'' }">未在线</dd>
+										<dd data-value="1"
+											class="${account.isOnline eq 1 ?'lovdmx-this':'' }">在线</dd>
+									</dl>
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="lovdmx-inline">
+					<button class="lovdmx-btn lovdmxadmin-btn" type="button"
+						id="account-query">
+						<i class="lovdmx-icon iconfont icon-sousuo lovdmxadmin-button-btn"></i>
+					</button>
+				</div>
+			</form>
+
+			<div class="panel-heading">
+				<a class="btn btn-info btn-tit" href="javascript:void(0)">管理员列表</a>
+				<a class="btn btn-info" href="${path }/ht/manage/add.do">添加管理员</a>
+			</div>
+			<div>
+
+				<font style="color: red; font-size: 16px">${sessionScope.flag }<c:remove
+						var="flag" />
+				</font>
+				<table class="table tb">
+					<thead>
+						<tr>
+							<th>序号</th>
+							<th>MAC</th>
+							<th>项目名</th>
+							<th>账号</th>
+							<th>密码</th>
+							<th>角色</th>
+							<th>账号状态</th>
+							<th>在线状态</th>
+							<th>离线状态</th>
+							<th>创建时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach items="${pageInfo.list }" varStatus="random" var="lst">
+							<tr>
+								<td>${random.count }</td>
+								<td>${lst.macAddress }</td>
+								<td>${lst.projectName }</td>
+								<td>${lst.userName }</td>
+								<td>${lst.pwd }</td>
+								<td>${lst.roleId eq 1?"<button class='lovdmx-btn lovdmx-btn-xs status lovdmx-btn-red'>超级用户</button>":"<button class='lovdmx-btn lovdmx-btn-xs status lovdmx-btn-common'>普通用户</button>"}</td>
+								<td>${lst.status  eq 1?"<button class='lovdmx-btn lovdmx-btn-xs status lovdmx-btn-green'>启用</button>":"<button class='lovdmx-btn lovdmx-btn-xs status lovdmx-btn-gray'>禁用</button>" }</td>
+								<td>${lst.isOnline eq 1?"<button class='lovdmx-btn lovdmx-btn-xs status lovdmx-btn-green'>在线</button>":"<button class='lovdmx-btn lovdmx-btn-xs status lovdmx-btn-gray'>未在线</button>" }</td>
+								<td><fmt:formatDate value="${lst.lastTime}"
+										pattern="yyyy-MM-dd HH:mm:ss" /></td>
+								<td><fmt:formatDate value="${lst.createTime}"
+										pattern="yyyy-MM-dd HH:mm:ss" /></td>
+								<td><a
+									href="${path}/ht/account/edit.do?accountId=${lst.accountId}"><font
+										class="keywords">编辑</font>账号</a>&nbsp;&nbsp;&nbsp;&nbsp;<c:if
+										test="${lst.status eq 1 }">
+										<a href="javascript:void(0)"
+											data-link="${path}/ht/account/status.do?accountId=${lst.accountId}"
+											class="nologin" data-status="0"><font class="keywords">禁用</font>账号</a>&nbsp;&nbsp;&nbsp;&nbsp;
+								</c:if> <c:if test="${lst.status eq 0 }">
+										<a href="javascript:void(0)"
+											data-link="${path}/ht/account/status.do?accountId=${lst.accountId}"
+											class="nologin" data-status="1"><font class="keywords">启用</font>账号</a>&nbsp;&nbsp;&nbsp;&nbsp;
+								</c:if></td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+			</div>
+			<div class="lovdmx-table-page">
+				<div id="table-page">
+					<div class="lovdmx-box lovdmx-page-default lovdmx-lovpage">
+
+						<c:if test="${pageInfo.isFirstPage || pageInfo.size<=0}">
+							<a href="javascript:void(0);"
+								class="lovdmx-page-prev lovdmx-disabled"><i
+								class="lovdmx-icon icon-zuobian iconfont"></i></a>
+						</c:if>
+
+						<c:if test="${!pageInfo.isFirstPage && pageInfo.size>0}">
+							<a
+								href="${path }/ht/account/index.do?pageNo=${pageInfo.pageNum -1}&macAddress=${param.macAddress}&projectName=${param.projectName}&userName=${param.userName}&isOnline=${param.isOnline}"
+								class="lovdmx-page-prev"><i
+								class="lovdmx-icon icon-zuobian iconfont"></i></a>
+						</c:if>
+						<c:forEach begin="${pageInfo.firstPage }" var="pageNo2"
+							end="${pageInfo.lastPage }">
+							<a
+								href="${path }/ht/account/index.do?pageNo=${pageNo2}&macAddress=${param.macAddress}&projectName=${param.projectName}&userName=${param.userName}&isOnline=${param.isOnline}"
+								class="lovdmx-page-num ${pageInfo.pageNum eq pageNo2?'lovdmx-page-curr':'' } "
+								data-page="${pageNo2 }">${pageNo2 }</a>
+						</c:forEach>
+
+						<c:if test="${pageInfo.isLastPage || pageInfo.size==0}">
+							<a href="javascript:void(0)"
+								class="lovdmx-page-next lovdmx-disabled"><i
+								class="lovdmx-icon icon-youbian iconfont"></i></a>
+						</c:if>
+
+						<c:if test="${!pageInfo.isLastPage && pageInfo.size>0}">
+							<a
+								href="${path }/ht/account/index.do?pageNo=${pageInfo.pageNum +1}&macAddress=${param.macAddress}&projectName=${param.projectName}&userName=${param.userName}&isOnline=${param.isOnline}"
+								class="lovdmx-page-next"><i
+								class="lovdmx-icon icon-youbian iconfont"></i></a>
+						</c:if>
+						<input type='hidden' name="pages" value='${pageInfo.pages }'>
+						<input type='hidden' name="link"
+							value='${path }/ht/account/index.do?macAddress=${param.macAddress}&projectName=${param.projectName}&userName=${param.userName}&isOnline=${param.isOnline}'>
+						<span class="lovdmx-page-skip"> 到第 <input type="text"
+							name="pageNo" min="1" value="${pageInfo.pageNum }"
+							class="lovdmx-input"
+							onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}">
+							页
+							<button type="button" class="lovdmx-page-btn"
+								onclick="submitPageNo();">确定</button>
+						</span> <span class="lovdmx-page-count" data-count="${pageInfo.total }">共${pageInfo.total }条</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="${path }/js/upload/tz_upload.js"></script>
+<script type="text/javascript" src="${path }/js/sg/tz_util.js"></script>
+<script type="text/javascript" src="${path }/js/sg/sg.js"></script>
+<script type="text/javascript" src="${path }/js/layui/layui.all.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$(".nologin").click(function() {
+			var path = $(this).attr("data-link");
+			var status = $(this).attr("data-status");
+			$.tzAlert({
+				title : "温馨提示 ！",
+				content : "确认操作？",
+				callback : function(ok) {
+					if (ok) {
+						$.ajax({
+							type : "GET",
+							url : path,
+							data : "status=" + status,
+							success : function(msg) {
+								location.reload();
+							}
+						});
+					}
+				}
+			});
+		});
+
+		$("#account-query").click(
+				function() {
+
+					var $form = $(".lovdmx-form");
+					//在线状态
+					var isOnline = $(".lovdmx-select-title .select_is_online")
+							.attr("data-value");
+					$form.find("input[name='isOnline']").val(
+							isOnline == -1 ? null : isOnline);
+					$form.submit();
+				});
+
+	});
+</script>
+</html>
